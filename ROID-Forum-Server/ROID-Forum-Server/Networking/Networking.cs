@@ -2,7 +2,7 @@
 using Fleck;
 using System.Collections.Generic;
 using System.Text;
-namespace AppServer
+namespace ROIDForumServer
 {
 	public class Networking
 	{

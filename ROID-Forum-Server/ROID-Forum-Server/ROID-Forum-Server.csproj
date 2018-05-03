@@ -5,4 +5,16 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="test.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ByteArray" Version="1.1.6" />
+    <PackageReference Include="CassandraCSharpDriver" Version="3.5.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Fleck">
+      <HintPath>Fleck.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

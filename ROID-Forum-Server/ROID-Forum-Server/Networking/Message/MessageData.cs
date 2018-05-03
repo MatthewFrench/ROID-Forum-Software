@@ -1,6 +1,6 @@
 ﻿using System;
 using Soly.ByteArray;
-namespace AppServer
+namespace ROIDForumServer
 {
 	public abstract class MessageData
 	{

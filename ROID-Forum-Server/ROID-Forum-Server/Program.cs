@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AppServer
+namespace ROIDForumServer
 {
     class Program
     {

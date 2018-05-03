@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Soly.ByteArray;
 
-namespace AppServer
+namespace ROIDForumServer
 {
     /*
      * Writes a message and produces a binary buffer.

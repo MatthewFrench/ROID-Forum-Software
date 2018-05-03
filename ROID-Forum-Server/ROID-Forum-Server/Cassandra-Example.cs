@@ -1,9 +1,9 @@
 ﻿using System;
 using Cassandra;
 
-namespace Cassandra_CSharp_Example
+namespace ROIDForumServer
 {
-    class Program
+    class CassandraExample
     {
 		//Connection port
 		static int PORT = 32769;
@@ -21,7 +21,7 @@ namespace Cassandra_CSharp_Example
 		static Cluster ClusterConnection;
         //Session connection, only use a single session connection
 		static ISession Session;
-        static void Main(string[] args)
+        static void Run()
         {
 			ConnectToSession();
 			CreateKeyspaceIfDoesntExist();

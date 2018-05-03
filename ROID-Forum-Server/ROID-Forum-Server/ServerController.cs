@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-namespace AppServer
+namespace ROIDForumServer
 {
     public class ServerController
     {
