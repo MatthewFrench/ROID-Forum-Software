@@ -1,0 +1,49 @@
+#newPostView.newPostHolder {
+    margin-top : 50px;
+    border-top-style:solid;
+    border-left-style:solid;
+    border-right-style:solid;
+    border-color:black;
+    border-width:1px;
+    width:calc(100% - 50px);
+    margin-left:25px;
+    margin-right:25px;
+}
+#newPostView.newPostLabel {
+    height:23px;
+    width:100%;
+    border-bottom-style:solid;
+    border-color:black;
+    border-width:1px;
+    display:flex;
+    background-color:rgb(0, 102, 102);
+}
+#newPostView.newPostNameLabel {
+    flex : 1;
+    flex-basis : 495px;
+    border-right-style : solid;
+    border-color : black;
+    border-width : 1px;
+    color:white;
+    padding-left : 5px;
+    line-height : 23px;
+}
+#newPostView.newPostLocationLabel {
+    flex : 0;
+    flex-basis : 120px;
+    border-right-style : solid;
+    border-color : black;
+    border-width : 1px;
+    color:white;
+    text-align : center;
+    line-height : 23px;
+    min-width : 120px;
+}
+#newPostView.newPostAuthorDateLabel {
+    flex : 1;
+    flex-basis : 166px;
+    color:white;
+    text-align : center;
+    line-height : 23px;
+    min-width : 166px;
+}

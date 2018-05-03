@@ -1,0 +1,16 @@
+$theme-color: #FFD9A7;
+$theme-text-color: #000000;
+$background-color: #fff5f0;
+$background-text-color: black;
+$border-color: #000000;
+
+//Load font awesome
+$fa-font-path: "~font-awesome/fonts";
+@import '~font-awesome/scss/font-awesome.scss';
+@import 'Interface/MainPage';
+
+body {
+  padding: 0;
+  margin: 0;
+  white-space: pre-wrap;
+}

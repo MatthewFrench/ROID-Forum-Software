@@ -1,0 +1,123 @@
+#threadViewPiece.container {
+height : 53px;
+width : 100%;
+border-bottom-style : solid;
+border-color : black;
+border-width : 1px;
+display : flex;
+border-bottom-style : solid;
+border-color : black;
+border-left-style:solid;
+border-right-style:solid;
+}
+#threadViewPiece.threadIndicatorDiv {
+    flex : 0;
+    flex-basis : 55px;
+    min-width : 55px;
+    border-right-style : solid;
+    border-color : black;
+    border-width : 1px;
+    color : black;
+    text-align : center;
+    vertical-align : middle;
+    height : 100%;
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    background-color : rgb(255, 255, 241);
+}
+#threadViewPiece.threadNameDescriptionDiv {
+    flex : 1;
+    flex-basis : 495px;
+    border-right-style : solid;
+    border-color : black;
+    border-width : 1px;
+    padding-left : 5px;
+    overflow : hidden;
+}
+#threadViewPiece.threadNameLabel {
+    padding-top : 6px;
+    padding-left : 3px;
+    width : calc(100% - 3px);
+    color : rgb(22, 20, 114);
+    font-size : 18px;
+    display : inline-block;
+    text-overflow : ellipsis;
+    overflow : hidden;
+    white-space : nowrap;
+    font-weight : bold;
+    cursor : pointer;
+}
+#threadViewPiece.threadDescriptionLabel {
+    width : calc(100% - 3px);
+    color : black;
+    font-size : 15px;
+    padding-left : 3px;
+    display : inline-block;
+    text-overflow : ellipsis;
+    overflow : hidden;
+    white-space : nowrap;
+}
+#threadViewPiece.startedByDiv {
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    flex : 0;
+    flex-basis : 100px;
+    border-right-style : solid;
+    border-color : black;
+    border-width : 1px;
+    color : black;
+    min-width : 100px;
+    background-color : rgb(255, 255, 241);
+}
+#threadViewPiece.threadRepliesDiv {
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    flex : 0;
+    flex-basis : 55px;
+    border-right-style : solid;
+    border-color : black;
+    border-width : 1px;
+    color : black;
+    min-width : 55px;
+    background-color : rgb(255, 255, 241);
+}
+#threadViewPiece.threadViewsDiv {
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    flex : 0;
+    flex-basis : 46px;
+    border-right-style : solid;
+    border-color : black;
+    border-width : 1px;
+    color : black;
+    min-width : 46px;
+    background-color : rgb(255, 255, 241);
+}
+#threadViewPiece.threadLastPostDiv {
+    flex : 1;
+    flex-basis : 160px;
+    color : black;
+    min-width : 160px;
+    font-size : 15px;
+}
+#threadViewPiece.threadLastPostDateDiv {
+    padding-top : 6px;
+    padding-left : 6px;
+    width : calc(100% - 6px);
+}
+#threadViewPiece.threadLastPostDateLabel1 {
+    font-weight : bold;
+}
+#threadViewPiece.threadLastPostUserDiv {
+    padding-left : 6px;
+    padding-top : 6px;
+    width : calc(100% - 6px);
+}
+#threadViewPiece.threadLastPostUserLabel2 {
+    color : rgb(20,22,114);
+    cursor : pointer;
+}

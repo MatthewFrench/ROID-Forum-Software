@@ -1,0 +1,142 @@
+#forumViewPiece.container {
+    height: 53px;
+    width: 100%;
+    border-bottom-style: solid;
+    border-color: black;
+    border-width: 1px;
+    border-left-style: solid;
+    border-right-style: solid;
+    display: flex;
+}
+#forumViewPiece.forumIndicatorDiv {
+    flex : 0;
+    flex-basis : 55px;
+    min-width : 55px;
+    border-right-style : solid;
+    border-color : black;
+    border-width : 1px;
+    color : black;
+    text-align : center;
+    vertical-align : middle;
+    height : 100%;
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    background-color : rgb(255, 255, 241);
+}
+#forumViewPiece.forumNameDescriptionDiv {
+    flex : 1;
+    flex-basis : 439px;
+    border-right-style : solid;
+    border-color : black;
+    border-width : 1px;
+    padding-left : 5px;
+    overflow : hidden;
+}
+#forumViewPiece.forumNameLabel {
+    padding-top : 6px;
+    padding-left : 3px;
+    width : calc(100% - 3px);
+    color : rgb(22, 20, 114);
+    font-size : 20px;
+    display : inline-block;
+    text-overflow : ellipsis;
+    overflow : hidden;
+    white-space : nowrap;
+    font-weight : bold;
+    cursor : pointer;
+}
+#forumViewPiece.forumDescriptionLabel {
+    width : calc(100% - 3px);
+    color : black;
+    font-size : 15px;
+    padding-left : 3px;
+    display : inline-block;
+    text-overflow : ellipsis;
+    overflow : hidden;
+    white-space : nowrap;
+}
+#forumViewPiece.forumSectionsDiv {
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    flex : 0;
+    flex-basis : 61px;
+    border-right-style : solid;
+    border-color : black;
+    border-width : 1px;
+    color : black;
+    min-width : 61px;
+    background-color : rgb(255, 255, 241);
+}
+#forumViewPiece.forumThreadsDiv {
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    flex : 0;
+    flex-basis : 59px;
+    border-right-style : solid;
+    border-color : black;
+    border-width : 1px;
+    color : black;
+    min-width : 59px;
+    background-color : rgb(255, 255, 241);
+}
+#forumViewPiece.forumPostsDiv {
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    flex : 0;
+    flex-basis : 42px;
+    border-right-style : solid;
+    border-color : black;
+    border-width : 1px;
+    color : black;
+    min-width : 42px;
+    background-color : rgb(255, 255, 241);
+}
+#forumViewPiece.forumLastPostDiv {
+    flex : 1;
+    flex-basis : 230px;
+    color : black;
+    min-width : 230px;
+    font-size : 15px;
+}
+#forumViewPiece.forumLastPostDateDiv {
+    padding-top : 1px;
+    padding-left : 6px;
+    width : calc(100% - 6px);
+}
+#forumViewPiece.forumLastPostDateLabel1 {
+    font-weight : bold;
+}
+#forumViewPiece.forumLastPostUserDiv {
+    padding-left : 6px;
+    width : calc(100% - 6px);
+}
+#forumViewPiece.forumLastPostUserLabel2 {
+    color : rgb(20,22,114);
+    cursor : pointer;
+}
+#forumViewPiece.forumLastPostThreadDiv {
+    padding-left : 6px;
+    width : calc(100% - 6px);
+    display : inline-block;
+    text-overflow : ellipsis;
+    overflow : hidden;
+    white-space : nowrap;
+}
+#forumViewPiece.forumLastPostThreadDateLabel1 {
+    display : inline-block;
+    text-overflow : ellipsis;
+    overflow : hidden;
+    white-space : nowrap;
+}
+#forumViewPiece.forumLastPostThreadDateLabel2 {
+    color : rgb(20,22,114);
+    cursor : pointer;
+    display : inline-block;
+    text-overflow : ellipsis;
+    overflow : hidden;
+    white-space : nowrap;
+}
