@@ -6,10 +6,10 @@ homepage: http://gamemakersgarage.com
 dependencies:
   browser: '>=0.10.0+2 <0.11.0'
   crypto: '>=0.9.0 <0.10.0'
+  unittest: '>=0.11.4 <0.12.0'
   three:
     path: ../three/
-  unittest: '>=0.11.4 <0.12.0'
-  vector_math: any
+  
 dev_dependencies:
   animation: any
 transformers:

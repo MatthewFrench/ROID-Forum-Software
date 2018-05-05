@@ -1,5 +1,4 @@
 name: GMGServer
 description: A sample command-line application
 dependencies:
-  mongo_dart: any
   unittest: any

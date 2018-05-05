@@ -14,12 +14,12 @@ class Database {
     switch (event) {
       case "Logged In":
         {
-          String n = message['Username'];
+          String n = message['Name'];
           String p = message['Password'];
 
           //Save name and password in local storage
           Storage localStorage = window.localStorage;
-          localStorage['Username'] = n;
+          localStorage['Name'] = n;
           localStorage['Password'] = p;
 
           loggedIn = true;
@@ -31,7 +31,7 @@ class Database {
         {
           //Clear local storage
           Storage localStorage = window.localStorage;
-          localStorage.remove('Username');
+          localStorage.remove('Name');
           localStorage.remove('Password');
           name = "";
           password = "";
