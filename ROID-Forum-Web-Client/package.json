@@ -23,7 +23,6 @@
     "sass",
     "css module"
   ],
-  "author": "Micooz",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/micooz/es6-webpack-starter/issues"

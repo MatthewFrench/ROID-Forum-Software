@@ -7,9 +7,11 @@ namespace ROIDForumServer
 	public class Networking
 	{
 		int port = 7779;
-		WebSocketServer websocketServer;
-		ServerController serverController;
-		List<IWebSocketConnection> webSockets = new List<IWebSocketConnection>();
+		public WebSocketServer websocketServer;
+        public ServerController serverController;
+        public List<IWebSocketConnection> webSockets = new List<IWebSocketConnection>();
+        public List<User> users = new List<User>();
+        public Dictionary<IWebSocketConnection, User> userMap = new Dictionary<IWebSocketConnection, User>();
 		public Networking(ServerController controller) {
 			serverController = controller;
 		}
@@ -18,7 +20,13 @@ namespace ROIDForumServer
 			webSockets.Add(socket);
 			Console.WriteLine("Open!");
 			Console.WriteLine("Clients connected: " + GetNumberOfConnectedClients());
+
+            User p = new User(socket);
+            users.Add(p);
+            userMap.Add(socket, p);
+            serverController.onOpen(p);
            
+            /*
             var message = new MessageWriter();
             message.AddUint8(1);
             message.AddInt8(-1);
@@ -33,15 +41,29 @@ namespace ROIDForumServer
             message2.AddString("Inner Binary");
             message.AddBinary(message2.ToBuffer());
 			socket.Send(message.ToBuffer());
+			*/
 		}
         
         public void ClientDisconnectedEvent(IWebSocketConnection socket)
         {
 			webSockets.Remove(socket);
             Console.WriteLine("Close!");
+            var user = userMap.GetValueOrDefault(socket);
+            serverController.onClose(user);
+            users.Remove(user);
+            userMap.Remove(socket);
         }
 
-		public void ClientMessageEvent(IWebSocketConnection socket, byte[] binary) {
+		public void ClientBinaryMessageEvent(IWebSocketConnection socket, byte[] binary) {
+            try
+            {
+                //serverController.onMessage(userMap.GetValueOrDefault(socket), binary);
+            }
+            catch (Exception e) {
+                Console.WriteLine(e);
+            }
+
+            /*
 			var sb = new StringBuilder();
 			foreach (var b in binary)
             {
@@ -68,7 +90,20 @@ namespace ROIDForumServer
 			if (message.IsAtEndOfData()) {
 				Console.WriteLine("End of Message");
 			}
+			*/
 		}
+
+        public void ClientMessageEvent(IWebSocketConnection socket, string message)
+        {
+            try
+            {
+                serverController.onMessage(userMap.GetValueOrDefault(socket), message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
 
 
         public void Start()
@@ -78,7 +113,8 @@ namespace ROIDForumServer
             {
                 socket.OnOpen = () => { ClientConnectedEvent(socket); };
                 socket.OnClose = () => { ClientDisconnectedEvent(socket); };
-                socket.OnBinary = (byte[] binary) => { ClientMessageEvent(socket, binary); };
+                socket.OnBinary = (byte[] binary) => { ClientBinaryMessageEvent(socket, binary); };
+                socket.OnMessage = (string message) => { ClientMessageEvent(socket, message); };
                 socket.OnError = (Exception error) => { Console.WriteLine("Client Error: " + error); };
             });
         }
