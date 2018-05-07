@@ -1,0 +1,53 @@
+.HeaderView {
+  position: absolute;
+  width: calc(100% - 20px);
+  top: 0px;
+  left: 10px;
+  height: 80px;
+  border-top-style: solid;
+  border-width: 1px;
+  border-color: #AAAAAA;
+  color: white;
+
+  .HeaderTitle {
+    position: absolute;
+    font-size: 30px;
+    left: 70px;
+    top: 0px;
+    text-decoration: underline;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 70px);
+    height: 30px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    padding-top: 10px;
+    color: white;
+  }
+  .HeaderOwner {
+    position: absolute;
+    font-size: 15px;
+    right: 10px;
+    bottom: 10px;
+    cursor: pointer;
+    color: white;
+  }
+  .HeaderCommentCount {
+    position: absolute;
+    font-size: 15px;
+    left: 70px;
+    bottom: 10px;
+    cursor: pointer;
+    color: white;
+  }
+  .HeaderOwnerAvatarImage {
+    position: absolute;
+    left: 0px;
+    top: 10px;
+    height: 60px;
+    width: 60px;
+    background-color: rgb(200, 200, 200);
+    border-style: solid;
+    border-width: 1px;
+  }
+}

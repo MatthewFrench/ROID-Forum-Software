@@ -1,0 +1,16 @@
+.BackgroundCanvas {
+  position : absolute;
+  display : block;
+  left : 0px;
+  perspective : 1000px;
+  perspective-origin : 50% 50%;
+  transform-style : preserve-3d;
+  transform : translateZ(-250px);
+  top : 0px;
+  opacity: 1.0;
+  transition: opacity 0.5s;
+
+  &.Hidden {
+    opacity: 0.0;
+  }
+}

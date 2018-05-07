@@ -1,6 +1,6 @@
 import {AppController} from "../AppController";
 import {Interface} from "../Utility/Interface";
-import {Section} from "./CodingSection/Section";
+import {Section} from "./Section/Section";
 
 export class MainTopBarSection {
     website: AppController;

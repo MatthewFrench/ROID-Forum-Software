@@ -1,7 +1,9 @@
+import './Section.scss';
+
 import {AppController} from "../../AppController";
 import {NewPostWindow} from "./NewPostWindow";
 import {ThreadController} from "./ThreadController";
-import {FancyBackground} from "./FancyBackground";
+import {MatrixBackground} from "./MatrixBackground";
 import {Interface} from "../../Utility/Interface";
 
 export class Section {
@@ -12,15 +14,17 @@ export class Section {
     newPostWindow: NewPostWindow = null;
     threadController: ThreadController;
     showThreadWhenLoaded = -1;
-    background: FancyBackground;
+    background: MatrixBackground;
 
     constructor(w: AppController) {
         this.website = w;
-        this.makeMainContentComponent();
+
+        this.content = Interface.Create({type: 'div', className: 'Section', elements: [
+            (this.threadController = new ThreadController(this)).mainView
+        ]});
+
         this.newPostWindow = new NewPostWindow(this);
-        this.threadController = new ThreadController(this);
-        this.content.appendChild(this.threadController.mainView);
-        this.background = new FancyBackground(this);
+        this.background = new MatrixBackground(this);
     }
 
     show() {
@@ -131,15 +135,5 @@ export class Section {
 
     getDisplayName(): string {
         return this.displayName;
-    }
-
-    /************* Create the GUI Components ***********/
-    makeMainContentComponent() {
-        this.content = Interface.Create({type: 'div'});
-        this.content.style.position = "absolute";
-        this.content.style.left = "0px";
-        this.content.style.top = "90px";
-        this.content.style.width = "calc(100% - 300px)";
-        this.content.style.paddingTop = "10px";
     }
 }

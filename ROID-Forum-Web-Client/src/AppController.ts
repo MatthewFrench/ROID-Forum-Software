@@ -5,7 +5,7 @@ import {Database} from "./Database";
 import {ControlPanel} from "./Interface/ControlPanel";
 import {Chatbox} from "./Interface/Chatbox";
 import {MainTopBarSection} from "./Interface/MainTopBarSection";
-import {Section} from "./Interface/CodingSection/Section";
+import {Section} from "./Interface/Section/Section";
 import {Utility} from "./Utility/Utility";
 
 export class AppController {
