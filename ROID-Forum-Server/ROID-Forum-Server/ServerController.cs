@@ -70,6 +70,7 @@ namespace ROIDForumServer
         {
             if (message is String)
             {
+                Console.WriteLine("Message: " + message);
                 Dictionary<string, object> m = JsonConvert.DeserializeObject<Dictionary<string, object>>((string)message);
                 if ((string)m["Controller"] == "Chat")
                 {

@@ -37,5 +37,14 @@ namespace ROIDForumServer
             m["AvatarURL"] = avatarURL;
             return m;
         }
+        public byte[] toBinary() {
+            var message = new MessageWriter();
+            message.AddUint32((uint)threadID);
+            message.AddUint32((uint)commentID);
+            message.AddString(comment);
+            message.AddString(owner);
+            message.AddString(avatarURL);
+            return message.ToBuffer();
+        }
     }
 }

@@ -59,13 +59,10 @@ namespace ROIDForumServer
                 list += $"{guests} Guests";
             }
 
-            Dictionary<string, object> m = new Dictionary<string, object>();
-            m["Controller"] = "Chat";
-            m["Title"] = "Online List";
-            m["Data"] = list;
-    foreach (User u in users)
+            byte[] message = ServerMessages.SendChatOnlineList(list);
+            foreach (User u in users)
             {
-                u.sendMap(m);
+                u.sendBinary(message);
             }
             Console.WriteLine(list);
         }
@@ -78,15 +75,11 @@ namespace ROIDForumServer
             chat = $"{u.account.name}: " + chat;
             chats.Add(chat);
             //Send chat to all connected websockets
-            Dictionary<string, object> m = new Dictionary<string, object>();
-            m["Controller"] = "Chat";
-            m["Title"] = "Msg";
-            m["Data"] = chat;
-            String message = JsonConvert.SerializeObject(m);
+            byte[] chatMsg = ServerMessages.SendChatMessage(chat);
             for (int i = 0; i < server.GetNetworking().users.Count; i++)
             {
                 User u2 = server.GetNetworking().users[i];
-                u2.sendString(message);
+                u2.sendBinary(chatMsg);
             }
         }
         public void sendAllChats(User u)
@@ -97,11 +90,7 @@ namespace ROIDForumServer
             // }
             for (int i = start; i < chats.Count; i++)
             {
-                Dictionary<string, object> m = new Dictionary<string, object>();
-                m["Controller"] = "Chat";
-                m["Title"] = "Msg";
-                m["Data"] = chats[i];
-                u.sendMap(m);
+                u.sendBinary(ServerMessages.SendChatMessage(chats[i]));
             }
         }
         public void onMessage(User u, Dictionary<string, object> message)

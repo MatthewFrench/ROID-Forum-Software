@@ -42,10 +42,13 @@ export class AppController {
         this.logicTimer = setInterval(this.logic, 16);
 
         this.setUp();
-        this.networkController.initialize();
     }
 
     setUp() {
+        Utility.ClearElements(this.behindWebsiteDiv);
+        Utility.ClearElements(this.websiteDiv);
+        Utility.ClearElements(this.aheadWebsiteDiv);
+
         this.networkController = new NetworkController(this);
         this.database = new Database(this);
         this.controlPanel = new ControlPanel(this);
@@ -65,6 +68,9 @@ export class AppController {
         this.sectionOrder = [/*this.allSection,*/ this.codingSection, this.gameSection, this.graphicsSection, this.otherSection];
         //Now add the main parts of the site
         this.mainSection = new MainTopBarSection(this);
+
+
+        this.networkController.initialize();
     }
 
     logic = () => {
@@ -89,6 +95,8 @@ export class AppController {
         }
         this.reconnectingDiv = Interface.Create({type: 'div', className: 'ReconnectingDiv', text: 'Unable to connect...'});
         this.body.appendChild(this.reconnectingDiv);
+
+        this.reset();
     }
 
     reset() {
