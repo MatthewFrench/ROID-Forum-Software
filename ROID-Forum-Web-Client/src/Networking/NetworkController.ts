@@ -8,7 +8,8 @@ import {MessageReader} from "../Utility/Message/MessageReader";
 
 export class NetworkController {
     port : string = '7779';
-    ip : string = 'localhost';
+    //ip : string = 'localhost';
+    ip = '18.221.216.221';
     serverURL : string = `ws://${this.ip}:${this.port}`;
     connection : WebSocket = null;
     connected : boolean = false;
