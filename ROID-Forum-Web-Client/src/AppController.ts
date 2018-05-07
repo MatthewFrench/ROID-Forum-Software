@@ -1,3 +1,5 @@
+import './AppController.scss';
+
 import {Interface} from "./Utility/Interface";
 import {NetworkController} from "./Networking/NetworkController";
 import {Database} from "./Database";
@@ -29,18 +31,13 @@ export class AppController {
     reconnectingDiv: HTMLDivElement;
 
     constructor() {
-        this.mainDiv = Interface.Create({
-            type: 'div', className: 'ApplicationDiv', elements: [
+        this.mainDiv = Interface.Create({type: 'div', className: 'ApplicationDiv', elements: [
                 this.behindWebsiteDiv = Interface.Create({type: 'div', className: 'behindWebsite'}),
                 this.websiteDiv = Interface.Create({type: 'div', className: 'Website'}),
                 this.aheadWebsiteDiv = Interface.Create({type: 'div', className: 'aheadWebsite'})
             ]
         });
         this.body = document.body as HTMLBodyElement;
-
-        this.websiteDiv.style.width = "100%";
-        this.websiteDiv.style.height = "100%";
-        this.websiteDiv.style.overflow = "scroll";
 
         this.logicTimer = setInterval(this.logic, 16);
 
@@ -85,22 +82,13 @@ export class AppController {
             this.reconnectingDiv.remove();
             this.reconnectingDiv = null;
         }
-        this.reconnectingDiv = Interface.Create({type: 'div'});
-        this.reconnectingDiv.style.width = "100%";
-        this.reconnectingDiv.style.height = "100%";
-        this.reconnectingDiv.style.textAlign = "Center";
-        this.reconnectingDiv.style.fontSize = "40px";
-        this.reconnectingDiv.style.background = "white";
-        this.reconnectingDiv.innerText = "Unable to connect...";
+        this.reconnectingDiv = Interface.Create({type: 'div', className: 'ReconnectingDiv', text: 'Unable to connect...'});
         this.body.appendChild(this.reconnectingDiv);
     }
 
     reset() {
         this.setUp();
-        //console.log("Trying to reconnect");
-        //networkingController = new NetworkingController(this);
     }
-
 
     connectedToServer() {
         this.behindWebsiteDiv.hidden = false;

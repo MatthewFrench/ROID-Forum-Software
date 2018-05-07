@@ -60,7 +60,7 @@ export class Section {
 
     showThread = (threadID: number) => {
         this.showThreadWhenLoaded = threadID;
-    }
+    };
 
     processEvent = (event: string) => {
         switch (event) {
