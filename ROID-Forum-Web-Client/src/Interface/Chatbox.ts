@@ -135,8 +135,8 @@ export class Chatbox {
         this.chatboxDiv.style.borderTopLeftRadius = "6px";
         //website.aheadWebsiteDiv.appendChild(chatboxDiv);
 
-        //let cubeWidth = 300;
-        //let cubeHeight = 300;
+        let cubeWidth = 300;
+        let cubeHeight = 300;
 
 
         let cubeContainer : HTMLDivElement = Interface.Create({type: 'div'});
@@ -155,16 +155,16 @@ export class Chatbox {
             cubeDiv.style.transformStyle = "preserve-3d";
             cubeDiv.style.position = "relative";
             cubeDiv.style.margin = "0 auto";
-            cubeDiv.style.height = "${cubeHeight}px";
-            cubeDiv.style.width = "${cubeWidth}px";
+            cubeDiv.style.height = `${cubeHeight}px`;
+            cubeDiv.style.width = `${cubeWidth}px`;
         //cubeDiv.style.transformOriginZ = "-200px";
         cubeContainer.appendChild(cubeDiv);
 
         let cubeFace : HTMLDivElement = Interface.Create({type: 'div'});
             cubeFace.style.display = "block";
             cubeFace.style.position = "absolute";
-            cubeFace.style.height = "${cubeHeight-40}px";
-            cubeFace.style.width = "${cubeWidth-40}px";
+            cubeFace.style.height = `${cubeHeight-40}px`;
+            cubeFace.style.width = `${cubeWidth-40}px`;
             cubeFace.style.padding = "20px";
             cubeFace.style.opacity = "0.9";
             cubeFace.style.backgroundPosition = "center center";
@@ -177,8 +177,8 @@ export class Chatbox {
         cubeFace = Interface.Create({type: 'div'});
             cubeFace.style.display = "block";
             cubeFace.style.position = "absolute";
-            cubeFace.style.height = "${cubeHeight-40}px";
-            cubeFace.style.width = "${cubeWidth-40}px";
+            cubeFace.style.height = `${cubeHeight-40}px`;
+            cubeFace.style.width = `${cubeWidth-40}px`;
             cubeFace.style.padding = "20px";
             cubeFace.style.opacity = "0.9";
             cubeFace.style.backgroundPosition = "center center";
@@ -190,8 +190,8 @@ export class Chatbox {
         cubeFace = Interface.Create({type: 'div'});
             cubeFace.style.display = "block";
             cubeFace.style.position = "absolute";
-            cubeFace.style.height = "${cubeHeight-40}px";
-            cubeFace.style.width = "${cubeWidth-40}px";
+            cubeFace.style.height = `${cubeHeight-40}px`;
+            cubeFace.style.width = `${cubeWidth-40}px`;
             cubeFace.style.padding = "20px";
             cubeFace.style.opacity = "0.9";
             cubeFace.style.backgroundPosition = "center center";
@@ -203,8 +203,8 @@ export class Chatbox {
         cubeFace = Interface.Create({type: 'div'});
             cubeFace.style.display = "block";
             cubeFace.style.position = "absolute";
-            cubeFace.style.height = "${cubeHeight-40}px";
-            cubeFace.style.width = "${cubeWidth-40}px";
+            cubeFace.style.height = `${cubeHeight-40}px`;
+            cubeFace.style.width = `${cubeWidth-40}px`;
             cubeFace.style.padding = "20px";
             cubeFace.style.opacity = "0.9";
             cubeFace.style.backgroundPosition = "center center";
@@ -216,8 +216,8 @@ export class Chatbox {
         cubeFace = Interface.Create({type: 'div'});
             cubeFace.style.display = "block";
             cubeFace.style.position = "absolute";
-            cubeFace.style.height = "${cubeHeight-40}px";
-            cubeFace.style.width = "${cubeWidth-40}px";
+            cubeFace.style.height = `${cubeHeight-40}px`;
+            cubeFace.style.width = `${cubeWidth-40}px`;
             cubeFace.style.padding = "20px";
             cubeFace.style.opacity = "0.9";
             cubeFace.style.backgroundPosition = "center center";
@@ -229,8 +229,8 @@ export class Chatbox {
         cubeFace = Interface.Create({type: 'div'});
             cubeFace.style.display = "block";
             cubeFace.style.position = "absolute";
-            cubeFace.style.height = "${cubeHeight-40}px";
-            cubeFace.style.width = "${cubeWidth-40}px";
+            cubeFace.style.height = `${cubeHeight-40}px`;
+            cubeFace.style.width = `${cubeWidth-40}px`;
             cubeFace.style.padding = "20px";
             cubeFace.style.opacity = "0.9";
             cubeFace.style.backgroundPosition = "center center";

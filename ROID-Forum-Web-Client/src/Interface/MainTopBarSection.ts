@@ -52,7 +52,7 @@ export class MainTopBarSection {
             if (Math.abs(this.currentHighlightWidth - this.newHighlightWidth) < movementSpeed) {
                 this.currentHighlightWidth = this.newHighlightWidth;
             }
-            this.sectionBarHighlight.style.width = "${this.currentHighlightWidth}%";
+            this.sectionBarHighlight.style.width = `${this.currentHighlightWidth}%`;
         }
         if (this.currentHighlightPosition != this.newHighlightPosition) {
             let movementSpeed = Math.abs((this.newHighlightPosition - this.currentHighlightPosition) / 5.0);
@@ -68,7 +68,7 @@ export class MainTopBarSection {
             if (Math.abs(this.currentHighlightPosition - this.newHighlightPosition) < movementSpeed) {
                 this.currentHighlightPosition = this.newHighlightPosition;
             }
-            this.sectionBarHighlight.style.left = "${this.currentHighlightPosition}%";
+            this.sectionBarHighlight.style.left = `${this.currentHighlightPosition}%`;
         }
     }
 
@@ -145,7 +145,7 @@ export class MainTopBarSection {
             s.style.textAlign = 'center';
             s.style.height = '40px';
             s.style.top = '0px';
-            s.style.left = '${p}%';
+            s.style.left = `${p}%`;
             s.style.lineHeight = '40px';
             s.style.textOverflow = 'ellipsis';
             s.style.whiteSpace = 'nowrap';

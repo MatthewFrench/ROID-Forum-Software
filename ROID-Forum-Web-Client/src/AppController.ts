@@ -207,7 +207,7 @@ export class AppController {
                 }
                     break;
                 default: {
-                    console.log("Got other message: ${message['Title']}");
+                    console.log(`Got other message: ${message['Title']}`);
                 }
             }
         }

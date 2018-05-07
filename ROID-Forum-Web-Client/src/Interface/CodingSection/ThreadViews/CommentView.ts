@@ -55,8 +55,8 @@ export class CommentView {
         message['Thread ID'] = this.thread.getID();
         message['Comment ID'] = this.comment.getCommentID();
         message['Text'] = this.editDescription.value;
-        this.threadController.sectionController.website.networkingController.Send(message);
-        console.log("Pressed Edit Comment on thread ${this.thread.getID()} and on comment ${this.comment.getCommentID()}");
+        this.threadController.sectionController.website.networkController.send(message);
+        console.log(`Pressed Edit Comment on thread ${this.thread.getID()} and on comment ${this.comment.getCommentID()}`);
     }
 
     deleteCommentButtonClick() {

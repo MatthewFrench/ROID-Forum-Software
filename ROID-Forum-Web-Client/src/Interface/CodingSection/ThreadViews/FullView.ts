@@ -36,7 +36,7 @@ export class FullView {
         m['Title'] = 'Add Comment';
         m['ID'] = this.thread.getID();
         m['Text'] = text;
-        this.threadController.sectionController.website.networkingController.Send(m);
+        this.threadController.sectionController.website.networkController.send(m);
         this.commentBox.value = "";
     }
 
