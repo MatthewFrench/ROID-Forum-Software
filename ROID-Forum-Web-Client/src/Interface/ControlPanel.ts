@@ -62,15 +62,17 @@ export class ControlPanel {
                 {type: 'label', className: 'AvatarLabel', text: 'Avatar Image'},
                 {type: 'button', className: 'AvatarSaveButton', text: 'Save Avatar', onClick: this.avatarSaveButtonClick}
             ]});
+
+        this.topNameDiv = Interface.Create({type: 'div', className: 'TopNameDiv'});
     }
-    darkTheme() {
+    darkTheme = () => {
         this.topNameDiv.classList.add('DarkTheme');
         this.topNameDiv.classList.remove('LightTheme');
-    }
-    lightTheme() {
+    };
+    lightTheme = () => {
         this.topNameDiv.classList.remove('DarkTheme');
         this.topNameDiv.classList.add('LightTheme');
-    }
+    };
     preferencesButtonClicked = () => {
         let m : any = {};
         m['Controller'] = 'Login';
@@ -150,17 +152,17 @@ export class ControlPanel {
         m['Email'] = this.loginWindowEmail.value;
         this.website.networkController.send(m);
     };
-    removeLoginDiv() {
+    removeLoginDiv = () => {
         this.hideBackgroundDiv.remove();
         this.loginDiv.remove();
         this.showingLoginWindow = false;
-    }
-    removePreferencesDiv() {
+    };
+    removePreferencesDiv = () => {
         this.hideBackgroundDiv.remove();
         this.preferencesDiv.remove();
         this.showingPreferencesWindow = false;
-    }
-    processEvent(event : string) {
+    };
+    processEvent = (event : string) => {
         switch (event) {
             case 'Logged In':
             {
@@ -194,7 +196,7 @@ export class ControlPanel {
             }
                 break;
         }
-    }
+    };
     encrypt(s : string) : string {
         /*
         var sha256 = new SHA256();
