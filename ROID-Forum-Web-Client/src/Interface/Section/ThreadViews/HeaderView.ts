@@ -17,10 +17,10 @@ export class HeaderView {
         this.thread = t;
         this.threadController = tc;
 
-        this.headerDiv = Interface.Create({type: 'div', className: 'HeaderView', elements: [
-            this.threadHeaderTitle = Interface.Create({type: 'span', className: 'HeaderTitle', onClick: this.onClick}),
+        this.headerDiv = Interface.Create({type: 'div', className: 'HeaderView', onClick: this.onClick, elements: [
+            this.threadHeaderTitle = Interface.Create({type: 'span', className: 'HeaderTitle'}),
             this.threadHeaderOwner = Interface.Create({type: 'span', className: 'HeaderOwner'}),
-            this.threadHeaderComment = Interface.Create({type: 'span', className: 'HeaderCommentCount', onClick: this.onClick}),
+            this.threadHeaderComment = Interface.Create({type: 'span', className: 'HeaderCommentCount'}),
             this.threadHeaderImage = Interface.Create({type: 'img', className: 'HeaderOwnerAvatarImage'})
         ]});
     }

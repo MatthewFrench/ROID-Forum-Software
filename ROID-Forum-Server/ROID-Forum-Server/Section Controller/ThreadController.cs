@@ -26,7 +26,7 @@ namespace ROIDForumServer
         //Thread actions
         public void addThread(User p, String title, String description)
         {
-            ThreadInfo t = new ThreadInfo(p.account.name, threadIDs++, title, description);
+            ThreadInfo t = new ThreadInfo(p.account.name, threadIDs++, title, description, p.account.avatarURL);
             threads.Add(t);
             controller.messageSender.sendAddThreadToAll(t);
 
@@ -81,7 +81,7 @@ namespace ROIDForumServer
             ThreadInfo t = getThreadForID(threadID);
             if (t != null)
             {
-                CommentInfo c = new CommentInfo(t.id, t.commentIDs++, text, u.account.name);
+                CommentInfo c = new CommentInfo(t.id, t.commentIDs++, text, u.account.name, u.account.avatarURL);
                 t.comments.Add(c);
                 controller.messageSender.sendAddCommentToAll(c);
 

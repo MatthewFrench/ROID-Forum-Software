@@ -8,15 +8,17 @@ namespace ROIDForumServer
         public String title;
         public String description;
         public String owner;
+        public string avatarURL;
         public List<CommentInfo> comments;
         public int commentIDs = 0;
-        public ThreadInfo(String _owner, int _id, String t, String d)
+        public ThreadInfo(String _owner, int _id, String t, String d, String avatar)
         {
             owner = _owner;
             id = _id;
             title = t;
             description = d;
             comments = new List<CommentInfo>();
+            avatarURL = avatar;
         }
         public ThreadInfo(Dictionary<string, object> m)
         {
@@ -49,6 +51,7 @@ namespace ROIDForumServer
             m["Title"] = title;
             m["Description"] = description;
             m["CommentIDs"] = commentIDs;
+            m["AvatarURL"] = avatarURL;
             List<Dictionary<string, object>> commentArray = new List<Dictionary<string, object>>();
             for (int i = 0; i < comments.Count; i++)
             {

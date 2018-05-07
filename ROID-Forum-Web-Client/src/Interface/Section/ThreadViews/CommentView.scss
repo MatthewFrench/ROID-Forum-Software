@@ -2,7 +2,7 @@
   display: inline-block;
   margin-left: 75px;
   position: relative;
-  width: calc(100% - 75px);
+  width: calc(100% - 85px);
   opacity: 1.0;
   
   .ProfileSection {
@@ -30,7 +30,7 @@
   
   .DescriptionSection {
     display: inline-block;
-    width: calc(100% - 95px);
+    width: calc(100% - 90px);
     margin-left: 70px;
     margin-top: 5px;
     min-height: 90px;
@@ -39,13 +39,13 @@
     
     .Description {
       width : 90%;
-      word-wrap : normal;
+      word-wrap: break-word;
       color : white;
     }
     
     .EditDescription {
       width : 90%;
-      word-wrap : normal;
+      word-wrap: break-word;
       color : black;
     }
 

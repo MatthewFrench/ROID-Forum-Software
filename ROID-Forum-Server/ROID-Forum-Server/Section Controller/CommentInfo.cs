@@ -8,15 +8,17 @@ namespace ROIDForumServer
         public int commentID;
         public String comment;
         public String owner;
+        public String avatarURL;
         public CommentInfo()
         {
         }
-        public CommentInfo(int _threadID, int _commentID, String _comment, String _owner)
+        public CommentInfo(int _threadID, int _commentID, String _comment, String _owner, String _avatarURL)
         {
             threadID = _threadID;
             commentID = _commentID;
             comment = _comment;
             owner = _owner;
+            avatarURL = _avatarURL;
         }
         public CommentInfo(Dictionary<string, object> m)
         {
@@ -32,6 +34,7 @@ namespace ROIDForumServer
             m["CommentID"] = commentID;
             m["Comment"] = comment;
             m["Owner"] = owner;
+            m["AvatarURL"] = avatarURL;
             return m;
         }
     }

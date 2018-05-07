@@ -2,6 +2,7 @@
   .View {
     display: inline-block;
     margin-left: 75px;
+    width: calc(100% - 85px);
 
     .ProfileSection {
       display: inline-block;
