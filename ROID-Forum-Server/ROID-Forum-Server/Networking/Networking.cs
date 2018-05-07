@@ -5,7 +5,9 @@ using System.Text;
 namespace ROIDForumServer
 {
 	public class Networking
-	{
+    {
+        //string ip = "127.0.0.1";
+        string ip = "172.31.42.222";
 		int port = 7779;
 		public WebSocketServer websocketServer;
         public ServerController serverController;
@@ -109,7 +111,7 @@ namespace ROIDForumServer
 
         public void Start()
         {
-			websocketServer = new WebSocketServer("ws://127.0.0.1:" + port);
+            websocketServer = new WebSocketServer("ws://"+ip+":" + port);
             websocketServer.Start(socket =>
             {
                 socket.OnOpen = () => { ClientConnectedEvent(socket); };
