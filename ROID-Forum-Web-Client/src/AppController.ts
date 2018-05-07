@@ -110,27 +110,17 @@ export class AppController {
     showView(section: number) {
         if (this.showingSection != null) {
             this.showingSection.getDiv().style.opacity = "0.0";
-            //animate(this.showingSection.getDiv(), duration: 250, properties: {
-            //    'opacity': 0.0
-            //}).onComplete.listen((_) {
             this.showingSection.getDiv().remove();
             this.showingSection.hide();
             this.showingSection = this.sectionOrder[section];
             this.showingSection.getDiv().style.opacity = "1.0";
             this.websiteDiv.appendChild(this.showingSection.getDiv());
             this.showingSection.show();
-            //animate(this.showingSection.getDiv(), duration: 250, properties: {
-            //    'opacity': 1.0
-            //});
-//});
         } else {
             this.showingSection = this.sectionOrder[section];
             this.showingSection.getDiv().style.opacity = "1.0";
             this.websiteDiv.appendChild(this.showingSection.getDiv());
             this.showingSection.show();
-            //animate(this.showingSection.getDiv(), duration: 250, properties: {
-            //    'opacity': 1.0
-            //});
         }
     }
 

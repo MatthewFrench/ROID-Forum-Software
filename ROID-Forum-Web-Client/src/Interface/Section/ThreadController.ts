@@ -71,9 +71,6 @@ export class ThreadController {
         for (let i = 0; i < this.threads.length; i++) {
             let t: ThreadInfo = this.threads[i];
             t.headerView.getDiv().style.top = `${i * 85 + 60}px`;
-            //animate(t.headerView.getDiv(), duration: 250, properties: {
-            //  'top': "${i*85+60}px"
-            //});
         }
     };
 
@@ -132,9 +129,6 @@ export class ThreadController {
             thread.headerView.getDiv().style.opacity = "1.0";
             thread.headerView.getDiv().style.top = `${(this.threads.length - 1) * 85 + 60}px`;
             this.headerView.appendChild(thread.headerView.getDiv());
-            //animate(thread.headerView.getDiv(), duration: 250, properties: {
-            //  'opacity': 1.0
-            //});
 
             this.updateThreadPositions();
         }
@@ -145,17 +139,9 @@ export class ThreadController {
         if (thread != null) {
             this.threads.splice(this.threads.indexOf(thread), 1);
             thread.headerView.getDiv().style.opacity = "1.0";
-            //animate(thread.headerView.getDiv(), duration: 250, properties: {
-            //  'opacity': 0.0
-            //}).onComplete.listen((_) {
             thread.headerView.getDiv().remove();
-            //});
             thread.fullView.getDiv().style.opacity = "1.0";
-            //animate(thread.fullView.getDiv(), duration: 250, properties: {
-            //  'opacity': 0.0
-            //}).onComplete.listen((_) {
             thread.fullView.getDiv().remove();
-            //});
             this.updateThreadPositions();
             if (thread == this.viewingThread) {
                 this.restoreToDefaultState();

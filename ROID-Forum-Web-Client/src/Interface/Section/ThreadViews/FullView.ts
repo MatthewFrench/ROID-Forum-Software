@@ -66,8 +66,6 @@ export class FullView {
     addComment(ci: CommentInfo) {
         this.commentViews.push(ci.commentView);
         this.commentContainer.appendChild(ci.commentView.getDiv());
-        //ci.commentView.getDiv().style.opacity = "0.01";
-        //animate(ci.commentView.getDiv(), duration: 250, properties: {'opacity': 1.0});
     }
 
     removeComment(ci: CommentInfo) {
