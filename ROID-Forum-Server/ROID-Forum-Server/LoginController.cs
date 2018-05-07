@@ -21,37 +21,21 @@ namespace ROIDForumServer
             }
             if ((string)message["Title"] == "Get Avatar" && u.account != null)
             {
-                Dictionary<string, object> m = new Dictionary<string, object>();
-                m["Controller"] = "Login";
-                m["Title"] = "Get Avatar";
-                m["AvatarURL"] = u.account.avatarURL;
-                String s = JsonConvert.SerializeObject(m);
-                u.sendString(s);
+                u.sendBinary(ServerMessages.GetAvatarMessage(u.account.avatarURL));
             }
             if ((string)message["Title"] == "Login" && u.account == null)
             {
                 if (server.accountController.accountExists((string)message["Name"], (string)message["Password"]))
                 {
                     u.account = server.accountController.getAccount((string)message["Name"], (string)message["Password"]);
-                    //Send login notification
-                    Dictionary<string, object> m = new Dictionary<string, object>();
-                    m["Controller"] = "Login";
-                    m["Title"] = "Logged In";
-                    m["Name"] = u.account.name;
-                    m["Password"] = u.account.password;
-                    String s = JsonConvert.SerializeObject(m);
-                    u.sendString(s);
+                    u.sendBinary(ServerMessages.LoggedInMessage(u.account.name, u.account.password));
 
                     server.accountLoggedIn(u);
                 }
                 else
                 {
                     //Send login failure
-                    Dictionary<string, object> m = new Dictionary<string, object>();
-                    m["Controller"] = "Login";
-                    m["Title"] = "Login Failed";
-                    String s = JsonConvert.SerializeObject(m);
-                    u.sendString(s);
+                    u.sendBinary(ServerMessages.LoginFailedMessage());
                 }
             }
             if ((string)message["Title"] == "Logout" && u.account != null)
@@ -59,35 +43,20 @@ namespace ROIDForumServer
                 //Perhaps an account method can be called for saving or other logic
                 u.account = null;
                 //Send logout notification
-                Dictionary<string, object> m = new Dictionary<string, object>();
-                m["Controller"] = "Login";
-                m["Title"] = "Logged Out";
-                String s = JsonConvert.SerializeObject(m);
-                u.sendString(s);
+                u.sendBinary(ServerMessages.LoggedOutMessage());
                 server.accountLoggedOut(u);
             }
             if ((string)message["Title"] == "Register" && u.account == null)
             {
                 if (server.accountController.accountNameExists((string)message["Name"]))
                 {
-                    //Send register failure
-                    Dictionary<string, object> m = new Dictionary<string, object>();
-                    m["Controller"] = "Login";
-                    m["Title"] = "Register Failed";
-                    String s = JsonConvert.SerializeObject(m);
-                    u.sendString(s);
+                    u.sendBinary(ServerMessages.RegisterFailedMessage());
                 }
                 else
                 {
                     u.account = server.accountController.createAccount((string)message["Name"], (string)message["Password"], (string)message["Email"]);
                     //Send login notification
-                    Dictionary<string, object> m = new Dictionary<string, object>();
-                    m["Controller"] = "Login";
-                    m["Title"] = "Logged In";
-                    m["Name"] = u.account.name;
-                    m["Password"] = u.account.password;
-                    String s = JsonConvert.SerializeObject(m);
-                    u.sendString(s);
+                    u.sendBinary(ServerMessages.LoggedInMessage(u.account.name, u.account.password));
                     server.accountLoggedIn(u);
                 }
             }

@@ -1,9 +1,9 @@
 import {MessageRouter} from "./MessageRouter";
 
 import {AppController} from "../AppController";
-import {ChatMessageCreator} from "./Chat/ChatMessageCreator";
-import {Controllers} from "./MessageDefinitions/ServerMessageDefinitions";
-import {MessageWriter} from "../Utility/Message/MessageWriter";
+//import {ChatMessageCreator} from "./Chat/ChatMessageCreator";
+//import {Controllers} from "./MessageDefinitions/ServerMessages";
+//import {MessageWriter} from "../Utility/Message/MessageWriter";
 import {MessageReader} from "../Utility/Message/MessageReader";
 
 export class NetworkController {
@@ -121,7 +121,8 @@ export class NetworkController {
             console.trace();
             return;
         }
-        this.messageRouter.handleMessageEvent(messageData);
+        this.appController.BinaryMessage(new MessageReader(messageData));
+        //this.messageRouter.handleMessageEvent(messageData);
 
         /*
         //Handle test message

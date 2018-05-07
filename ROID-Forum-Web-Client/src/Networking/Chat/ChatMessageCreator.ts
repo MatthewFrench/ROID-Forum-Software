@@ -1,12 +1,14 @@
-import {Controllers} from '../MessageDefinitions/ServerMessageDefinitions';
+//import {Controllers} from '../MessageDefinitions/ServerMessages';
 import {MessageWriter} from '../../Utility/Message/MessageWriter';
 
 export class ChatMessageCreator {
-    static NewChatMessage(chatMessage : any) : ArrayBuffer {
+    //static NewChatMessage(chatMessage : any) : ArrayBuffer {
+        /*
         let message = new MessageWriter();
         message.addUint8(Controllers.Chat.ID);
         message.addUint8(Controllers.Chat.Messages.NewChatMessage);
         message.addString(chatMessage);
         return message.toBuffer();
-    }
+        */
+    //}
 }

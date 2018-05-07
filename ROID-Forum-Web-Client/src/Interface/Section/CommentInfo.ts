@@ -1,6 +1,7 @@
 import {CommentView} from "./ThreadViews/CommentView";
 import {ThreadInfo} from "./ThreadInfo";
 import {ThreadController} from "./ThreadController";
+import {MessageReader} from "../../Utility/Message/MessageReader";
 
 export class CommentInfo {
     _threadID: number;
@@ -16,6 +17,19 @@ export class CommentInfo {
         this.thread = t;
         this.threadController = tc;
         this.commentView = new CommentView(this, this.thread, this.threadController, darkTheme);
+    }
+
+    setBinary(message: MessageReader) {
+        let threadID = message.getUint32();
+        let commentID = message.getUint32();
+        let comment = message.getString();
+        let owner = message.getString();
+        let avatarURL = message.getString();
+        this._threadID = threadID;
+        this._commentID = commentID;
+        this._comment = comment;
+        this._owner = owner;
+        this._avatarURL = avatarURL;
     }
 
     setThreadID(id: number) {

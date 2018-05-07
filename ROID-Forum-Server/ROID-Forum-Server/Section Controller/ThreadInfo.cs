@@ -60,6 +60,23 @@ namespace ROIDForumServer
             m["Comments"] = commentArray;
             return m;
         }
+
+        public byte[] toBinary() {
+            var message = new MessageWriter();
+            message.AddString(owner);
+            message.AddUint32((uint)id);
+            message.AddString(title);
+            message.AddString(description);
+            message.AddUint32((uint)commentIDs);
+            message.AddString(avatarURL);
+            message.AddUint32((uint)comments.Count);
+            for (int i = 0; i < comments.Count; i++)
+            {
+                message.AddBinary(comments[i].toBinary());
+            }
+            return message.ToBuffer();
+        }
+
         public CommentInfo getCommentForID(int commentID)
         {
             for (int i = 0; i < comments.Count; i++)

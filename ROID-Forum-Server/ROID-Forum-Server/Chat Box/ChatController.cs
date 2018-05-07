@@ -59,7 +59,7 @@ namespace ROIDForumServer
                 list += $"{guests} Guests";
             }
 
-            byte[] message = ServerMessages.SendChatOnlineList(list);
+            byte[] message = ServerMessages.ChatOnlineList(list);
             foreach (User u in users)
             {
                 u.sendBinary(message);
@@ -75,7 +75,7 @@ namespace ROIDForumServer
             chat = $"{u.account.name}: " + chat;
             chats.Add(chat);
             //Send chat to all connected websockets
-            byte[] chatMsg = ServerMessages.SendChatMessage(chat);
+            byte[] chatMsg = ServerMessages.ChatMessage(chat);
             for (int i = 0; i < server.GetNetworking().users.Count; i++)
             {
                 User u2 = server.GetNetworking().users[i];
@@ -90,7 +90,7 @@ namespace ROIDForumServer
             // }
             for (int i = start; i < chats.Count; i++)
             {
-                u.sendBinary(ServerMessages.SendChatMessage(chats[i]));
+                u.sendBinary(ServerMessages.ChatMessage(chats[i]));
             }
         }
         public void onMessage(User u, Dictionary<string, object> message)

@@ -25,6 +25,21 @@ export class Database {
             this.password = p;
         }
         break;
+        case "Logged In Binary":
+        {
+            let n : string = message.getString();
+            let p : string = message.getString();
+
+            //Save name and password in local storage
+            let localStorage : Storage = window.localStorage;
+            localStorage.setItem('Name', n);
+            localStorage.setItem('Password', p);
+
+            this.loggedIn = true;
+            this.name = n;
+            this.password = p;
+        }
+            break;
     case "Logged Out":
         {
             //Clear local storage

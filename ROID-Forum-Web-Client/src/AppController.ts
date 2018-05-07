@@ -8,6 +8,8 @@ import {Chatbox} from "./Interface/Chatbox";
 import {MainTopBarSection} from "./Interface/MainTopBarSection";
 import {Section} from "./Interface/Section/Section";
 import {Utility} from "./Utility/Utility";
+import {MessageReader} from "./Utility/Message/MessageReader";
+import {ServerMessages} from "./Networking/MessageDefinitions/ServerMessages";
 
 export class AppController {
     mainDiv: HTMLDivElement;
@@ -216,7 +218,85 @@ export class AppController {
         }
     }
 
-    BinaryMessage(buffer: ArrayBuffer) {
+    getSection(name : String) : Section {
+        for (let section of this.sectionOrder) {
+            if (section.getName() == name) {
+                return section;
+            }
+        }
+        return null;
+    }
+
+    BinaryMessage(message: MessageReader) {
+        let controller = message.getUint8();
+        let messageID = message.getUint8();
+        switch(controller) {
+            case ServerMessages.Controller.Chat: {
+                switch(messageID) {
+                    case ServerMessages.ChatMsg.Msg: {
+                        this.chatbox.gotMessageBinary(message);
+                    }break;
+                    case ServerMessages.ChatMsg.OnlineList: {
+                        this.chatbox.gotOnlineListBinary(message);
+                    }break;
+                }
+            } break;
+            case ServerMessages.Controller.Login: {
+                switch(messageID) {
+                    case ServerMessages.LoginMsg.GetAvatar: {
+                        this.controlPanel.preferencesAvatarInput.value = message.getString();
+                    }break;
+                    case ServerMessages.LoginMsg.LoggedIn: {
+                        this.database.processEvent('Logged In Binary', message);
+                        this.controlPanel.processEvent('Logged In');
+                        this.chatbox.processEvent('Logged In');
+                        for (let section of this.sectionOrder) section.processEvent('Logged In');
+                    }break;
+                    case ServerMessages.LoginMsg.LoggedOut: {
+                        this.database.processEvent('Logged Out', message);
+                        this.controlPanel.processEvent('Logged Out');
+                        this.chatbox.processEvent('Logged Out');
+                        for (let section of this.sectionOrder) section.processEvent('Logged Out');
+                    }break;
+                    case ServerMessages.LoginMsg.LoginFailed: {
+                        this.controlPanel.processEvent('Login Failed');
+                    }break;
+                    case ServerMessages.LoginMsg.RegisterFailed: {
+                        this.controlPanel.processEvent('Register Failed');
+                    }break;
+                }
+            } break;
+            case ServerMessages.Controller.Section: {
+                let sectionName = message.getString();
+                let section = this.getSection(sectionName);
+                switch(messageID) {
+                    case ServerMessages.SectionMsg.AddComment: {
+                        section.addCommentBinary(message);
+                    }break;
+                    case ServerMessages.SectionMsg.AddThread: {
+                        section.addThreadBinary(message);
+                    }break;
+                    case ServerMessages.SectionMsg.UpdateThread: {
+                        section.updateThreadBinary(message);
+                    }break;
+                    case ServerMessages.SectionMsg.UpdateComment: {
+                        section.updateCommentBinary(message);
+                    }break;
+                    case ServerMessages.SectionMsg.RemoveThread: {
+                        section.removeThreadBinary(message);
+                    }break;
+                    case ServerMessages.SectionMsg.RemoveComment: {
+                        section.removeCommentBinary(message);
+                    }break;
+                    case ServerMessages.SectionMsg.MoveThreadToTop: {
+                        section.moveThreadToTopBinary(message);
+                    }break;
+                    case ServerMessages.SectionMsg.AllThreads: {
+                        section.allThreadsBinary(message);
+                    }break;
+                }
+            } break;
+        }
     }
 
     getInterface() {

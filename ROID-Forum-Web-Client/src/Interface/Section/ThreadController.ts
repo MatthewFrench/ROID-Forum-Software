@@ -5,6 +5,7 @@ import {Section} from "./Section";
 import {Interface} from "../../Utility/Interface";
 import {CommentInfo} from "./CommentInfo";
 import {Utility} from "../../Utility/Utility";
+import {MessageReader} from "../../Utility/Message/MessageReader";
 
 export class ThreadController {
     threads: ThreadInfo[];
@@ -144,6 +145,50 @@ export class ThreadController {
         }
     };
 
+    addThreadBinary = (message: MessageReader) => {
+        let owner = message.getString();
+        let id = message.getUint32();
+        let title = message.getString();
+        let description = message.getString();
+        let commentIDs = message.getUint32();
+        let avatarURL = message.getString();
+        let numberOfComments = message.getUint32();
+
+        if (this.getThread(id) == null) {
+            let thread: ThreadInfo = new ThreadInfo(this, this.hasDarkTheme);
+            thread.setID(id);
+            this.threads.push(thread);
+
+            thread.setOwner(owner);
+            if (avatarURL != null) {
+                thread.setAvatarURL(avatarURL);
+            }
+            thread.setTitle(title);
+            thread.setDescription(description);
+
+            //let commentArray: any[] = threadMap["Comments"];
+            for (let i = 0; i < numberOfComments; i++) {
+                //let c: any = commentArray[i];
+                let cf: CommentInfo = new CommentInfo(thread, this, this.hasDarkTheme);
+                thread.addComment(cf);
+                //console.log(`Loaded comment with threadID: ${c['ThreadID']} and commentID: ${c['CommentID']}`);
+                cf.setBinary(new MessageReader(message.getBinary()));
+                //cf.setThreadID(c['ThreadID']);
+                //cf.setCommentID(c['CommentID']);
+                //cf.setComment(c['Comment']);
+                //cf.setOwner(c['Owner']);
+                //if (c["AvatarURL"] != null) {
+                //    cf.setAvatarURL(c["AvatarURL"]);
+                //}
+            }
+            thread.headerView.getDiv().style.opacity = "1.0";
+            thread.headerView.getDiv().style.top = `${(this.threads.length - 1) * 85 + 60}px`;
+            this.headerView.appendChild(thread.headerView.getDiv());
+
+            this.updateThreadPositions();
+        }
+    };
+
     removeThread = (threadID: number) => {
         let thread: ThreadInfo = this.getThread(threadID);
         if (thread != null) {
@@ -187,6 +232,24 @@ export class ThreadController {
             cf.setComment(commentMap['Comment']);
             cf.setOwner(commentMap['Owner']);
             cf.setAvatarURL(commentMap["AvatarURL"]);
+        }
+    };
+
+    addCommentBinary = (message: MessageReader) => {
+        let threadID: number = message.getUint32();
+        let commentID = message.getUint32();
+        let comment = message.getString();
+        let owner = message.getString();
+        let avatarURL = message.getString();
+        let thread: ThreadInfo = this.getThread(threadID);
+        if (thread != null) {
+            let cf: CommentInfo = new CommentInfo(thread, this, this.hasDarkTheme);
+            thread.addComment(cf);
+            cf.setThreadID(threadID);
+            cf.setCommentID(commentID);
+            cf.setComment(comment);
+            cf.setOwner(owner);
+            cf.setAvatarURL(avatarURL);
         }
     };
 

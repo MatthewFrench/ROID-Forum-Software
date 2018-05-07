@@ -3,6 +3,7 @@ import './Chatbox.scss';
 import {AppController} from "../AppController";
 import {Interface} from "../Utility/Interface";
 import {DescriptionParser} from "../Utility/DescriptionParser";
+import {MessageReader} from "../Utility/Message/MessageReader";
 const ding = require('./../../static/assets/ding8.wav');
 
 export class Chatbox {
@@ -114,6 +115,14 @@ export class Chatbox {
         if (message['Title'] == 'Online List') {
             this.chatOnlineBox.innerText = message['Data'];
         }
+    }
+    gotMessageBinary(message : MessageReader) {
+        let chatString = message.getString();
+        this.addChat(chatString);
+    }
+    gotOnlineListBinary(message : MessageReader) {
+        let onlineString = message.getString();
+        this.chatOnlineBox.innerText = onlineString;
     }
 }
 
