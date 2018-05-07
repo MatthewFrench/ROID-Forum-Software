@@ -12,10 +12,10 @@ export class CommentInfo {
     thread: ThreadInfo;
     threadController: ThreadController;
 
-    constructor(t: ThreadInfo, tc: ThreadController) {
+    constructor(t: ThreadInfo, tc: ThreadController, darkTheme : boolean) {
         this.thread = t;
         this.threadController = tc;
-        this.commentView = new CommentView(this, this.thread, this.threadController);
+        this.commentView = new CommentView(this, this.thread, this.threadController, darkTheme);
     }
 
     setThreadID(id: number) {

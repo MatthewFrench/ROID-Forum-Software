@@ -20,7 +20,7 @@ export class AppController {
     logicTimer: any;
     chatbox: Chatbox;
     mainSection: MainTopBarSection;
-    allSection: Section;
+    //allSection: Section;
     codingSection: Section;
     gameSection: Section;
     graphicsSection: Section;
@@ -52,12 +52,17 @@ export class AppController {
         //Put the chat on the right side
         this.chatbox = new Chatbox(this);
         //Lets make the visual stuff
-        this.allSection = new Section(this);
-        this.codingSection = new Section(this);
-        this.gameSection = new Section(this);
-        this.graphicsSection = new Section(this);
-        this.otherSection = new Section(this);
-        this.sectionOrder = [this.allSection, this.codingSection, this.gameSection, this.graphicsSection, this.otherSection];
+        //this.allSection = new Section(this);
+        this.codingSection = new Section({appController: this, name: 'Coding Section',
+            displayName: 'Coding', title: 'The Programmer\'s Corner',
+            darkTheme: true, hasMatrixBackground: true});
+        this.gameSection = new Section({appController: this, name: 'Game Section',
+            displayName: 'Game', title: 'The Gamer\'s Hangout'});
+        this.graphicsSection = new Section({appController: this, name: 'Graphics Section',
+            displayName: 'Graphics', title: 'The Artist\'s Muse'});
+        this.otherSection = new Section({appController: this, name: 'Other Section',
+            displayName: 'Other', title: 'Trash Talk'});
+        this.sectionOrder = [/*this.allSection,*/ this.codingSection, this.gameSection, this.graphicsSection, this.otherSection];
         //Now add the main parts of the site
         this.mainSection = new MainTopBarSection(this);
     }
@@ -65,7 +70,7 @@ export class AppController {
     logic = () => {
         this.mainSection.logic();
         this.codingSection.logic();
-        this.allSection.logic();
+        //this.allSection.logic();
         this.gameSection.logic();
         this.graphicsSection.logic();
         this.otherSection.logic();
@@ -189,9 +194,9 @@ export class AppController {
         if (message['Controller'] == this.codingSection.name) {
             this.codingSection.onMessage(message);
         }
-        if (message['Controller'] == this.allSection.name) {
-            this.allSection.onMessage(message);
-        }
+        //if (message['Controller'] == this.allSection.name) {
+            //this.allSection.onMessage(message);
+        //}
         if (message['Controller'] == this.otherSection.name) {
             this.otherSection.onMessage(message);
         }

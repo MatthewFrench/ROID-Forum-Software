@@ -4,6 +4,13 @@
   position: relative;
   width: calc(100% - 85px);
   opacity: 1.0;
+
+  &.DarkTheme {
+    color: white;
+  }
+  &.LightTheme {
+    color: black;
+  }
   
   .ProfileSection {
     display: inline-block;
@@ -12,7 +19,6 @@
     position: absolute;
     top: 5px;
     text-align: center;
-    color: white;
     
     .ProfileImage {
       height : 60px;
@@ -24,7 +30,6 @@
     
     .ProfileOwnerName {
       font-size : 15px;
-      color : white;
     }
   }
   
@@ -35,12 +40,10 @@
     margin-top: 5px;
     min-height: 90px;
     text-align: left;
-    color: white;
     
     .Description {
       width : 90%;
       word-wrap: break-word;
-      color : white;
     }
     
     .EditDescription {

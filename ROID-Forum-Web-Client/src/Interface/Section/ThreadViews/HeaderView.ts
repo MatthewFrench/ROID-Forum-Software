@@ -13,7 +13,7 @@ export class HeaderView {
     thread: ThreadInfo;
     threadController: ThreadController;
 
-    constructor(t: ThreadInfo, tc: ThreadController) {
+    constructor(t: ThreadInfo, tc: ThreadController, darkTheme : boolean) {
         this.thread = t;
         this.threadController = tc;
 
@@ -23,7 +23,14 @@ export class HeaderView {
             this.threadHeaderComment = Interface.Create({type: 'span', className: 'HeaderCommentCount'}),
             this.threadHeaderImage = Interface.Create({type: 'img', className: 'HeaderOwnerAvatarImage'})
         ]});
+        if (darkTheme) {
+            this.headerDiv.classList.add('DarkTheme');
+        } else {
+            this.headerDiv.classList.add('LightTheme');
+        }
     }
+
+
 
     getDiv(): HTMLDivElement {
         return this.headerDiv;
@@ -42,6 +49,9 @@ export class HeaderView {
     }
 
     updateAvatarURL() {
+        if (this.thread.getAvatarURL() == null || this.thread.getAvatarURL() == '' || this.thread.getAvatarURL() == undefined) {
+            return;
+        }
         this.threadHeaderImage.src = this.thread.getAvatarURL();
     }
 

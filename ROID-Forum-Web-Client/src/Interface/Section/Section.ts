@@ -9,22 +9,30 @@ import {Interface} from "../../Utility/Interface";
 export class Section {
     website: AppController;
     content: HTMLDivElement;
-    name = 'Coding Section';
-    displayName = 'Coding';
+    name = '';
+    displayName = '';
     newPostWindow: NewPostWindow = null;
     threadController: ThreadController;
     showThreadWhenLoaded = -1;
     background: MatrixBackground;
+    hasDarkTheme = false;
 
-    constructor(w: AppController) {
-        this.website = w;
+    constructor({appController, darkTheme = false, hasMatrixBackground = false, name, displayName, title} :
+                    {appController : AppController, darkTheme? : boolean,
+                        hasMatrixBackground? : boolean, name: string, displayName: string, title: string}) {
+        this.name = name;
+        this.displayName = displayName;
+        this.hasDarkTheme = darkTheme;
+        this.website = appController;
 
         this.content = Interface.Create({type: 'div', className: 'Section', elements: [
-            (this.threadController = new ThreadController(this)).mainView
+            (this.threadController = new ThreadController(this, title, this.hasDarkTheme)).mainView
         ]});
 
         this.newPostWindow = new NewPostWindow(this);
-        this.background = new MatrixBackground(this);
+        if (hasMatrixBackground) {
+            this.background = new MatrixBackground(this);
+        }
     }
 
     show = () => {
@@ -36,18 +44,28 @@ export class Section {
 
         this.threadController.restoreToDefaultState();
 
-        this.background.show();
+        if (this.background != null) {
+            this.background.show();
+        }
 
-        this.website.chatbox.darkTheme();
-        this.website.mainSection.darkTheme();
-        this.website.controlPanel.darkTheme();
+        if (this.hasDarkTheme) {
+            this.website.chatbox.darkTheme();
+            this.website.mainSection.darkTheme();
+            this.website.controlPanel.darkTheme();
+        } else {
+            this.website.chatbox.lightTheme();
+            this.website.mainSection.lightTheme();
+            this.website.controlPanel.lightTheme();
+        }
     };
 
     hide = () => {
         //Destroy all posts
         this.threadController.clearAllThreads();
 
-        this.background.hide();
+        if (this.background != null) {
+            this.background.hide();
+        }
 
         this.website.chatbox.lightTheme();
         this.website.mainSection.lightTheme();
@@ -55,7 +73,9 @@ export class Section {
     };
 
     logic = () => {
-        this.background.logic();
+        if (this.background != null) {
+            this.background.logic();
+        }
     };
 
     showThread = (threadID: number) => {

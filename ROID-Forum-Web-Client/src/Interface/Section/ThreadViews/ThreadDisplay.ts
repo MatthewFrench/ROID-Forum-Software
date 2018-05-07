@@ -25,7 +25,7 @@ export class ThreadDisplay {
     controller: FullView;
     onMainView = true;
 
-    constructor(c: FullView) {
+    constructor(c: FullView, darkTheme : boolean) {
         this.controller = c;
 
         this.main = Interface.Create({type: 'div', className: 'ThreadDisplay', elements: [
@@ -43,6 +43,12 @@ export class ThreadDisplay {
                 {type: 'hr'}
             ]})
         ]});
+
+        if (darkTheme) {
+            this.main.classList.add('DarkTheme');
+        } else {
+            this.main.classList.add('LightTheme');
+        }
 
         this.switchToEditViewButton = Interface.Create({type: 'button', text: 'Edit',
             className: 'EditViewButton', onClick: this.switchView});
@@ -70,6 +76,9 @@ export class ThreadDisplay {
     };
 
     updateAvatarURL = () => {
+        if (this.controller.thread.getAvatarURL() == null || this.controller.thread.getAvatarURL() == '' || this.controller.thread.getAvatarURL() == undefined) {
+            return;
+        }
         this.image.src = this.controller.thread.getAvatarURL();
     };
 

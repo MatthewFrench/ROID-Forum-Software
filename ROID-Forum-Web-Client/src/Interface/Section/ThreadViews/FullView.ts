@@ -18,13 +18,13 @@ export class FullView {
     commentContainer: HTMLDivElement;
     commentViews: CommentView[] = [];
 
-    constructor(t: ThreadInfo, tc: ThreadController) {
+    constructor(t: ThreadInfo, tc: ThreadController, darkTheme: boolean) {
         this.threadController = tc;
         this.thread = t;
 
         this.main = Interface.Create({
             type: 'div', className: 'FullView', elements: [
-                (this.threadDisplay = new ThreadDisplay(this)).getDiv(),
+                (this.threadDisplay = new ThreadDisplay(this, darkTheme)).getDiv(),
                 this.commentContainer = Interface.Create({type: 'div', className: 'CommentContainer'})
             ]
         });

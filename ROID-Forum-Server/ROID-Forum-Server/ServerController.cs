@@ -11,8 +11,8 @@ namespace ROIDForumServer
         LoginController loginController;
         ChatController chatController;
         HighResolutionTimer logicTimer;
+        //SectionController allSection;
         SectionController codingSection;
-        SectionController allSection;
         SectionController gameSection;
         SectionController graphicsSection;
         SectionController otherSection;
@@ -24,11 +24,11 @@ namespace ROIDForumServer
             loginController = new LoginController(this);
             chatController = new ChatController(this);
             logicTimer = new HighResolutionTimer(8, logic); //120 fps logic timer
-            codingSection = new SectionController(this);
-            allSection = new SectionController(this);
-            gameSection = new SectionController(this);
-            graphicsSection = new SectionController(this);
-            otherSection = new SectionController(this);
+            codingSection = new SectionController(this, "Coding Section");
+            //allSection = new SectionController(this);
+            gameSection = new SectionController(this, "Game Section");
+            graphicsSection = new SectionController(this, "Graphics Section");
+            otherSection = new SectionController(this, "Other Section");
 
             networking.Start();
             Console.ReadKey(true);
@@ -41,7 +41,7 @@ namespace ROIDForumServer
             chatController.logic();
             accountController.logic();
 
-            allSection.logic();
+            //allSection.logic();
             codingSection.logic();
             gameSection.logic();
             graphicsSection.logic();
@@ -80,7 +80,7 @@ namespace ROIDForumServer
                     loginController.onMessage(u, m);
                 }
                 if ((string)m["Controller"] == codingSection.name) codingSection.onMessage(u, m);
-                if ((string)m["Controller"] == allSection.name) allSection.onMessage(u, m);
+                //if ((string)m["Controller"] == allSection.name) allSection.onMessage(u, m);
                 if ((string)m["Controller"] == graphicsSection.name) graphicsSection.onMessage(u, m);
                 if ((string)m["Controller"] == gameSection.name) gameSection.onMessage(u, m);
                 if ((string)m["Controller"] == otherSection.name) otherSection.onMessage(u, m);
@@ -115,7 +115,7 @@ namespace ROIDForumServer
                     break;
                 case "All Section":
                     {
-                        allSection.addUser(u);
+                        //allSection.addUser(u);
                     }
                     break;
                 case "Other Section":
@@ -141,7 +141,7 @@ namespace ROIDForumServer
             {
                 case "All Section":
                     {
-                        allSection.removeUser(u);
+                        //allSection.removeUser(u);
                     }
                     break;
                 case "Coding Section":

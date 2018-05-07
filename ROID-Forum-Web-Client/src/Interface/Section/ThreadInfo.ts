@@ -14,11 +14,11 @@ export class ThreadInfo {
     fullView: FullView;
     threadController: ThreadController;
 
-    constructor(tc: ThreadController) {
+    constructor(tc: ThreadController, darkTheme : boolean) {
         this.threadController = tc;
         this._comments = [];
-        this.headerView = new HeaderView(this, tc);
-        this.fullView = new FullView(this, tc);
+        this.headerView = new HeaderView(this, tc, darkTheme);
+        this.fullView = new FullView(this, tc, darkTheme);
         this.headerView.updateCommentCount();
     }
 

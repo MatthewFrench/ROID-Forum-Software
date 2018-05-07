@@ -16,20 +16,30 @@ export class ThreadController {
     backButton: HTMLButtonElement;
     viewingPosition = 0;
     viewingThread: ThreadInfo = null;
+    threadHeaderTitle : HTMLSpanElement;
+    hasDarkTheme : boolean;
 
-    constructor(c: Section) {
+    constructor(c: Section, title : string, darkTheme : boolean) {
         this.sectionController = c;
         this.threads = [];
         this.mainView = Interface.Create({type: 'div', className: 'ThreadControllerView', elements: [
             this.headerView = Interface.Create({type: 'div', className: 'ThreadHeaderView', elements: [
-                {type: 'span', className: 'ThreadHeaderTitle', text: 'The Programmer\'s Corner'}
+                this.threadHeaderTitle = Interface.Create({type: 'span', className: 'ThreadHeaderTitle', text: title})
             ]})
         ]});
+        this.hasDarkTheme = darkTheme;
+        if (darkTheme) {
+            this.threadHeaderTitle.classList.add('DarkTheme');
+        } else {
+            this.threadHeaderTitle.classList.add('LightTheme');
+        }
 
         this.fullView = Interface.Create({type: 'div', className: 'FullView'});
         this.newPostButton = Interface.Create({type: 'button', className: 'NewPostButton', text: 'Create New Post', onClick: this.sectionController.newPostButtonClicked});
         this.backButton = Interface.Create({type: 'button', className: 'BackButton', onClick: this.backButtonClicked, text: 'Back'});
     }
+
+
 
     loggedInEvent = () => {
         this.headerView.appendChild(this.newPostButton);
@@ -101,7 +111,7 @@ export class ThreadController {
     addThread = (threadMap: any) => {
         let id: number = threadMap["ID"];
         if (this.getThread(id) == null) {
-            let thread: ThreadInfo = new ThreadInfo(this);
+            let thread: ThreadInfo = new ThreadInfo(this, this.hasDarkTheme);
             thread.setID(id);
             this.threads.push(thread);
 
@@ -115,7 +125,7 @@ export class ThreadController {
             let commentArray: any[] = threadMap["Comments"];
             for (let i = 0; i < commentArray.length; i++) {
                 let c: any = commentArray[i];
-                let cf: CommentInfo = new CommentInfo(thread, this);
+                let cf: CommentInfo = new CommentInfo(thread, this, this.hasDarkTheme);
                 thread.addComment(cf);
                 console.log(`Loaded comment with threadID: ${c['ThreadID']} and commentID: ${c['CommentID']}`);
                 cf.setThreadID(c['ThreadID']);
@@ -170,7 +180,7 @@ export class ThreadController {
         let threadID: number = commentMap["ThreadID"];
         let thread: ThreadInfo = this.getThread(threadID);
         if (thread != null) {
-            let cf: CommentInfo = new CommentInfo(thread, this);
+            let cf: CommentInfo = new CommentInfo(thread, this, this.hasDarkTheme);
             thread.addComment(cf);
             cf.setThreadID(commentMap['ThreadID']);
             cf.setCommentID(commentMap['CommentID']);

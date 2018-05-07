@@ -22,7 +22,7 @@ export class CommentView {
     deleteComment: HTMLButtonElement;
     owner: HTMLSpanElement;
 
-    constructor(ci: CommentInfo, t: ThreadInfo, tc: ThreadController) {
+    constructor(ci: CommentInfo, t: ThreadInfo, tc: ThreadController, darkTheme : boolean) {
         this.threadController = tc;
         this.thread = t;
         this.comment = ci;
@@ -36,6 +36,12 @@ export class CommentView {
             ]}),
             {type: 'hr'}
         ]});
+
+        if (darkTheme) {
+            this.main.classList.add('DarkTheme');
+        } else {
+            this.main.classList.add('LightTheme');
+        }
 
         this.editDescription = Interface.Create({type: 'textarea', className: 'EditDescription'});
 
@@ -98,7 +104,7 @@ export class CommentView {
     }
 
     updateAvatarURL() {
-        if (this.comment.getAvatarURL() == null || this.comment.getAvatarURL() == undefined) {
+        if (this.comment.getAvatarURL() == null || this.comment.getAvatarURL() == undefined || this.comment.getAvatarURL() == '') {
             return;
         }
         this.image.src = this.comment.getAvatarURL();

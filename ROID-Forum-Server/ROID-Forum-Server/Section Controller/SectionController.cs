@@ -8,12 +8,13 @@ namespace ROIDForumServer
         public SectionMessageSender messageSender;
         public ThreadController threadController;
         public List<User> usersViewing = new List<User>();
-        public String name = "Coding Section";
+        public String name = "";
         public SectionIOController ioController;
         int saveTimer = -1;
-        public SectionController(ServerController s)
+        public SectionController(ServerController s, String name)
         {
             server = s;
+            this.name = name;
             messageSender = new SectionMessageSender(this);
             threadController = new ThreadController(this);
             ioController = new SectionIOController(this);
