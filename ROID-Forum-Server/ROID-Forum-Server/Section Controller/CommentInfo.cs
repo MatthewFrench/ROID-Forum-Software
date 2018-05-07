@@ -20,8 +20,8 @@ namespace ROIDForumServer
         }
         public CommentInfo(Dictionary<string, object> m)
         {
-            threadID = (int)m["ThreadID"];
-            commentID = (int)m["CommentID"];
+            threadID = Convert.ToInt32(m["ThreadID"]);
+            commentID = Convert.ToInt32(m["CommentID"]);
             comment = (string)m["Comment"];
             owner = (string)m["Owner"];
         }

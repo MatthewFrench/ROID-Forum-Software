@@ -1,0 +1,64 @@
+.CommentView {
+  display: inline-block;
+  margin-left: 75px;
+  position: relative;
+  width: calc(100% - 75px);
+  opacity: 1.0;
+  
+  .ProfileSection {
+    display: inline-block;
+    width: 60px;
+    height: 80px;
+    position: absolute;
+    top: 5px;
+    text-align: center;
+    color: white;
+    
+    .ProfileImage {
+      height : 60px;
+      width : 60px;
+      background-color : rgb(200,200,200);
+      border-style : solid;
+      border-width : 1px;
+    }
+    
+    .ProfileOwnerName {
+      font-size : 15px;
+      color : white;
+    }
+  }
+  
+  .DescriptionSection {
+    display: inline-block;
+    width: calc(100% - 95px);
+    margin-left: 70px;
+    margin-top: 5px;
+    min-height: 90px;
+    text-align: left;
+    color: white;
+    
+    .Description {
+      width : 90%;
+      word-wrap : normal;
+      color : white;
+    }
+    
+    .EditDescription {
+      width : 90%;
+      word-wrap : normal;
+      color : black;
+    }
+
+    .EditComment {
+      float : right;
+    }
+
+    .SaveComment {
+      float : right;
+    }
+
+    .DeleteComment {
+      float: left;
+    }
+  }
+}

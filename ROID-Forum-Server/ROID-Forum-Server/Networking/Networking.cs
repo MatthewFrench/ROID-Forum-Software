@@ -102,6 +102,7 @@ namespace ROIDForumServer
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                Console.WriteLine("Errored Network Message: " + message);
             }
         }
 

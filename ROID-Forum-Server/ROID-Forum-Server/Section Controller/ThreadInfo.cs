@@ -21,14 +21,14 @@ namespace ROIDForumServer
         public ThreadInfo(Dictionary<string, object> m)
         {
             owner = (string)m["Owner"];
-            id = (int)m["ID"];
+            id = Convert.ToInt32(m["ID"]);
             title = (string)m["Title"];
             description = (string)m["Description"];
             List<Dictionary<string, object>> commentArray = (List<Dictionary<string, object>>)m["Comments"];
             comments = new List<CommentInfo>();
             if (m["CommentIDs"] != null)
             {
-                commentIDs = (int)m["CommentIDs"];
+                commentIDs = Convert.ToInt32(m["CommentIDs"]);
             }
             //Repair comments when loading them just in case their IDs are wrong.
             for (int i = 0; i < commentArray.Count; i++)

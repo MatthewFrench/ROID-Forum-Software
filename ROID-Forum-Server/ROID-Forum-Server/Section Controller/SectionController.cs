@@ -51,7 +51,7 @@ namespace ROIDForumServer
                     break;
                 case "Edit Post":
                     {
-                        int threadID = (int)message["Thread ID"];
+                        int threadID = Convert.ToInt32(message["Thread ID"]);
                         String title = (string)message["Edit Title"];
                         String description = (string)message["Text"];
                         threadController.editThread(p, threadID, title, description);
@@ -59,29 +59,29 @@ namespace ROIDForumServer
                     break;
                 case "Delete Post":
                     {
-                        int threadID = (int)message["Thread ID"];
+                        int threadID = Convert.ToInt32(message["Thread ID"]);
                         threadController.deleteThread(p, threadID);
                     }
                     break;
                 case "Add Comment":
                     {
-                        int id = (int)message["ID"];
+                        int id = Convert.ToInt32(message["ID"]);
                         String text = (string)message["Text"];
                         threadController.addComment(p, id, text);
                     }
                     break;
                 case "Edit Comment":
                     {
-                        int threadID = (int)message["Thread ID"];
-                        int commentID = (int)message["Comment ID"];
+                        int threadID = Convert.ToInt32(message["Thread ID"]);
+                        int commentID = Convert.ToInt32(message["Comment ID"]);
                         String description = (string)message["Text"];
                         threadController.editComment(p, threadID, commentID, description);
                     }
                     break;
                 case "Delete Comment":
                     {
-                        int threadID = (int)message["Thread ID"];
-                        int commentID = (int)message["Comment ID"];
+                        int threadID = Convert.ToInt32(message["Thread ID"]);
+                        int commentID = Convert.ToInt32(message["Comment ID"]);
                         threadController.deleteComment(p, threadID, commentID);
                     }
                     break;

@@ -1,7 +1,7 @@
 import {AppController} from "../AppController";
 import {Interface} from "../Utility/Interface";
 import {DescriptionParser} from "../Utility/DescriptionParser";
-import {Key} from "readline";
+const ding = require('./../../static/assets/ding8.wav');
 
 export class Chatbox {
     website : AppController;
@@ -12,7 +12,7 @@ export class Chatbox {
     ding : HTMLAudioElement;
     doneLoading = false;
     chatMsgs : ChatMsg[] = [];
-    bottomNode : HTMLDivElement;
+    bottomNode : HTMLDivElement = null;
     constructor(w : AppController) {
         this.website = w;
         this.makeChatboxDivComponent();
@@ -22,7 +22,7 @@ export class Chatbox {
         setTimeout(()=>{
             this.doneLoading = true;
         }, 1000);
-        this.ding = Interface.Create({type: 'audio', src: 'Resources/ding8.wav'});
+        this.ding = Interface.Create({type: 'audio', src: ding});
     }
     darkTheme() {
         this.chatOnlineBox.style.color = "white";
@@ -88,6 +88,9 @@ export class Chatbox {
         }
     }
     scrollToBottom() {
+        if (this.bottomNode == null) {
+            return;
+        }
         this.bottomNode.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
     }
     updateChatHighlights() {

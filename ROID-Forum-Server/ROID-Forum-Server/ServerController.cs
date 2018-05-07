@@ -50,12 +50,16 @@ namespace ROIDForumServer
 
         public void accountLoggedIn(User u)
         {
-            Console.WriteLine($"Account logged in {u.account.name}");
+            if (u.account != null) {
+                Console.WriteLine($"Account logged in {u.account.name}");
+            }
             chatController.sendListUpdateToAll();
         }
         public void accountLoggedOut(User u)
         {
-            Console.WriteLine($"Account logged out {u.account.name}");
+            if (u.account != null) {
+                Console.WriteLine($"Account logged out {u.account.name}");
+            }
             chatController.sendListUpdateToAll();
         }
         public void onOpen(User u)

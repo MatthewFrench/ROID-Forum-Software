@@ -17,8 +17,8 @@ export class Database {
 
             //Save name and password in local storage
             let localStorage : Storage = window.localStorage;
-            localStorage['Name'] = n;
-            localStorage['Password'] = p;
+            localStorage.setItem('Name', n);
+            localStorage.setItem('Password', p);
 
             this.loggedIn = true;
             this.name = n;
@@ -29,8 +29,8 @@ export class Database {
         {
             //Clear local storage
             let localStorage : Storage = window.localStorage;
-            localStorage.remove('Name');
-            localStorage.remove('Password');
+            localStorage.removeItem('Name');
+            localStorage.removeItem('Password');
             this.name = "";
             this.password = "";
             this.loggedIn = false;

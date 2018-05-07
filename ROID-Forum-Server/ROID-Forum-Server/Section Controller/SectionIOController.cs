@@ -24,7 +24,7 @@ namespace ROIDForumServer
         }
         public void processDataMap(Dictionary<string, object> m)
         {
-            int threadIDs = (int)m["threadIDs"];
+            int threadIDs = Convert.ToInt32(m["threadIDs"]);
             controller.threadController.threadIDs = threadIDs;
             List<Dictionary<string, object>> threadList = (List<Dictionary<string, object>>)m["threads"];
             for (int i = 0; i < threadList.Count; i++)

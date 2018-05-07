@@ -115,8 +115,8 @@ export class AppController {
         }
         //Try auto-login
         let localStorage: Storage = window.localStorage;
-        if (localStorage['Name'] != null) {
-            this.controlPanel.loginAlreadyEncrypted(localStorage['Name'], localStorage['Password']);
+        if (localStorage.getItem('Name') != null) {
+            this.controlPanel.loginAlreadyEncrypted(localStorage.getItem('Name'), localStorage.getItem('Password'));
         }
         //Load the All page
         this.mainSection.sectionClick(0);
