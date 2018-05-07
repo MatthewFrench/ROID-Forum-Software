@@ -128,7 +128,7 @@ export class ThreadController {
                 let c: any = commentArray[i];
                 let cf: CommentInfo = new CommentInfo(thread, this, this.hasDarkTheme);
                 thread.addComment(cf);
-                console.log(`Loaded comment with threadID: ${c['ThreadID']} and commentID: ${c['CommentID']}`);
+                //console.log(`Loaded comment with threadID: ${c['ThreadID']} and commentID: ${c['CommentID']}`);
                 cf.setThreadID(c['ThreadID']);
                 cf.setCommentID(c['CommentID']);
                 cf.setComment(c['Comment']);

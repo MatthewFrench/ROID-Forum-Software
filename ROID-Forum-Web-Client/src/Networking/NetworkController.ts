@@ -43,7 +43,7 @@ export class NetworkController {
 
     connectedEvent = () => {
         this.connected = true;
-        console.log('Client has connected to the server!');
+        //console.log('Client has connected to the server!');
         this.appController.connectedToServer();
 
         /*
@@ -71,7 +71,7 @@ export class NetworkController {
         } else {
             //Was just connected and now isn't, try an immediate reconnect
             this.connected = false;
-            console.log('The client has disconnected!');
+            //console.log('The client has disconnected!');
             this.appController.prepareReset();
         }
     };
@@ -114,7 +114,7 @@ export class NetworkController {
         let messageData = event.data;
 
         if (typeof messageData === 'string') {
-            console.log('Got string message: ' + messageData);
+            //console.log('Got string message: ' + messageData);
             this.appController.Message(JSON.parse(messageData));
             return;
         } else if (messageData instanceof ArrayBuffer === false) {
