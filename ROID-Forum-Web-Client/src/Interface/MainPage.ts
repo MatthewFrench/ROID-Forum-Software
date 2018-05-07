@@ -6,7 +6,8 @@ import {Interface} from '../Utility/Interface';
 export class MainPage {
     mainInterface: HTMLElement;
     constructor() {
-        this.mainInterface = Interface.Create({type: 'div', className: 'MainPage', text: 'test'});
+        this.mainInterface = Interface.Create({type: 'div', className: 'MainPage', elements: [
+            ]});
     }
 
     /**

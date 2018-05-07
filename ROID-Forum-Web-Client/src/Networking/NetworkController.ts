@@ -43,7 +43,9 @@ export class NetworkController {
     connectedEvent = () => {
         this.connected = true;
         console.log('Client has connected to the server!');
+        this.appController.connectedToServer();
 
+        /*
         let message = new MessageWriter();
         message.addUint8(1);
         message.addInt8(-1);
@@ -58,17 +60,18 @@ export class NetworkController {
         message2.addString("Inner Binary");
         message.addBinary(message2.toBuffer());
         this.send(message.toBuffer());
+        */
     };
 
     disconnectedEvent = (close : CloseEvent) => {
         if (this.connected == false) {
             //Try to reconnect at an interval
-            setTimeout(this.initialize, 10 * 1000);
+            setTimeout(()=>{this.appController.prepareReset();}, 10 * 1000);
         } else {
             //Was just connected and now isn't, try an immediate reconnect
-            this.initialize();
             this.connected = false;
             console.log('The client has disconnected!');
+            this.appController.prepareReset();
         }
     };
 
@@ -108,13 +111,19 @@ export class NetworkController {
 
     gotMessageEvent = (event : MessageEvent) => {
         let messageData = event.data;
-        if (messageData instanceof ArrayBuffer === false) {
+
+        if (typeof messageData === 'string') {
+            console.log('Got string message: ' + messageData);
+            this.appController.Message(JSON.parse(messageData));
+            return;
+        } else if (messageData instanceof ArrayBuffer === false) {
             console.error('Invalid Message Type Not Binary');
             console.trace();
             return;
         }
         this.messageRouter.handleMessageEvent(messageData);
-        
+
+        /*
         //Handle test message
         document.body.innerText += ("\n" + "Bytes: " + messageData.byteLength);
         var enc = new TextDecoder("utf-8");
@@ -135,9 +144,14 @@ export class NetworkController {
         if (message.isAtEndOfData()) {
             document.body.innerText +=("\n" + "End of Message");
         }
+        */
     };
 
-    send(message : ArrayBuffer) {
-        this.connection.send(message);
+    send(msg : {}) {
+        this.connection.send(JSON.stringify(msg));
+    }
+
+    sendBinary(msg : ArrayBuffer) {
+        this.connection.send(msg);
     }
 }
