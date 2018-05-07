@@ -30,6 +30,9 @@ export class CommentInfo {
         this._comment = comment;
         this._owner = owner;
         this._avatarURL = avatarURL;
+        this.commentView.updateAvatarURL();
+        this.commentView.updateOwner();
+        this.commentView.updateDescription();
     }
 
     setThreadID(id: number) {
