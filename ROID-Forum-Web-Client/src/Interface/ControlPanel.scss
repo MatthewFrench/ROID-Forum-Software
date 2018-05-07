@@ -1,0 +1,243 @@
+.TopControlPanel {
+  position: absolute;
+  width: 300px;
+  height: 80px;
+  top: 10px;
+  right: 2px;
+
+  .LoginButton {
+    width: 140px;
+    height: 40px;
+    background-color: white;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #DDDDDD;
+    font-size: 15px;
+    bottom: 5px;
+    position: absolute;
+    outline: none;
+    &:active {
+      background: #BBBBBB;
+    }
+  }
+  .PreferencesButton {
+    width: 140px;
+    height: 40px;
+    background-color: white;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #DDDDDD;
+    font-size: 15px;
+    top: 5px;
+    left: 5px;
+    position: absolute;
+    outline: none;
+    &:active {
+      background: #BBBBBB;
+    }
+  }
+  .LogoutButton {
+    width: 140px;
+    height: 40px;
+    background-color: white;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #DDDDDD;
+    font-size: 15px;
+    top: 5px;
+    position: absolute;
+    outline: none;
+    right: 5px;
+    &:active {
+      background: #BBBBBB;
+    }
+  }
+  .TopNameDiv {
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    color: black;
+    font-size: 20px;
+    left: 0px;
+    bottom: 0px;
+
+    &.LightTheme {
+      color: black;
+    }
+    &.DarkTheme {
+      color: white;
+    }
+  }
+}
+
+.HideBackgroundDiv {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  top: 0px;
+  left: 0px;
+}
+
+.LoginWindowDiv {
+  position: absolute;
+  width: 400px;
+  height: 300px;
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #DDDDDD;
+  background-color: white;
+  top: calc(50% - 150px);
+  left: calc(50% - 200px);
+
+  .Title {
+    position: absolute;
+    top: 15px;
+    left: 0px;
+    width: 100%;
+    text-align: center;
+    font-size: 25px;
+  }
+  .LoginHR {
+    width: 70%;
+    top: 35px;
+    position: absolute;
+    left: 15%;
+  }
+  .LoginButton {
+    width: 140px;
+    height: 40px;
+    background-color: white;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #DDDDDD;
+    font-size: 15px;
+    bottom: 5px;
+    position: absolute;
+    outline: none;
+    right: 5px;
+    &:active {
+      background: #BBBBBB;
+    }
+  }
+  .RegisterButton {
+    width: 140px;
+    height: 40px;
+    background-color: white;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #DDDDDD;
+    font-size: 15px;
+    bottom: 5px;
+    position: absolute;
+    outline: none;
+    left: 5px;
+    &:active {
+      background: #BBBBBB;
+    }
+  }
+  .Name {
+    width: 90%;
+    height: 30px;
+    background-color: white;
+    border-radius: 2px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #DDDDDD;
+    font-size: 25px;
+    top: 70px;
+    position: absolute;
+    outline: none;
+    left: 5%;
+  }
+  .Password {
+    width: 90%;
+    height: 30px;
+    background-color: white;
+    border-radius: 2px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #DDDDDD;
+    font-size: 25px;
+    top: 110px;
+    position: absolute;
+    outline: none;
+    left: 5%;
+  }
+  .Email {
+    width: 90%;
+    height: 30px;
+    background-color: white;
+    border-radius: 2px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #DDDDDD;
+    font-size: 25px;
+    top: 190px;
+    position: absolute;
+    outline: none;
+    left: 5%;
+
+  }
+  .Error {
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    color: red;
+    font-size: 15px;
+    left: 0px;
+    top: 230px;
+  }
+}
+
+.PreferencesDiv {
+  position: absolute;
+  width: 400px;
+  height: 300px;
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #DDDDDD;
+  background-color: white;
+  top: calc(50% - 150px);
+  left: calc(50% - 200px);
+
+  .Title {
+    position: absolute;
+    top: 15px;
+    left: 0px;
+    width: 100%;
+    text-align: center;
+    font-size: 25px;
+  }
+  .PreferencesHR {
+    width: 70%;
+    top: 35px;
+    position: absolute;
+    left: 15%;
+  }
+  .AvatarInput {
+    width: 70%;
+    position: absolute;
+    top: 45px;
+    right: 5px;
+  }
+  .AvatarLabel {
+    width: 25%;
+    position: absolute;
+    top: 45px;
+    left: 5px;
+  }
+  .AvatarSaveButton {
+    width: 120px;
+    position: absolute;
+    top: 65px;
+    right: 5px;
+  }
+}
