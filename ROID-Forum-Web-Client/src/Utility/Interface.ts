@@ -19,7 +19,7 @@ export class Interface {
                   attributes = null, style = null, onFocus = null, outFocus = null, onBlur = null, width = null, height = null,
                   min = null, max = null, step = null, backgroundImage = null, title = null, checked = null, disabled = null,
                     valueAsDate = null, selected = null, onDoubleClick = null, draggable = null,
-                  onDrop = null, onDragOver = null, onDragStart = null
+                  onDrop = null, onDragOver = null, onDragStart = null, onKeyPress = null
                 } : {type? : string, className? : string, inputType? : string, text? : string, html? : string, opacity? : number,
       appendTo? : HTMLElement, src? : string, id? : string, value? : string, name? : string, onClick? : (event? : Event)=>void,
       onMouseMove? : (event? : Event)=>void, onMouseDown? : (event? : Event)=>void,
@@ -31,7 +31,8 @@ export class Interface {
       onBlur? : (event? : Event)=>void, width? : number, height? : number,
       min? : number, max? : number, step? : number, backgroundImage? : string, title? : string, checked? : boolean, disabled? : boolean,
       valueAsDate? : Date, selected? : boolean, onDoubleClick? : (event? : Event)=>void, draggable? : boolean,
-      onDrop? : (event? : Event)=>void, onDragOver? : (event? : Event)=>void, onDragStart? : (event? : Event)=>void
+      onDrop? : (event? : Event)=>void, onDragOver? : (event? : Event)=>void, onDragStart? : (event? : Event)=>void,
+      onKeyPress? : (event? : Event) => void
   } = {}) : any {
     //type : Element type to create
     //class : Class name of element
@@ -76,6 +77,7 @@ export class Interface {
     if (onMouseOut !== null) element.onmouseout = onMouseOut;
     if (onKeyUp !== null) element.onkeyup = onKeyUp;
     if (onKeyDown !== null) element.onkeydown = onKeyDown;
+    if (onKeyPress !== null) element.onkeypress = onKeyPress;
     if (onInput !== null) element.oninput = onInput;
     if (onChange !== null) element.onchange = onChange;
     if (onFocus !== null) element.onfocus = onFocus;

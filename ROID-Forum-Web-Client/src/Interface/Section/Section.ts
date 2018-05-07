@@ -27,7 +27,7 @@ export class Section {
         this.background = new MatrixBackground(this);
     }
 
-    show() {
+    show = () => {
         let m: any = {};
         m['Controller'] = "Server";
         m['Title'] = 'Viewing';
@@ -41,9 +41,9 @@ export class Section {
         this.website.chatbox.darkTheme();
         this.website.mainSection.darkTheme();
         this.website.controlPanel.darkTheme();
-    }
+    };
 
-    hide() {
+    hide = () => {
         //Destroy all posts
         this.threadController.clearAllThreads();
 
@@ -52,17 +52,17 @@ export class Section {
         this.website.chatbox.lightTheme();
         this.website.mainSection.lightTheme();
         this.website.controlPanel.lightTheme();
-    }
+    };
 
-    logic() {
+    logic = () => {
         this.background.logic();
-    }
+    };
 
-    showThread(threadID: number) {
+    showThread = (threadID: number) => {
         this.showThreadWhenLoaded = threadID;
     }
 
-    processEvent(event: string) {
+    processEvent = (event: string) => {
         switch (event) {
             case "Logged In": {
                 this.threadController.loggedInEvent();
@@ -73,11 +73,11 @@ export class Section {
             }
                 break;
         }
-    }
+    };
 
-    newPostButtonClicked() {
+    newPostButtonClicked = () => {
         this.newPostWindow.show();
-    }
+    };
 
     onMessage(message: any) {
         switch (message['Title']) {

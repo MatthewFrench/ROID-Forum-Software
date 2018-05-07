@@ -86,7 +86,7 @@ class CommandToken {
                 tokenSpan.appendChild(link);
             }
             if (this.startTag.command == "img") {
-                let link : HTMLImageElement = Interface.Create({type: 'div', src: this.innerCommandToken.getOriginalText()});
+                let link : HTMLImageElement = Interface.Create({type: 'img', src: this.innerCommandToken.getOriginalText()});
                 link.style.maxWidth = "100%";
                 link.style.display="inline-block";
                 /*
