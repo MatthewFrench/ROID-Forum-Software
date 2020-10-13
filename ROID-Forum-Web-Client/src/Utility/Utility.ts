@@ -348,7 +348,7 @@ export class Utility {
     /**
      * Downloads a file from the given URL and returns it as a binary blob to the callback.
      */
-    static ConvertFileToDataURL(url : string, callback : (result: string)=>{}) {
+    static ConvertFileToDataURL(url : string, callback : (result: string | ArrayBuffer)=>{}) {
         let xhr = new XMLHttpRequest();
         xhr.onload = function () {
             let reader = new FileReader();
