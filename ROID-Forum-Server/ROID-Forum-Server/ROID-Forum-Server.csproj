@@ -11,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="ByteArray" Version="1.1.6" />
     <PackageReference Include="CassandraCSharpDriver" Version="3.5.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Fleck">
