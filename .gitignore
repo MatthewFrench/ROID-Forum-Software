@@ -4,6 +4,4 @@ ROID-Forum-Server/ROID-Forum-Server/obj/
 **/.idea
 **/dist
 **/node_modules
-yarn.lock
-package-lock.json
 ROID-Forum-Web-Client/yarn-error.log

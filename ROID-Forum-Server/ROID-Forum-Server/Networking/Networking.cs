@@ -6,8 +6,9 @@ namespace ROIDForumServer
 {
 	public class Networking
     {
-        //string ip = "127.0.0.1";
-        string ip = "172.31.42.222";
+        string ip = "127.0.0.1";
+        // Todo: Why did the server need this IP?
+        //string ip = "172.31.42.222";
 		int port = 7779;
 		public WebSocketServer websocketServer;
         public ServerController serverController;
