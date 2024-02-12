@@ -22,5 +22,6 @@ Goals:
   * `dotnet run`
 
 ## Client
-
-Todo: Add server and client run instructions.
+* In `ROID-Forum-Web-Client` folder
+  * `npm ci --legacy-peer-deps`
+  * `npm run build`
