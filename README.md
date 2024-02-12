@@ -25,3 +25,8 @@ Goals:
 * In `ROID-Forum-Web-Client` folder
   * `npm ci --legacy-peer-deps`
   * `npm run build`
+
+## Deploying Server
+In `ROID-Forum-Server/ROID-Forum-Server` folder, run `docker-compose -f "server-docker-compose.yml" up --build forum-server`.  
+The server docker instance will be accessible on 7779.  
+This server expects signed certs to exist.

@@ -112,7 +112,11 @@ namespace ROIDForumServer
 
         public void Start()
         {
-            websocketServer = new WebSocketServer("ws://"+ip+":" + port);
+            websocketServer = new WebSocketServer("wss://"+ip+":" + port);
+            // Note: This should not be done if running the project locally
+            X509Certificate2 pubOnly = new X509Certificate2("./certs/fullchain1.pem");
+            X509Certificate2 pubPrivEphemeral = pubOnly.CopyWithPrivateKey("./certs/privkey1.pem");
+            websocketServer.Certificate = new X509Certificate2(pubPrivEphemeral.Export(X509ContentType.Pfx));
             websocketServer.Start(socket =>
             {
                 socket.OnOpen = () => { ClientConnectedEvent(socket); };
