@@ -5,11 +5,13 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.IO;
+using System.Security.Authentication;
 namespace ROIDForumServer
 {
 	public class Networking
     {
-        string ip = "127.0.0.1";
+        string ip = "0.0.0.0";
+        //string ip = "127.0.0.1";
         // Todo: Why did the server need this IP?
         //string ip = "172.31.42.222";
 		int port = 7779;
@@ -118,6 +120,7 @@ namespace ROIDForumServer
             websocketServer = new WebSocketServer("wss://"+ip+":" + port);
             // Note: This should not be done if running the project locally
             websocketServer.Certificate = new X509Certificate2("../certs/cert.pfx", "password");
+            websocketServer.EnabledSslProtocols = SslProtocols.Tls12;
             websocketServer.Start(socket =>
             {
                 socket.OnOpen = () => { ClientConnectedEvent(socket); };
