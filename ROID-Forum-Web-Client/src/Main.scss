@@ -12,4 +12,11 @@ body {
   padding: 0;
   margin: 0;
   white-space: pre-wrap;
+
+  &.DarkTheme {
+    background: black;
+  }
+  &.LightTheme {
+    background: white;
+  }
 }

@@ -50,10 +50,12 @@ export class Section {
         }
 
         if (this.hasDarkTheme) {
+            this.website.darkTheme();
             this.website.chatbox.darkTheme();
             this.website.mainSection.darkTheme();
             this.website.controlPanel.darkTheme();
         } else {
+            this.website.lightTheme();
             this.website.chatbox.lightTheme();
             this.website.mainSection.lightTheme();
             this.website.controlPanel.lightTheme();

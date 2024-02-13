@@ -299,6 +299,16 @@ export class AppController {
         }
     }
 
+    darkTheme() {
+        this.body.classList.add('DarkTheme');
+        this.body.classList.remove('LightTheme');
+    }
+
+    lightTheme() {
+        this.body.classList.add('LightTheme');
+        this.body.classList.remove('DarkTheme');
+    }
+
     getInterface() {
         return this.mainDiv;
     }
