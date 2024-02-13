@@ -30,3 +30,4 @@ Goals:
 In `ROID-Forum-Server/ROID-Forum-Server` folder, run `docker-compose -f "server-docker-compose.yml" up --build forum-server`.  
 The server docker instance will be accessible on 7779.  
 This server expects signed certs to exist.
+Created pfx cert using "openssl pkcs12 -in fullchain1.crt -inkey privkey1.key -export -out cert.pfx".

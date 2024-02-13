@@ -31,7 +31,15 @@ namespace ROIDForumServer
             otherSection = new SectionController(this, "Other Section");
 
             networking.Start();
-            Console.ReadKey(true);
+
+            var exitEvent = new ManualResetEvent(false);
+
+            Console.CancelKeyPress += (sender, eventArgs) => {
+                    eventArgs.Cancel = true;
+                    exitEvent.Set();
+                };
+            exitEvent.WaitOne();
+
             networking.Stop();
 			Thread.Sleep(1000);
         }

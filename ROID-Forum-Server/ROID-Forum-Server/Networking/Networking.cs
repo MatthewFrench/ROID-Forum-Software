@@ -1,7 +1,10 @@
 ﻿using System;
 using Fleck;
 using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.IO;
 namespace ROIDForumServer
 {
 	public class Networking
@@ -114,9 +117,7 @@ namespace ROIDForumServer
         {
             websocketServer = new WebSocketServer("wss://"+ip+":" + port);
             // Note: This should not be done if running the project locally
-            X509Certificate2 pubOnly = new X509Certificate2("./certs/fullchain1.pem");
-            X509Certificate2 pubPrivEphemeral = pubOnly.CopyWithPrivateKey("./certs/privkey1.pem");
-            websocketServer.Certificate = new X509Certificate2(pubPrivEphemeral.Export(X509ContentType.Pfx));
+            websocketServer.Certificate = new X509Certificate2("../certs/cert.pfx", "password");
             websocketServer.Start(socket =>
             {
                 socket.OnOpen = () => { ClientConnectedEvent(socket); };
