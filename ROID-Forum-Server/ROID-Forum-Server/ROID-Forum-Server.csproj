@@ -10,13 +10,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CassandraCSharpDriver" Version="3.20.0" />
+    <PackageReference Include="Fleck" Version="1.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Soly.Utilities.ByteArray" Version="1.2.6" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Fleck">
-      <HintPath>Fleck.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Account Controller\" />
