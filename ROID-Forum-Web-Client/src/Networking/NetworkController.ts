@@ -9,9 +9,6 @@ import {MessageReader} from "../Utility/Message/MessageReader";
 export class NetworkController {
     port : string = '7779';
     // Todo: Switch this to a configuration to automatically run localhost for local dev
-    //ip : string = 'localhost';
-    ip = 'server.matthewfrench.io';
-    serverURL : string = `wss://${this.ip}:${this.port}`;
     connection : WebSocket = null;
     connected : boolean = false;
     pingTime : number = 0;
@@ -26,7 +23,11 @@ export class NetworkController {
 
     initialize = () => {
         // Create WebSocket connection.
-        this.connection = new WebSocket(this.serverURL);
+        if (window.location.hostname === 'localhost') {
+            this.connection = new WebSocket(`ws://localhost:${this.port}`);
+        } else {
+            this.connection = new WebSocket(`wss://server.matthewfrench.io:${this.port}`);
+        }
         this.connection.binaryType = "arraybuffer";
 
         // Connection opened
