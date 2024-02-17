@@ -5,3 +5,5 @@ ROID-Forum-Server/ROID-Forum-Server/obj/
 **/dist
 **/node_modules
 ROID-Forum-Web-Client/yarn-error.log
+.DS_Store
+ROID-Forum-Server/ROID-Forum-Server.sln.DotSettings.user

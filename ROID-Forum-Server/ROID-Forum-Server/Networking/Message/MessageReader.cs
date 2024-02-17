@@ -1,5 +1,5 @@
 ﻿using System;
-using Soly.ByteArray;
+using Soly.Utilities.ByteArray;
 namespace ROIDForumServer
 {
 	public class MessageReader
@@ -31,7 +31,7 @@ namespace ROIDForumServer
 
 		public byte GetUint8()
 		{
-			var data = this.byteData.ReadU8((int)this.currentLoc, Endianess.BigEndian);
+			var data = this.byteData.ReadU8((int)this.currentLoc);
 			this.currentLoc += 1;
 			return data;
 		}
@@ -43,7 +43,7 @@ namespace ROIDForumServer
 
 		public sbyte GetInt8()
 		{
-			var data = this.byteData.ReadI8((int)this.currentLoc, Endianess.BigEndian);
+			var data = this.byteData.ReadI8((int)this.currentLoc);
 
 			this.currentLoc += 1;
 			return data;
@@ -57,7 +57,7 @@ namespace ROIDForumServer
 
 		public ushort GetUint16()
 		{
-			var data = this.byteData.ReadU16((int)this.currentLoc, Endianess.BigEndian);
+			var data = this.byteData.ReadU16((int)this.currentLoc, Endianness.BigEndian);
 
 			this.currentLoc += 2;
 			return data;
@@ -71,7 +71,7 @@ namespace ROIDForumServer
 
 		public short GetInt16()
 		{
-			var data = this.byteData.ReadI16((int)this.currentLoc, Endianess.BigEndian);
+			var data = this.byteData.ReadI16((int)this.currentLoc, Endianness.BigEndian);
 
 			this.currentLoc += 2;
 			return data;
@@ -85,7 +85,7 @@ namespace ROIDForumServer
 
 		public uint GetUint32()
 		{
-			var data = this.byteData.ReadU32((int)this.currentLoc, Endianess.BigEndian);
+			var data = this.byteData.ReadU32((int)this.currentLoc, Endianness.BigEndian);
 			this.currentLoc += 4;
 			return data;
 		}
@@ -97,14 +97,14 @@ namespace ROIDForumServer
 
 		public int GetInt32()
 		{
-			var data = this.byteData.ReadI32((int)this.currentLoc, Endianess.BigEndian);
+			var data = this.byteData.ReadI32((int)this.currentLoc, Endianness.BigEndian);
 			this.currentLoc += 4;
 			return data;
 		}
 
 		public double GetFloat64()
 		{
-			var data = this.byteData.ReadF64((int)this.currentLoc, Endianess.BigEndian);
+			var data = this.byteData.ReadF64((int)this.currentLoc, Endianness.BigEndian);
 			this.currentLoc += 8;
 			return data;
 		}
@@ -121,20 +121,20 @@ namespace ROIDForumServer
 
 		public float GetFloat32()
 		{
-			var data = this.byteData.ReadF32((int)this.currentLoc, Endianess.BigEndian);
+			var data = this.byteData.ReadF32((int)this.currentLoc, Endianness.BigEndian);
 			this.currentLoc += 4;
 			return data;
 		}
 
 		public bool HasString()
 		{
-			var length = this.byteData.ReadU32((int)this.currentLoc, Endianess.BigEndian);
+			var length = this.byteData.ReadU32((int)this.currentLoc, Endianness.BigEndian);
 			return (this.currentLoc + length) <= this.byteLength;
 		}
 
 		public string GetString()
 		{
-			var length = this.byteData.ReadU32((int)this.currentLoc, Endianess.BigEndian);
+			var length = this.byteData.ReadU32((int)this.currentLoc, Endianness.BigEndian);
 			this.currentLoc += 4;
 			var innerLength = length - 4;
 
@@ -147,13 +147,13 @@ namespace ROIDForumServer
 
 		public bool HasBinary()
 		{
-			var length = this.byteData.ReadU32((int)this.currentLoc, Endianess.BigEndian);
+			var length = this.byteData.ReadU32((int)this.currentLoc, Endianness.BigEndian);
 			return (this.currentLoc + length) <= this.byteLength;
 		}
 
 		public byte[] GetBinary()
 		{
-			var length = this.byteData.ReadU32((int)this.currentLoc, Endianess.BigEndian);
+			var length = this.byteData.ReadU32((int)this.currentLoc, Endianness.BigEndian);
 			this.currentLoc += 4;
 			var innerLength = length - 4;
             var byteArray = new byte[innerLength];

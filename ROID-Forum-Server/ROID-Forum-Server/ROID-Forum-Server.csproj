@@ -2,16 +2,16 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="test.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ByteArray" Version="1.1.6" />
-    <PackageReference Include="CassandraCSharpDriver" Version="3.5.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="CassandraCSharpDriver" Version="3.20.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Soly.Utilities.ByteArray" Version="1.2.6" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Fleck">
@@ -21,7 +21,6 @@
   <ItemGroup>
     <Folder Include="Account Controller\" />
     <Folder Include="Section Controller\" />
-    <Folder Include="Utility\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Convert Server Code\GMGServer\bin\Server\Chatbox Games\BlockGame\BlockController.dart" />

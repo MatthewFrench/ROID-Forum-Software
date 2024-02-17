@@ -21,6 +21,8 @@ Goals:
   * `dotnet build`
   * `dotnet run`
 
+If running locally, specify `environment=local` environment variable.
+
 ## Client
 * In `ROID-Forum-Web-Client` folder
   * `npm ci --legacy-peer-deps`

@@ -117,10 +117,17 @@ namespace ROIDForumServer
 
         public void Start()
         {
-            websocketServer = new WebSocketServer("wss://"+ip+":" + port);
-            // Note: This should not be done if running the project locally
-            websocketServer.Certificate = new X509Certificate2("../certs/cert.pfx", "password");
-            websocketServer.EnabledSslProtocols = SslProtocols.Tls12;
+	        if (Environment.IsRunningLocally())
+	        {
+		        websocketServer = new WebSocketServer("ws://"+ip+":" + port);
+	        }
+	        else
+	        {
+		        websocketServer = new WebSocketServer("wss://"+ip+":" + port);
+		        // Note: This should not be done if running the project locally
+		        websocketServer.Certificate = new X509Certificate2("../certs/cert.pfx", "password");
+		        websocketServer.EnabledSslProtocols = SslProtocols.Tls12;
+	        }
             websocketServer.Start(socket =>
             {
                 socket.OnOpen = () => { ClientConnectedEvent(socket); };

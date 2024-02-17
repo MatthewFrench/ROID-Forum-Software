@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Soly.ByteArray;
+using Soly.Utilities.ByteArray;
 
 namespace ROIDForumServer
 {
@@ -31,7 +31,7 @@ namespace ROIDForumServer
 			ByteArray byteData = new ByteArray((int)totalLength);
 			uint loc = 0;
 			//Append the message length
-			byteData.Write(totalLength, (int)loc, Endianess.BigEndian);
+			byteData.Write(totalLength, (int)loc, Endianness.BigEndian);
 			loc += 4;
 			//Append the message
 			foreach (MessageData data in dataArray)
