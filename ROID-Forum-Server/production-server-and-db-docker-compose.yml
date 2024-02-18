@@ -1,0 +1,32 @@
+version: '3.9'
+name: 'forum-server'
+services:
+  forum-db-node1:
+    image: scylladb/scylla:5.4.3
+    restart: unless-stopped
+    container_name: forum-db-node1
+    command: --seeds=forum-db-node1 --smp 4 --memory 4G --overprovisioned 1 --api-address 0.0.0.0
+    environment:
+      CLUSTER_NAME: forum-db
+    # Where our data will be persisted
+    volumes:
+      - "forum-db:/var/lib/scylla"
+      - "./scylla/scylla.yaml:/etc/scylla/scylla.yaml"
+      - "./scylla/cassandra-rackdc.properties:/etc/scylla/cassandra-rackdc.properties"
+  forum-server:
+    # Build the image from the dockerfile if it does not already exist
+    build:
+      context: ./
+      dockerfile: forum-server.Dockerfile
+    image: forum-server
+    container_name: forum-server
+    restart: unless-stopped
+    # Assume we have generated valid certificates at this location to pull in
+    volumes:
+      - "C:/letsencrypt/etc/archive/server.matthewfrench.io:/certs"
+    ports:
+      - '7779:7779'
+    expose:
+      - '7779'
+volumes:
+  forum-db:

@@ -29,7 +29,10 @@ If running locally, specify `environment=local` environment variable.
   * `npm run build`
 
 ## Deploying Server
-In `ROID-Forum-Server/ROID-Forum-Server` folder, run `docker-compose -f "server-docker-compose.yml" up --build forum-server`.  
+In `ROID-Forum-Server/ROID-Forum-Server` folder, run `docker-compose -f "production-server-and-db-docker-compose.yml" up`.  
 The server docker instance will be accessible on 7779.  
 This server expects signed certs to exist.
 Created pfx cert using "openssl pkcs12 -export -out cert.pfx -inkey privkey1.pem -in fullchain1.pem".
+
+## Deploying server locally (without certs)
+Run `docker-compose -f "local-server-and-db-docker-compose.yml" up -d`. 
