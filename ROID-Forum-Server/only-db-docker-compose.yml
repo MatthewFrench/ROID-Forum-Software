@@ -23,19 +23,5 @@ services:
       - "./scylla/scylla.yaml:/etc/scylla/scylla.yaml"
       - "./scylla/cassandra-rackdc.properties:/etc/scylla/cassandra-rackdc.properties"
       - "./scylla/scylla-server.conf:/etc/supervisord.conf.d/scylla-server.conf"
-  forum-server:
-    # Build the image from the dockerfile if it does not already exist
-    build:
-      context: ./
-      dockerfile: forum-server.Dockerfile
-    image: forum-server
-    container_name: forum-server
-    restart: unless-stopped
-    environment:
-      environment: local
-    ports:
-      - '7779:7779'
-    expose:
-      - '7779'
 volumes:
   forum-db-local:

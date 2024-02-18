@@ -6,6 +6,7 @@ namespace ROIDForumServer
 {
     public class ServerController
     {
+        Database database;
         Networking networking;
         public AccountController accountController;
         LoginController loginController;
@@ -17,7 +18,8 @@ namespace ROIDForumServer
         SectionController graphicsSection;
         SectionController otherSection;
         public ServerController()
-        {         
+        {
+            database = new Database(this);
             networking = new Networking(this);
             accountController = new AccountController(this);
 
@@ -39,7 +41,6 @@ namespace ROIDForumServer
                     exitEvent.Set();
                 };
             exitEvent.WaitOne();
-
             networking.Stop();
 			Thread.Sleep(1000);
         }
@@ -180,5 +181,8 @@ namespace ROIDForumServer
 		public Networking GetNetworking() {
 			return this.networking;
 		}
+        public Database GetDatabase() {
+            return this.database;
+        }
     }
 }

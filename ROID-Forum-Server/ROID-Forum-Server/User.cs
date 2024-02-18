@@ -9,7 +9,6 @@ namespace ROIDForumServer
         public IWebSocketConnection connection;
         public Account account;
         public String viewingSection = "";
-        public String inGame = "";
         public User(IWebSocketConnection c) {
             connection = c;
             account = null;

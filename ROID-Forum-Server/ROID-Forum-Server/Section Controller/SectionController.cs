@@ -5,6 +5,7 @@ namespace ROIDForumServer
     public class SectionController
     {
         public ServerController server;
+        public Guid sectionID;
         public SectionMessageSender messageSender;
         public ThreadController threadController;
         public List<User> usersViewing = new List<User>();
@@ -15,6 +16,7 @@ namespace ROIDForumServer
         {
             server = s;
             this.name = name;
+            sectionID = server.GetDatabase().LoadSectionID(this.name);
             messageSender = new SectionMessageSender(this);
             threadController = new ThreadController(this);
             ioController = new SectionIOController(this);
