@@ -7,11 +7,12 @@ namespace ROIDForumServer
     public class ConnectedUser
     {
         public IWebSocketConnection connection;
-        public Account account;
+        // Null if the user is not logged in
+        public Guid? accountID;
         public String viewingSection = "";
         public ConnectedUser(IWebSocketConnection c) {
             connection = c;
-            account = null;
+            accountID = null;
         }
         public void sendBinary(byte[] data)
         {

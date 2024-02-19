@@ -7,10 +7,12 @@ namespace ROIDForumServer
         public List<ThreadInfo> threads;
         public SectionController controller;
         public int threadIDs = 0;
-        public ThreadController(SectionController c)
+        private Database database;
+        public ThreadController(SectionController c, Database database)
         {
             controller = c;
             threads = new List<ThreadInfo>();
+            this.database = database;
         }
         public ThreadInfo getThreadForID(int threadID)
         {
@@ -26,7 +28,11 @@ namespace ROIDForumServer
         //Thread actions
         public void addThread(ConnectedUser p, String title, String description)
         {
-            ThreadInfo t = new ThreadInfo(p.account.name, threadIDs++, title, description, p.account.avatarURL);
+            if (p.accountID == null)
+            {
+                return;
+            }
+            ThreadInfo t = new ThreadInfo(database.GetAccountName((Guid)p.accountID), threadIDs++, title, description, database.GetAvatarUrl((Guid)p.accountID));
             threads.Add(t);
             controller.messageSender.sendAddThreadToAll(t);
 
@@ -40,7 +46,7 @@ namespace ROIDForumServer
             ThreadInfo t = getThreadForID(threadID);
             if (t != null)
             {
-                if (t.owner == p.account.name)
+                if (t.owner == database.GetAccountName((Guid)p.accountID))
                 {
                     threads.Remove(t);
                     controller.messageSender.sendRemoveThreadToAll(t);
@@ -54,7 +60,7 @@ namespace ROIDForumServer
             ThreadInfo t = getThreadForID(id);
             if (t != null)
             {
-                if (t.owner == p.account.name)
+                if (t.owner == database.GetAccountName((Guid)p.accountID))
                 {
                     t.title = title;
                     t.description = description;
@@ -81,7 +87,7 @@ namespace ROIDForumServer
             ThreadInfo t = getThreadForID(threadID);
             if (t != null)
             {
-                CommentInfo c = new CommentInfo(t.id, t.commentIDs++, text, u.account.name, u.account.avatarURL);
+                CommentInfo c = new CommentInfo(t.id, t.commentIDs++, text, database.GetAccountName((Guid)u.accountID), database.GetAvatarUrl((Guid)u.accountID));
                 t.comments.Add(c);
                 controller.messageSender.sendAddCommentToAll(c);
 
@@ -99,7 +105,7 @@ namespace ROIDForumServer
                 CommentInfo c = t.getCommentForID(commentID);
                 if (c != null)
                 {
-                    if (p.account.name == c.owner)
+                    if (database.GetAccountName((Guid)p.accountID) == c.owner)
                     {
                         t.comments.Remove(c);
                         controller.messageSender.sendDeleteCommentToAll(c);
@@ -118,7 +124,7 @@ namespace ROIDForumServer
                 CommentInfo c = t.getCommentForID(commentID);
                 if (c != null)
                 {
-                    if (p.account.name == c.owner)
+                    if (database.GetAccountName((Guid)p.accountID) == c.owner)
                     {
                         c.comment = description;
                         controller.messageSender.sendUpdateCommentToAll(c);

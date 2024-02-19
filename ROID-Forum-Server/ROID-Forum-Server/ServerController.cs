@@ -8,7 +8,6 @@ namespace ROIDForumServer
     {
         Database database;
         Networking networking;
-        public AccountController accountController;
         LoginController loginController;
         ChatController chatController;
         HighResolutionTimer logicTimer;
@@ -21,7 +20,6 @@ namespace ROIDForumServer
         {
             database = new Database(this);
             networking = new Networking(this);
-            accountController = new AccountController(this);
 
             loginController = new LoginController(this);
             chatController = new ChatController(this);
@@ -48,7 +46,6 @@ namespace ROIDForumServer
         public void logic(float delta)
         {
             chatController.logic();
-            accountController.logic();
 
             //allSection.logic();
             codingSection.logic();
@@ -59,15 +56,15 @@ namespace ROIDForumServer
 
         public void accountLoggedIn(ConnectedUser u)
         {
-            if (u.account != null) {
-                Console.WriteLine($"Account logged in {u.account.name}");
+            if (u.accountID != null) {
+                Console.WriteLine($"Account logged in {u.accountID}");
             }
             chatController.sendListUpdateToAll();
         }
         public void accountLoggedOut(ConnectedUser u)
         {
-            if (u.account != null) {
-                Console.WriteLine($"Account logged out {u.account.name}");
+            if (u.accountID != null) {
+                Console.WriteLine($"Account logged out {u.accountID}");
             }
             chatController.sendListUpdateToAll();
         }

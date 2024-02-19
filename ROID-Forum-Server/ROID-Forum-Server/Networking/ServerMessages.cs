@@ -35,13 +35,12 @@ namespace ROIDForumServer
             LoggedIn = 4,
         }
 
-        public static byte[] LoggedInMessage(String username, String password)
+        public static byte[] LoggedInMessage(String username)
         {
             var message = new MessageWriter();
             message.AddUint8((byte)Controller.Login);
             message.AddUint8((byte)LoginMsg.LoggedIn);
             message.AddString(username);
-            message.AddString(password);
 
             return message.ToBuffer();
         }

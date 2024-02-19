@@ -15,50 +15,66 @@ namespace ROIDForumServer
         }
         public void onMessage(ConnectedUser u, Dictionary<string, object> message)
         {
-            if ((string)message["Title"] == "Set Avatar" && u.account != null)
+            if ((string)message["Title"] == "Set Avatar" && u.accountID != null)
             {
-                u.account.avatarURL = (string)message["AvatarURL"];
+                server.GetDatabase().SetAvatarUrl((Guid)u.accountID, (string)message["AvatarURL"]);
             }
-            if ((string)message["Title"] == "Get Avatar" && u.account != null)
+            if ((string)message["Title"] == "Get Avatar" && u.accountID != null)
             {
-                u.sendBinary(ServerMessages.GetAvatarMessage(u.account.avatarURL));
+                u.sendBinary(ServerMessages.GetAvatarMessage(server.GetDatabase().GetAvatarUrl((Guid)u.accountID)));
             }
-            if ((string)message["Title"] == "Login" && u.account == null)
+            if ((string)message["Title"] == "Login" && u.accountID == null)
             {
-                if (server.accountController.accountExists((string)message["Name"], (string)message["Password"]))
+                string username = (string)message["Name"];
+                string password = (string)message["Password"];
+                if (String.IsNullOrWhiteSpace(username) || String.IsNullOrWhiteSpace(password))
                 {
-                    u.account = server.accountController.getAccount((string)message["Name"], (string)message["Password"]);
-                    u.sendBinary(ServerMessages.LoggedInMessage(u.account.name, u.account.password));
-
-                    server.accountLoggedIn(u);
+                    u.sendBinary(ServerMessages.LoginFailedMessage());
                 }
                 else
                 {
-                    //Send login failure
-                    u.sendBinary(ServerMessages.LoginFailedMessage());
+                    Guid? accountID = server.GetDatabase().GetAccountIDForCredentials(username, password);
+                    if (accountID == null)
+                    {
+                        u.sendBinary(ServerMessages.LoginFailedMessage());
+                    }
+                    else
+                    {
+                        u.accountID = accountID;
+                        u.sendBinary(ServerMessages.LoggedInMessage(server.GetDatabase().GetAccountName((Guid)u.accountID)));
+                        server.accountLoggedIn(u);
+                    }
                 }
             }
-            if ((string)message["Title"] == "Logout" && u.account != null)
+            if ((string)message["Title"] == "Logout" && u.accountID != null)
             {
                 //Perhaps an account method can be called for saving or other logic
-                u.account = null;
+                u.accountID = null;
                 //Send logout notification
                 u.sendBinary(ServerMessages.LoggedOutMessage());
                 server.accountLoggedOut(u);
             }
-            if ((string)message["Title"] == "Register" && u.account == null)
+            if ((string)message["Title"] == "Register" && u.accountID == null)
             {
-                if (server.accountController.accountNameExists((string)message["Name"]))
+                string username = (string)message["Name"];
+                string password = (string)message["Password"];
+                string email = (string)message["Email"];
+                if (String.IsNullOrWhiteSpace(username) || String.IsNullOrWhiteSpace(password) || String.IsNullOrWhiteSpace(email))
                 {
                     u.sendBinary(ServerMessages.RegisterFailedMessage());
+                    return;
                 }
-                else
+                var (createAccountStatus, accountID) = server.GetDatabase().CreateAccount(username, password, email);
+                if (createAccountStatus == Database.CreateAccountStatus.AlreadyExists || accountID == null)
                 {
-                    u.account = server.accountController.createAccount((string)message["Name"], (string)message["Password"], (string)message["Email"]);
-                    //Send login notification
-                    u.sendBinary(ServerMessages.LoggedInMessage(u.account.name, u.account.password));
-                    server.accountLoggedIn(u);
+                    u.sendBinary(ServerMessages.RegisterFailedMessage());
+                    return;
                 }
+                // Set the account ID to log them in
+                u.accountID = accountID;
+                //Send login notification
+                u.sendBinary(ServerMessages.LoggedInMessage(server.GetDatabase().GetAccountName((Guid)u.accountID)));
+                server.accountLoggedIn(u);
             }
         }
     }

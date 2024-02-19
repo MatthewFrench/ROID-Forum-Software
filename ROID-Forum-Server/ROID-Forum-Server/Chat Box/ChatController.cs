@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 namespace ROIDForumServer
 {
     public class ChatController
     {
-        List<String> chats = new List<string>();
         ServerController server;
+        // Todo: We can use cassandra, redis, or nats to properly show
+        // active users and allow subscribing them to events.
+        // This will allow multi-instance scaling of the server.
         List<ConnectedUser> users = new List<ConnectedUser>();
-        ChatIOController chatIOController;
         public ChatController(ServerController s)
         {
-            chatIOController = new ChatIOController(this);
             server = s;
-            chatIOController.loadAllChats();
         }
         public void addUser(ConnectedUser u)
         {
@@ -31,9 +29,13 @@ namespace ROIDForumServer
             String list = $"Online({users.Count}): ";
             int guests = 0;
             bool addComma = false;
+            // Todo: Fix bulk account name lookups, either cache names
+            // or make an active online table in Cassandra, or
+            // make a bunch of async parallel queries to be distributed
+            // among cassandra nodes.
     foreach (ConnectedUser u in users)
             {
-                if (u.account != null)
+                if (u.accountID != null)
                 {
                     if (addComma)
                     {
@@ -43,7 +45,7 @@ namespace ROIDForumServer
                     {
                         addComma = true;
                     }
-                    list += u.account.name;
+                    list += server.GetDatabase().GetAccountName((Guid)u.accountID);
                 }
                 else
                 {
@@ -68,13 +70,17 @@ namespace ROIDForumServer
         }
         public void logic()
         {
-            chatIOController.logic();
         }
         public void addChat(ConnectedUser u, String chat)
         {
-            chat = $"{u.account.name}: " + chat;
-            chats.Add(chat);
+            if (u.accountID == null)
+            {
+                return;
+            }
+            chat = $"{server.GetDatabase().GetAccountName((Guid)u.accountID)}: " + chat;
+            server.GetDatabase().SubmitChat((Guid)u.accountID, chat);
             //Send chat to all connected websockets
+            // Todo: Switch to a NATS subscription model
             byte[] chatMsg = ServerMessages.ChatMessage(chat);
             for (int i = 0; i < server.GetNetworking().users.Count; i++)
             {
@@ -83,19 +89,15 @@ namespace ROIDForumServer
             }
         }
         public void sendAllChats(ConnectedUser u)
-        { //Send only last 20
-            int start = 0;
-            // if (chats.length > 20) {
-            //   start = chats.length - 20;
-            // }
-            for (int i = start; i < chats.Count; i++)
+        {
+            foreach (var (creator_account_id, chat_id, content, created_time) in server.GetDatabase().GetRecentChats())
             {
-                u.sendBinary(ServerMessages.ChatMessage(chats[i]));
+                u.sendBinary(ServerMessages.ChatMessage(content));
             }
         }
         public void onMessage(ConnectedUser u, Dictionary<string, object> message)
         {
-            if ((string)message["Title"] == "Msg" && u.account != null)
+            if ((string)message["Title"] == "Msg" && u.accountID != null)
             {
                 addChat(u, (string)message["Data"]);
             }

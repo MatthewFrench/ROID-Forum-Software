@@ -106,10 +106,8 @@ public class Database
                    creator_account_id uuid,
                    created_time timeuuid,
                    content text,
-                   PRIMARY KEY (created_time)
-                ) WITH compaction = {{ 'class' : 'TimeWindowCompactionStrategy' }}");
-        session.Execute($@"
-                CREATE INDEX IF NOT EXISTS ON ""{DEFAULT_KEYSPACE}"".""{TABLE_CHAT}"" (chat_id)");
+                   PRIMARY KEY (chat_id, created_time)
+                ) WITH CLUSTERING ORDER BY (created_time DESC)");
         session.Execute($@"
                 CREATE TABLE IF NOT EXISTS ""{DEFAULT_KEYSPACE}"".""{TABLE_ACTIVE_IN_SECTION}"" (
                    account_id uuid,
@@ -153,8 +151,7 @@ public class Database
 	    {
 		    return null;
 	    }
-	    var lowercasePassword = password.ToLower();
-	    if (SecretHasher.Verify(lowercasePassword, firstItem.GetValue<string>("password")))
+	    if (SecretHasher.Verify(password, firstItem.GetValue<string>("password")))
 	    {
 		    return firstItem.GetValue<Guid>("account_id");
 	    }
@@ -177,13 +174,10 @@ public class Database
 		    return (CreateAccountStatus.AlreadyExists, null);
 	    }
 	    // Create the authentication account
-	    string lowercasePassword = password.ToLower();
-	    string hashedPassword = SecretHasher.Hash(lowercasePassword);
-	    PreparedStatement insertStatement = session.Prepare($"INSERT INTO \"{DEFAULT_KEYSPACE}\".\"{TABLE_ACCOUNT_AUTHENTICATION}\" (account_id, username, password) VALUES (uuid(), ?, ?)");
-	    session.Execute(insertStatement.Bind(lowercaseUsername, hashedPassword));
-	    PreparedStatement selectAccountID = session.Prepare($"SELECT account_id FROM \"{DEFAULT_KEYSPACE}\".\"{TABLE_ACCOUNT_AUTHENTICATION}\" where username=? and password=?");
-	    var accountIDResult = session.Execute(selectAccountID.Bind(lowercaseUsername, hashedPassword));
-	    Guid accountID = accountIDResult.First().GetValue<Guid>("account_id");
+	    string hashedPassword = SecretHasher.Hash(password);
+	    Guid accountID = Guid.NewGuid();
+	    PreparedStatement insertStatement = session.Prepare($"INSERT INTO \"{DEFAULT_KEYSPACE}\".\"{TABLE_ACCOUNT_AUTHENTICATION}\" (account_id, username, password) VALUES (?, ?, ?)");
+	    session.Execute(insertStatement.Bind(accountID, lowercaseUsername, hashedPassword));
 	    // Create the account details
 	    // Todo: Use a generic picture url for avatar_url
 	    PreparedStatement insertAccount = session.Prepare($"INSERT INTO \"{DEFAULT_KEYSPACE}\".\"{TABLE_ACCOUNT}\" (account_id, display_name, email, created_time) VALUES (?, ?, ?, now())");
@@ -199,7 +193,8 @@ public class Database
     // Todo: Add pagination and dynamic loading/lookback as the user scrolls down in chats
     public List<DatabaseChatData> GetRecentChats()
     {
-	    var result = session.Execute($"SELECT chat_id, creator_account_id, created_time, content FROM \"{DEFAULT_KEYSPACE}\".\"{TABLE_CHAT}\" LIMIT 100 ORDER BY created_time DESC");
+	    // Order by isn't needed since Cassandra is ordering the data in descending order
+	    var result = session.Execute($"SELECT chat_id, creator_account_id, created_time, content FROM \"{DEFAULT_KEYSPACE}\".\"{TABLE_CHAT}\" LIMIT 100");
 	    List<DatabaseChatData> results = new List<DatabaseChatData>();
 	    foreach (Row item in result)
 	    {
@@ -207,6 +202,26 @@ public class Database
 	    }
 
 	    return results;
+    }
+    public String GetAccountName(Guid accountId)
+    {
+	    PreparedStatement selectStatement = session.Prepare($"SELECT display_name FROM \"{DEFAULT_KEYSPACE}\".\"{TABLE_ACCOUNT}\" where account_id=?");
+	    var result = session.Execute(selectStatement.Bind(accountId));
+	    // Todo: Add safety checks
+	    return result.FirstOrDefault().GetValue<String>("display_name");
+    }
+    public String GetAvatarUrl(Guid accountId)
+    {
+	    PreparedStatement selectStatement = session.Prepare($"SELECT avatar_url FROM \"{DEFAULT_KEYSPACE}\".\"{TABLE_ACCOUNT}\" where account_id=?");
+	    var result = session.Execute(selectStatement.Bind(accountId));
+	    // Todo: Add safety checks
+	    string avatarUrl = result.FirstOrDefault().GetValue<String>("avatar_url");
+	    return avatarUrl == null ? "" : avatarUrl;
+    }
+    public void SetAvatarUrl(Guid accountId, String text)
+    {
+	    PreparedStatement selectStatement = session.Prepare($"UPDATE \"{DEFAULT_KEYSPACE}\".\"{TABLE_ACCOUNT}\" set avatar_url=? where account_id=?");
+	    session.Execute(selectStatement.Bind(text, accountId));
     }
     /*
      * Schemas

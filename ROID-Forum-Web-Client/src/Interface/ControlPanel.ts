@@ -115,12 +115,17 @@ export class ControlPanel {
         this.login(this.loginWindowName.value, this.loginWindowPassword.value);
     };
     login = (name : string, password : string) => {
-        let m : any = {};
-        m['Controller'] = 'Login';
-        m['Title'] = 'Login';
-        m['Name'] = name;
-        m['Password'] = this.encrypt(password);
-        this.website.networkController.send(m);
+        this.securelyHash(password).then((hashedPassword)=>{
+            let m : any = {};
+            m['Controller'] = 'Login';
+            m['Title'] = 'Login';
+            m['Name'] = name;
+            m['Password'] = hashedPassword;
+            // Todo: Don't do this, or do it better. This is janky for setting up auto-login.
+            localStorage.setItem('Name', m['Name']);
+            localStorage.setItem('Password', m['Password']);
+            this.website.networkController.send(m);
+        });
     };
     loginAlreadyEncrypted = (name : string, password : string) => {
         let m: any = {};
@@ -144,13 +149,18 @@ export class ControlPanel {
             this.loginErrorDiv.innerText = 'Need an email';
             return;
         }
-        let m: any = {};
-        m['Controller'] = 'Login';
-        m['Title'] = 'Register';
-        m['Name'] = this.loginWindowName.value;
-        m['Password'] = this.encrypt(this.loginWindowPassword.value);
-        m['Email'] = this.loginWindowEmail.value;
-        this.website.networkController.send(m);
+        this.securelyHash(this.loginWindowPassword.value).then((hashedPassword)=>{
+            let m: any = {};
+            m['Controller'] = 'Login';
+            m['Title'] = 'Register';
+            m['Name'] = this.loginWindowName.value;
+            m['Password'] = hashedPassword;
+            m['Email'] = this.loginWindowEmail.value;
+            // Todo: Don't do this, or do it better. This is janky for setting up auto-login.
+            localStorage.setItem('Name', m['Name']);
+            localStorage.setItem('Password', m['Password']);
+            this.website.networkController.send(m);
+        });
     };
     removeLoginDiv = () => {
         this.hideBackgroundDiv.remove();
@@ -197,14 +207,12 @@ export class ControlPanel {
                 break;
         }
     };
-    encrypt(s : string) : string {
-        /*
-        var sha256 = new SHA256();
-        sha256.add(s.codeUnits);
-        var digest = sha256.close();
-        String hexString = CryptoUtils.bytesToHex(digest);
-        return hexString;
-        */
-        return s;
+    async securelyHash(value : string) : Promise<string> {
+        // Todo: When I'm no longer handling manual passwords, remove this.
+        const msgUint8 = new TextEncoder().encode(value);                           // encode as (utf-8) Uint8Array
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);           // hash the message
+        const hashArray = Array.from(new Uint8Array(hashBuffer));                     // convert buffer to byte array
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+        return hashHex;
     }
 }

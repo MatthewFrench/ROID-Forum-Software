@@ -18,7 +18,7 @@ namespace ROIDForumServer
             this.name = name;
             sectionID = server.GetDatabase().LoadSectionID(this.name);
             messageSender = new SectionMessageSender(this);
-            threadController = new ThreadController(this);
+            threadController = new ThreadController(this, server.GetDatabase());
             ioController = new SectionIOController(this);
             ioController.loadAllData();
         }

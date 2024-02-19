@@ -15,7 +15,6 @@
     <PackageReference Include="Soly.Utilities.ByteArray" Version="1.2.6" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Account Controller\" />
     <Folder Include="Section Controller\" />
   </ItemGroup>
   <ItemGroup>
