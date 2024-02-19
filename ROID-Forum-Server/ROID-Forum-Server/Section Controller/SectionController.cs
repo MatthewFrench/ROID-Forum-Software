@@ -8,7 +8,7 @@ namespace ROIDForumServer
         public Guid sectionID;
         public SectionMessageSender messageSender;
         public ThreadController threadController;
-        public List<User> usersViewing = new List<User>();
+        public List<ConnectedUser> usersViewing = new List<ConnectedUser>();
         public String name = "";
         public SectionIOController ioController;
         int saveTimer = -1;
@@ -23,12 +23,12 @@ namespace ROIDForumServer
             ioController.loadAllData();
         }
 
-        public void addUser(User u)
+        public void addUser(ConnectedUser u)
         {
             usersViewing.Add(u);
             messageSender.sendAllThreadsToUser(u);
         }
-        public void removeUser(User u)
+        public void removeUser(ConnectedUser u)
         {
             usersViewing.Remove(u);
         }
@@ -41,7 +41,7 @@ namespace ROIDForumServer
                 ioController.saveAllData();
             }
         }
-        public void onMessage(User p, Dictionary<string, object> message)
+        public void onMessage(ConnectedUser p, Dictionary<string, object> message)
         {
             switch ((string)message["Title"])
             {

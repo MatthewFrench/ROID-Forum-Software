@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 namespace ROIDForumServer
 {
-    public class User
+    public class ConnectedUser
     {
         public IWebSocketConnection connection;
         public Account account;
         public String viewingSection = "";
-        public User(IWebSocketConnection c) {
+        public ConnectedUser(IWebSocketConnection c) {
             connection = c;
             account = null;
         }

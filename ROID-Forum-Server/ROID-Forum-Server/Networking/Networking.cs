@@ -15,8 +15,8 @@ namespace ROIDForumServer
 		public WebSocketServer websocketServer;
         public ServerController serverController;
         public List<IWebSocketConnection> webSockets = new List<IWebSocketConnection>();
-        public List<User> users = new List<User>();
-        public Dictionary<IWebSocketConnection, User> userMap = new Dictionary<IWebSocketConnection, User>();
+        public List<ConnectedUser> users = new List<ConnectedUser>();
+        public Dictionary<IWebSocketConnection, ConnectedUser> userMap = new Dictionary<IWebSocketConnection, ConnectedUser>();
 		public Networking(ServerController controller) {
 			serverController = controller;
 		}
@@ -26,7 +26,7 @@ namespace ROIDForumServer
 			Console.WriteLine("Open!");
 			Console.WriteLine("Clients connected: " + GetNumberOfConnectedClients());
 
-            User p = new User(socket);
+            ConnectedUser p = new ConnectedUser(socket);
             users.Add(p);
             userMap.Add(socket, p);
             serverController.onOpen(p);

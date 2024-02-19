@@ -13,7 +13,7 @@ namespace ROIDForumServer
         public void logic()
         {
         }
-        public void onMessage(User u, Dictionary<string, object> message)
+        public void onMessage(ConnectedUser u, Dictionary<string, object> message)
         {
             if ((string)message["Title"] == "Set Avatar" && u.account != null)
             {

@@ -57,25 +57,25 @@ namespace ROIDForumServer
             otherSection.logic();
         }
 
-        public void accountLoggedIn(User u)
+        public void accountLoggedIn(ConnectedUser u)
         {
             if (u.account != null) {
                 Console.WriteLine($"Account logged in {u.account.name}");
             }
             chatController.sendListUpdateToAll();
         }
-        public void accountLoggedOut(User u)
+        public void accountLoggedOut(ConnectedUser u)
         {
             if (u.account != null) {
                 Console.WriteLine($"Account logged out {u.account.name}");
             }
             chatController.sendListUpdateToAll();
         }
-        public void onOpen(User u)
+        public void onOpen(ConnectedUser u)
         {
             chatController.addUser(u);
         }
-        public void onMessage(User u, Object message)
+        public void onMessage(ConnectedUser u, Object message)
         {
             if (message is String)
             {
@@ -108,12 +108,12 @@ namespace ROIDForumServer
             */
         }
 
-        public void onClose(User u)
+        public void onClose(ConnectedUser u)
         {
             disengageFromSection(u.viewingSection, u);
             chatController.removeUser(u);
         }
-        public void engageToSection(String section, User u)
+        public void engageToSection(String section, ConnectedUser u)
         {
             u.viewingSection = section;
             switch (section)
@@ -145,7 +145,7 @@ namespace ROIDForumServer
                     break;
             }
         }
-        public void disengageFromSection(String section, User u)
+        public void disengageFromSection(String section, ConnectedUser u)
         {
             switch (section)
             {

@@ -24,7 +24,7 @@ namespace ROIDForumServer
             return null;
         }
         //Thread actions
-        public void addThread(User p, String title, String description)
+        public void addThread(ConnectedUser p, String title, String description)
         {
             ThreadInfo t = new ThreadInfo(p.account.name, threadIDs++, title, description, p.account.avatarURL);
             threads.Add(t);
@@ -35,7 +35,7 @@ namespace ROIDForumServer
 
             moveThreadToTop(t.id);
         }
-        public void deleteThread(User p, int threadID)
+        public void deleteThread(ConnectedUser p, int threadID)
         {
             ThreadInfo t = getThreadForID(threadID);
             if (t != null)
@@ -49,7 +49,7 @@ namespace ROIDForumServer
                 }
             }
         }
-        public void editThread(User p, int id, String title, String description)
+        public void editThread(ConnectedUser p, int id, String title, String description)
         {
             ThreadInfo t = getThreadForID(id);
             if (t != null)
@@ -76,7 +76,7 @@ namespace ROIDForumServer
                 //controller.server.allSection.threadController.moveThreadToTop(controller.name, t.id);
             }
         }
-        public void addComment(User u, int threadID, String text)
+        public void addComment(ConnectedUser u, int threadID, String text)
         {
             ThreadInfo t = getThreadForID(threadID);
             if (t != null)
@@ -91,7 +91,7 @@ namespace ROIDForumServer
                 moveThreadToTop(threadID);
             }
         }
-        public void deleteComment(User p, int threadID, int commentID)
+        public void deleteComment(ConnectedUser p, int threadID, int commentID)
         {
             ThreadInfo t = getThreadForID(threadID);
             if (t != null)
@@ -110,7 +110,7 @@ namespace ROIDForumServer
                 }
             }
         }
-        public void editComment(User p, int threadID, int commentID, String description)
+        public void editComment(ConnectedUser p, int threadID, int commentID, String description)
         {
             ThreadInfo t = getThreadForID(threadID);
             if (t != null)

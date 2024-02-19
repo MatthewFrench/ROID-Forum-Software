@@ -10,14 +10,14 @@ namespace ROIDForumServer
         {
             controller = c;
         }
-        public void sendAllThreadsToUser(User u)
+        public void sendAllThreadsToUser(ConnectedUser u)
         {
             u.sendBinary(ServerMessages.AllThreadsMessage(controller));
         }
         public void sendAddThreadToAll(ThreadInfo t)
         {
             byte[] message = ServerMessages.AddThreadMessage(controller, t);
-            foreach (User u in controller.usersViewing)
+            foreach (ConnectedUser u in controller.usersViewing)
             {
                 u.sendBinary(message);
             }
@@ -25,7 +25,7 @@ namespace ROIDForumServer
         public void sendRemoveThreadToAll(ThreadInfo t)
         {
             byte[] message = ServerMessages.RemoveThreadMessage(controller, t);
-            foreach (User u in controller.usersViewing)
+            foreach (ConnectedUser u in controller.usersViewing)
             {
                 u.sendBinary(message);
             }
@@ -33,7 +33,7 @@ namespace ROIDForumServer
         public void sendUpdateThreadToAll(ThreadInfo t)
         {
             byte[] message = ServerMessages.UpdateThreadMessage(controller, t);
-            foreach (User u in controller.usersViewing)
+            foreach (ConnectedUser u in controller.usersViewing)
             {
                 u.sendBinary(message);
             }
@@ -41,7 +41,7 @@ namespace ROIDForumServer
         public void sendMoveThreadToTopToAll(ThreadInfo t)
         {
             byte[] message = ServerMessages.MoveToTopThreadMessage(controller, t);
-            foreach (User u in controller.usersViewing)
+            foreach (ConnectedUser u in controller.usersViewing)
             {
                 u.sendBinary(message);
             }
@@ -49,7 +49,7 @@ namespace ROIDForumServer
         public void sendAddCommentToAll(CommentInfo c)
         {
             byte[] message = ServerMessages.AddCommentMessage(controller, c);
-            foreach (User u in controller.usersViewing)
+            foreach (ConnectedUser u in controller.usersViewing)
             {
                 u.sendBinary(message);
             }
@@ -57,7 +57,7 @@ namespace ROIDForumServer
         public void sendDeleteCommentToAll(CommentInfo c)
         {
             byte[] message = ServerMessages.RemoveCommentMessage(controller, c);
-            foreach (User u in controller.usersViewing)
+            foreach (ConnectedUser u in controller.usersViewing)
             {
                 u.sendBinary(message);
             }
@@ -65,7 +65,7 @@ namespace ROIDForumServer
         public void sendUpdateCommentToAll(CommentInfo c)
         {
             byte[] message = ServerMessages.UpdateCommentMessage(controller, c);
-            foreach (User u in controller.usersViewing)
+            foreach (ConnectedUser u in controller.usersViewing)
             {
                 u.sendBinary(message);
             }

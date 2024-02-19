@@ -7,7 +7,7 @@ namespace ROIDForumServer
     {
         List<String> chats = new List<string>();
         ServerController server;
-        List<User> users = new List<User>();
+        List<ConnectedUser> users = new List<ConnectedUser>();
         ChatIOController chatIOController;
         public ChatController(ServerController s)
         {
@@ -15,13 +15,13 @@ namespace ROIDForumServer
             server = s;
             chatIOController.loadAllChats();
         }
-        public void addUser(User u)
+        public void addUser(ConnectedUser u)
         {
             users.Add(u);
             sendListUpdateToAll();
             sendAllChats(u);
         }
-        public void removeUser(User u)
+        public void removeUser(ConnectedUser u)
         {
             users.Remove(u);
             sendListUpdateToAll();
@@ -31,7 +31,7 @@ namespace ROIDForumServer
             String list = $"Online({users.Count}): ";
             int guests = 0;
             bool addComma = false;
-    foreach (User u in users)
+    foreach (ConnectedUser u in users)
             {
                 if (u.account != null)
                 {
@@ -60,7 +60,7 @@ namespace ROIDForumServer
             }
 
             byte[] message = ServerMessages.ChatOnlineList(list);
-            foreach (User u in users)
+            foreach (ConnectedUser u in users)
             {
                 u.sendBinary(message);
             }
@@ -70,7 +70,7 @@ namespace ROIDForumServer
         {
             chatIOController.logic();
         }
-        public void addChat(User u, String chat)
+        public void addChat(ConnectedUser u, String chat)
         {
             chat = $"{u.account.name}: " + chat;
             chats.Add(chat);
@@ -78,11 +78,11 @@ namespace ROIDForumServer
             byte[] chatMsg = ServerMessages.ChatMessage(chat);
             for (int i = 0; i < server.GetNetworking().users.Count; i++)
             {
-                User u2 = server.GetNetworking().users[i];
+                ConnectedUser u2 = server.GetNetworking().users[i];
                 u2.sendBinary(chatMsg);
             }
         }
-        public void sendAllChats(User u)
+        public void sendAllChats(ConnectedUser u)
         { //Send only last 20
             int start = 0;
             // if (chats.length > 20) {
@@ -93,7 +93,7 @@ namespace ROIDForumServer
                 u.sendBinary(ServerMessages.ChatMessage(chats[i]));
             }
         }
-        public void onMessage(User u, Dictionary<string, object> message)
+        public void onMessage(ConnectedUser u, Dictionary<string, object> message)
         {
             if ((string)message["Title"] == "Msg" && u.account != null)
             {
