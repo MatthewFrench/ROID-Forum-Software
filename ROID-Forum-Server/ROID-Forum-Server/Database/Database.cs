@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Cassandra;
 
@@ -55,8 +56,10 @@ public class Database
                    account_id uuid,
                    username TEXT,
                    password TEXT,
-                   PRIMARY KEY (username, password)
+                   PRIMARY KEY (username)
                 )");
+        session.Execute($@"
+                CREATE INDEX IF NOT EXISTS ON ""{DEFAULT_KEYSPACE}"".""{TABLE_ACCOUNT_AUTHENTICATION}"" (account_id)");
         session.Execute($@"
                 CREATE TABLE IF NOT EXISTS ""{DEFAULT_KEYSPACE}"".""{TABLE_ACCOUNT}"" (
                    account_id uuid,
@@ -138,6 +141,72 @@ public class Database
 	    PreparedStatement selectStatement = session.Prepare($"SELECT section_id FROM \"{DEFAULT_KEYSPACE}\".\"{TABLE_SECTION}\" where name=?");
 	    var result = session.Execute(selectStatement.Bind(sectionName));
 	    return result.First().GetValue<Guid>("section_id");
+    }
+
+    public Guid? GetAccountIDForCredentials(string username, string password)
+    {
+	    string lowercaseUsername = username.ToLower();
+	    PreparedStatement selectStatement = session.Prepare($"SELECT account_id, password FROM \"{DEFAULT_KEYSPACE}\".\"{TABLE_ACCOUNT_AUTHENTICATION}\" where username=?");
+	    var result = session.Execute(selectStatement.Bind(lowercaseUsername));
+	    var firstItem = result.FirstOrDefault();
+	    if (firstItem == null)
+	    {
+		    return null;
+	    }
+	    var lowercasePassword = password.ToLower();
+	    if (SecretHasher.Verify(lowercasePassword, firstItem.GetValue<string>("password")))
+	    {
+		    return firstItem.GetValue<Guid>("account_id");
+	    }
+	    return null;
+    }
+    public enum CreateAccountStatus
+    {
+	    Created,
+	    AlreadyExists
+    }
+    public (CreateAccountStatus, Guid?) CreateAccount(string username, string password, string email)
+    {
+	    // First ensure that the username isn't already taken
+	    string lowercaseUsername = username.ToLower();
+	    PreparedStatement selectStatement = session.Prepare($"SELECT account_id, password FROM \"{DEFAULT_KEYSPACE}\".\"{TABLE_ACCOUNT_AUTHENTICATION}\" where username=?");
+	    var result = session.Execute(selectStatement.Bind(lowercaseUsername));
+	    var firstItem = result.FirstOrDefault();
+	    if (firstItem != null)
+	    {
+		    return (CreateAccountStatus.AlreadyExists, null);
+	    }
+	    // Create the authentication account
+	    string lowercasePassword = password.ToLower();
+	    string hashedPassword = SecretHasher.Hash(lowercasePassword);
+	    PreparedStatement insertStatement = session.Prepare($"INSERT INTO \"{DEFAULT_KEYSPACE}\".\"{TABLE_ACCOUNT_AUTHENTICATION}\" (account_id, username, password) VALUES (uuid(), ?, ?)");
+	    session.Execute(insertStatement.Bind(lowercaseUsername, hashedPassword));
+	    PreparedStatement selectAccountID = session.Prepare($"SELECT account_id FROM \"{DEFAULT_KEYSPACE}\".\"{TABLE_ACCOUNT_AUTHENTICATION}\" where username=? and password=?");
+	    var accountIDResult = session.Execute(selectAccountID.Bind(lowercaseUsername, hashedPassword));
+	    Guid accountID = accountIDResult.First().GetValue<Guid>("account_id");
+	    // Create the account details
+	    // Todo: Use a generic picture url for avatar_url
+	    PreparedStatement insertAccount = session.Prepare($"INSERT INTO \"{DEFAULT_KEYSPACE}\".\"{TABLE_ACCOUNT}\" (account_id, display_name, email, created_time) VALUES (?, ?, ?, now())");
+	    session.Execute(insertAccount.Bind(accountID, username, email));
+	    return (CreateAccountStatus.Created, accountID);
+    }
+    public void SubmitChat(Guid accountID, string content)
+    {
+	    PreparedStatement insertStatement = session.Prepare($"INSERT INTO \"{DEFAULT_KEYSPACE}\".\"{TABLE_CHAT}\" (creator_account_id, chat_id, created_time, content) VALUES (?, uuid(), now(), ?)");
+	    session.Execute(insertStatement.Bind(accountID, content));
+    }
+    public record class DatabaseChatData(Guid creator_account_id, Guid chat_id, string content, TimeUuid created_time);
+    // Todo: Add pagination and dynamic loading/lookback as the user scrolls down in chats
+    public List<DatabaseChatData> GetRecentChats()
+    {
+	    var result = session.Execute($"SELECT chat_id, creator_account_id, created_time, content FROM \"{DEFAULT_KEYSPACE}\".\"{TABLE_CHAT}\" LIMIT 100 ORDER BY created_time DESC");
+	    List<DatabaseChatData> results = new List<DatabaseChatData>();
+	    foreach (Row item in result)
+	    {
+		    results.Add(new DatabaseChatData(item.GetValue<Guid>("creator_account_id"), item.GetValue<Guid>("chat_id"), item.GetValue<String>("content"), item.GetValue<TimeUuid>("created_time")));
+	    }
+
+	    return results;
     }
     /*
      * Schemas
