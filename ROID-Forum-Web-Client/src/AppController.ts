@@ -139,7 +139,7 @@ export class AppController {
         }
     }
 
-    goTo(section: string, threadID: number) {
+    goTo(section: string, threadID: string) {
         switch (section) {
             case "Coding Section": {
                 this.mainSection.sectionClick(this.sectionOrder.indexOf(this.codingSection));

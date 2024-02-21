@@ -4,8 +4,8 @@ import {ThreadController} from "./ThreadController";
 import {MessageReader} from "../../Utility/Message/MessageReader";
 
 export class CommentInfo {
-    _threadID: number;
-    _commentID: number;
+    _threadID: string;
+    _commentID: string;
     _comment: string;
     _owner: string;
     _avatarURL = "";
@@ -20,8 +20,8 @@ export class CommentInfo {
     }
 
     setBinary(message: MessageReader) {
-        let threadID = message.getUint32();
-        let commentID = message.getUint32();
+        let threadID = message.getString();
+        let commentID = message.getString();
         let comment = message.getString();
         let owner = message.getString();
         let avatarURL = message.getString();
@@ -35,19 +35,19 @@ export class CommentInfo {
         this.commentView.updateDescription();
     }
 
-    setThreadID(id: number) {
+    setThreadID(id: string) {
         this._threadID = id;
     }
 
-    getThreadID(): number {
+    getThreadID(): string {
         return this._threadID;
     }
 
-    setCommentID(id: number) {
+    setCommentID(id: string) {
         this._commentID = id;
     }
 
-    getCommentID(): number {
+    getCommentID(): string {
         return this._commentID;
     }
 

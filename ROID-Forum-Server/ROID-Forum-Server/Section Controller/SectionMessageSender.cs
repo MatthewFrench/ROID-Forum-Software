@@ -1,51 +1,52 @@
 ﻿using System;
-using System.Collections.Generic;
 namespace ROIDForumServer
 {
     public class SectionMessageSender
     {
-
+        private Database database;
         SectionController controller;
         public SectionMessageSender(SectionController c)
         {
             controller = c;
+            this.database = c.server.GetDatabase();
         }
         public void sendAllThreadsToUser(ConnectedUser u)
         {
-            u.sendBinary(ServerMessages.AllThreadsMessage(controller));
+            u.sendBinary(ServerMessages.AllThreadsMessage(controller, database.GetThreadsInSection(controller.sectionID)));
         }
-        public void sendAddThreadToAll(ThreadInfo t)
+        public void sendAddThreadToAll(Guid threadID, Guid creatorAccountID, String title)
         {
-            byte[] message = ServerMessages.AddThreadMessage(controller, t);
+            byte[] message = ServerMessages.AddThreadMessage(controller, creatorAccountID, threadID, title);
             foreach (ConnectedUser u in controller.usersViewing)
             {
                 u.sendBinary(message);
             }
         }
-        public void sendRemoveThreadToAll(ThreadInfo t)
+        public void sendRemoveThreadToAll(Guid threadID)
         {
-            byte[] message = ServerMessages.RemoveThreadMessage(controller, t);
+            byte[] message = ServerMessages.RemoveThreadMessage(controller, threadID);
             foreach (ConnectedUser u in controller.usersViewing)
             {
                 u.sendBinary(message);
             }
         }
-        public void sendUpdateThreadToAll(ThreadInfo t)
+        public void sendUpdateThreadToAll(Guid threadID, String title)
         {
-            byte[] message = ServerMessages.UpdateThreadMessage(controller, t);
+            byte[] message = ServerMessages.UpdateThreadMessage(controller, threadID, title);
             foreach (ConnectedUser u in controller.usersViewing)
             {
                 u.sendBinary(message);
             }
         }
-        public void sendMoveThreadToTopToAll(ThreadInfo t)
+        public void sendMoveThreadToTopToAll(Guid threadID)
         {
-            byte[] message = ServerMessages.MoveToTopThreadMessage(controller, t);
+            byte[] message = ServerMessages.MoveToTopThreadMessage(controller, threadID);
             foreach (ConnectedUser u in controller.usersViewing)
             {
                 u.sendBinary(message);
             }
         }
+        /*
         public void sendAddCommentToAll(CommentInfo c)
         {
             byte[] message = ServerMessages.AddCommentMessage(controller, c);
@@ -70,5 +71,6 @@ namespace ROIDForumServer
                 u.sendBinary(message);
             }
         }
+        */
     }
 }

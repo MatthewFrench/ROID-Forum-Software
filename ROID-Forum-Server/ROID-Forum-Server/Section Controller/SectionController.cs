@@ -10,7 +10,6 @@ namespace ROIDForumServer
         public ThreadController threadController;
         public List<ConnectedUser> usersViewing = new List<ConnectedUser>();
         public String name = "";
-        public SectionIOController ioController;
         int saveTimer = -1;
         public SectionController(ServerController s, String name)
         {
@@ -19,8 +18,6 @@ namespace ROIDForumServer
             sectionID = server.GetDatabase().LoadSectionID(this.name);
             messageSender = new SectionMessageSender(this);
             threadController = new ThreadController(this, server.GetDatabase());
-            ioController = new SectionIOController(this);
-            ioController.loadAllData();
         }
 
         public void addUser(ConnectedUser u)
@@ -34,12 +31,6 @@ namespace ROIDForumServer
         }
         public void logic()
         {
-            saveTimer += 1;
-            if (saveTimer >= 60 * 60 * 2)
-            { //Every 2 minutes
-                saveTimer = -1;
-                ioController.saveAllData();
-            }
         }
         public void onMessage(ConnectedUser p, Dictionary<string, object> message)
         {
@@ -54,38 +45,36 @@ namespace ROIDForumServer
                     break;
                 case "Edit Post":
                     {
-                        int threadID = Convert.ToInt32(message["Thread ID"]);
+                        Guid threadID = Guid.Parse((string)message["Thread ID"]);
                         String title = (string)message["Edit Title"];
                         String description = (string)message["Text"];
-                        threadController.editThread(p, threadID, title, description);
+                        threadController.editThread(p, sectionID, threadID, title, description);
                     }
                     break;
                 case "Delete Post":
                     {
-                        int threadID = Convert.ToInt32(message["Thread ID"]);
-                        threadController.deleteThread(p, threadID);
+                        Guid threadID = Guid.Parse((string)message["Thread ID"]);
+                        threadController.deleteThread(p, sectionID, threadID);
                     }
                     break;
                 case "Add Comment":
                     {
-                        int id = Convert.ToInt32(message["ID"]);
+                        Guid threadID = Guid.Parse((string)message["Thread ID"]);
                         String text = (string)message["Text"];
-                        threadController.addComment(p, id, text);
+                        threadController.addComment(p, threadID, sectionID, text);
                     }
                     break;
                 case "Edit Comment":
                     {
-                        int threadID = Convert.ToInt32(message["Thread ID"]);
-                        int commentID = Convert.ToInt32(message["Comment ID"]);
+                        Guid commentID = Guid.Parse((string)message["Comment ID"]);
                         String description = (string)message["Text"];
-                        threadController.editComment(p, threadID, commentID, description);
+                        threadController.editComment(p, commentID, description);
                     }
                     break;
                 case "Delete Comment":
                     {
-                        int threadID = Convert.ToInt32(message["Thread ID"]);
-                        int commentID = Convert.ToInt32(message["Comment ID"]);
-                        threadController.deleteComment(p, threadID, commentID);
+                        Guid commentID = Guid.Parse((string)message["Comment ID"]);
+                        threadController.deleteComment(p, commentID);
                     }
                     break;
             }

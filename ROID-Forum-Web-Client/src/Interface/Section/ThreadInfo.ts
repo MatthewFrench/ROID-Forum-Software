@@ -4,7 +4,7 @@ import {FullView} from "./ThreadViews/FullView";
 import {ThreadController} from "./ThreadController";
 
 export class ThreadInfo {
-    _id: number;
+    _threadID: string;
     _title: string;
     _description: string;
     _owner: string;
@@ -22,12 +22,12 @@ export class ThreadInfo {
         this.headerView.updateCommentCount();
     }
 
-    setID(id: number) {
-        this._id = id;
+    setThreadID(id: string) {
+        this._threadID = id;
     }
 
-    getID(): number {
-        return this._id;
+    getThreadID(): string {
+        return this._threadID;
     }
 
     setTitle(title: string) {
@@ -79,7 +79,7 @@ export class ThreadInfo {
         this.headerView.updateCommentCount();
     }
 
-    getComment(commentID: number): CommentInfo {
+    getComment(commentID: string): CommentInfo {
         for (let i = 0; i < this._comments.length; i++) {
             let ci: CommentInfo = this._comments[i];
             if (ci.getCommentID() == commentID) {
@@ -90,7 +90,7 @@ export class ThreadInfo {
         return null;
     }
 
-    removeComment(commentID: number) {
+    removeComment(commentID: string) {
         let c: CommentInfo = this.getComment(commentID);
         if (c != null) {
             this._comments.splice(this._comments.indexOf(c), 1);

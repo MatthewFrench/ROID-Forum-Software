@@ -93,7 +93,7 @@ export class ThreadDisplay {
         let message: any = {};
         message['Controller'] = this.controller.threadController.sectionController.name;
         message['Title'] = 'Edit Post';
-        message['Thread ID'] = this.controller.thread.getID();
+        message['Thread ID'] = this.controller.thread.getThreadID();
         message['Edit Title'] = this.editTitle.value;
         message['Text'] = this.editDescription.value;
         this.controller.threadController.sectionController.website.networkController.send(message);
@@ -105,7 +105,7 @@ export class ThreadDisplay {
         let message: any = {};
         message['Controller'] = this.controller.threadController.sectionController.name;
         message['Title'] = 'Delete Post';
-        message['Thread ID'] = this.controller.thread.getID();
+        message['Thread ID'] = this.controller.thread.getThreadID();
         this.controller.threadController.sectionController.website.networkController.send(message);
         this.controller.threadController.restoreToDefaultState();
     };

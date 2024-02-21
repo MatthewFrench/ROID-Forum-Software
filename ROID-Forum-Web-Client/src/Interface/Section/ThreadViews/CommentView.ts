@@ -75,7 +75,7 @@ export class CommentView {
         let message: any = {};
         message['Controller'] = this.threadController.sectionController.name;
         message['Title'] = 'Edit Comment';
-        message['Thread ID'] = this.thread.getID();
+        message['Thread ID'] = this.thread.getThreadID();
         message['Comment ID'] = this.comment.getCommentID();
         message['Text'] = this.editDescription.value;
         this.threadController.sectionController.website.networkController.send(message);
@@ -86,7 +86,7 @@ export class CommentView {
         let message: any = {};
         message['Controller'] = this.threadController.sectionController.name;
         message['Title'] = 'Delete Comment';
-        message['Thread ID'] = this.thread.getID();
+        message['Thread ID'] = this.thread.getThreadID();
         message['Comment ID'] = this.comment.getCommentID();
         this.threadController.sectionController.website.networkController.send(message);
     };

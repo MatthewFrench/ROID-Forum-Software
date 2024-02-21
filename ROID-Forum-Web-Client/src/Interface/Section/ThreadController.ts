@@ -85,14 +85,14 @@ export class ThreadController {
         }
     };
 
-    getThread(id: number): ThreadInfo {
+    getThread(id: string): ThreadInfo {
         for (let t of this.threads) {
-            if (t.getID() == id) return t;
+            if (t.getThreadID() == id) return t;
         }
         return null;
     }
 
-    showThread = (threadID: number) => {
+    showThread = (threadID: string) => {
         let thread: ThreadInfo = this.getThread(threadID);
         if (thread != null) {
             this.threadClicked(thread);
@@ -110,10 +110,10 @@ export class ThreadController {
     };
 
     addThread = (threadMap: any) => {
-        let id: number = threadMap["ID"];
+        let id: string = threadMap["Thread ID"];
         if (this.getThread(id) == null) {
             let thread: ThreadInfo = new ThreadInfo(this, this.hasDarkTheme);
-            thread.setID(id);
+            thread.setThreadID(id);
             this.threads.push(thread);
 
             thread.setOwner(threadMap["Owner"]);
@@ -147,40 +147,17 @@ export class ThreadController {
 
     addThreadBinary = (message: MessageReader) => {
         let owner = message.getString();
-        let id = message.getUint32();
+        let threadID = message.getString();
         let title = message.getString();
-        let description = message.getString();
-        let commentIDs = message.getUint32();
-        let avatarURL = message.getString();
-        let numberOfComments = message.getUint32();
 
-        if (this.getThread(id) == null) {
+        if (this.getThread(threadID) == null) {
             let thread: ThreadInfo = new ThreadInfo(this, this.hasDarkTheme);
-            thread.setID(id);
+            thread.setThreadID(threadID);
             this.threads.push(thread);
 
             thread.setOwner(owner);
-            if (avatarURL != null) {
-                thread.setAvatarURL(avatarURL);
-            }
             thread.setTitle(title);
-            thread.setDescription(description);
 
-            //let commentArray: any[] = threadMap["Comments"];
-            for (let i = 0; i < numberOfComments; i++) {
-                //let c: any = commentArray[i];
-                let cf: CommentInfo = new CommentInfo(thread, this, this.hasDarkTheme);
-                thread.addComment(cf);
-                //console.log(`Loaded comment with threadID: ${c['ThreadID']} and commentID: ${c['CommentID']}`);
-                cf.setBinary(new MessageReader(message.getBinary()));
-                //cf.setThreadID(c['ThreadID']);
-                //cf.setCommentID(c['CommentID']);
-                //cf.setComment(c['Comment']);
-                //cf.setOwner(c['Owner']);
-                //if (c["AvatarURL"] != null) {
-                //    cf.setAvatarURL(c["AvatarURL"]);
-                //}
-            }
             thread.headerView.getDiv().style.opacity = "1.0";
             thread.headerView.getDiv().style.top = `${(this.threads.length - 1) * 85 + 60}px`;
             this.headerView.appendChild(thread.headerView.getDiv());
@@ -189,7 +166,7 @@ export class ThreadController {
         }
     };
 
-    removeThread = (threadID: number) => {
+    removeThread = (threadID: string) => {
         let thread: ThreadInfo = this.getThread(threadID);
         if (thread != null) {
             this.threads.splice(this.threads.indexOf(thread), 1);
@@ -204,7 +181,7 @@ export class ThreadController {
         }
     };
 
-    updateThread = (threadID: number, title: string, description: string) => {
+    updateThread = (threadID: string, title: string, description: string) => {
         let thread: ThreadInfo = this.getThread(threadID);
         if (thread != null) {
             thread.setTitle(title);
@@ -212,7 +189,7 @@ export class ThreadController {
         }
     };
 
-    moveThreadToTop = (threadID: number) => {
+    moveThreadToTop = (threadID: string) => {
         let thread: ThreadInfo = this.getThread(threadID);
         if (thread != null) {
             this.threads.splice(this.threads.indexOf(thread), 1);
@@ -222,7 +199,7 @@ export class ThreadController {
     };
 
     addComment = (commentMap: any) => {
-        let threadID: number = commentMap["ThreadID"];
+        let threadID: string = commentMap["ThreadID"];
         let thread: ThreadInfo = this.getThread(threadID);
         if (thread != null) {
             let cf: CommentInfo = new CommentInfo(thread, this, this.hasDarkTheme);
@@ -236,8 +213,8 @@ export class ThreadController {
     };
 
     addCommentBinary = (message: MessageReader) => {
-        let threadID: number = message.getUint32();
-        let commentID = message.getUint32();
+        let threadID: string = message.getString();
+        let commentID = message.getString();
         let comment = message.getString();
         let owner = message.getString();
         let avatarURL = message.getString();
@@ -253,14 +230,14 @@ export class ThreadController {
         }
     };
 
-    deleteComment = (threadID: number, commentID: number) => {
+    deleteComment = (threadID: string, commentID: string) => {
         let thread: ThreadInfo = this.getThread(threadID);
         if (thread != null) {
             thread.removeComment(commentID);
         }
     };
 
-    updateComment = (threadID: number, commentID: number, comment: string) => {
+    updateComment = (threadID: string, commentID: string, comment: string) => {
         let thread: ThreadInfo = this.getThread(threadID);
         if (thread != null) {
             let ci: CommentInfo = thread.getComment(commentID);

@@ -14,7 +14,7 @@ export class Section {
     displayName = '';
     newPostWindow: NewPostWindow = null;
     threadController: ThreadController;
-    showThreadWhenLoaded = -1;
+    showThreadWhenLoaded: string = null;
     background: MatrixBackground;
     hasDarkTheme = false;
 
@@ -81,7 +81,7 @@ export class Section {
         }
     };
 
-    showThread = (threadID: number) => {
+    showThread = (threadID: string) => {
         this.showThreadWhenLoaded = threadID;
     };
 
@@ -110,10 +110,10 @@ export class Section {
                 for (let i = 0; i < threads.length; i++) {
                     this.threadController.addThread(threads[i]);
                 }
-                if (this.showThreadWhenLoaded != -1) {
+                if (this.showThreadWhenLoaded != null) {
                     this.threadController.showThread(this.showThreadWhenLoaded);
                     //console.log("Told to show thread ${this.showThreadWhenLoaded}");
-                    this.showThreadWhenLoaded = -1;
+                    this.showThreadWhenLoaded = null;
                 }
             }
                 break;
@@ -157,26 +157,26 @@ export class Section {
     }
 
     updateThreadBinary(message : MessageReader) {
-        let id = message.getUint32();
+        let threadID = message.getString();
         let title = message.getString();
         let description = message.getString();
-        this.threadController.updateThread(id, title, description);
+        this.threadController.updateThread(threadID, title, description);
     }
 
     updateCommentBinary(message : MessageReader) {
-        this.threadController.updateComment(message.getUint32(), message.getUint32(), message.getString());
+        this.threadController.updateComment(message.getString(), message.getString(), message.getString());
     }
 
     removeThreadBinary(message : MessageReader) {
-        this.threadController.removeThread(message.getUint32());
+        this.threadController.removeThread(message.getString());
     }
 
     removeCommentBinary(message : MessageReader) {
-        this.threadController.deleteComment(message.getUint32(), message.getUint32());
+        this.threadController.deleteComment(message.getString(), message.getString());
     }
 
     moveThreadToTopBinary(message : MessageReader) {
-        this.threadController.moveThreadToTop(message.getUint32());
+        this.threadController.moveThreadToTop(message.getString());
     }
 
     allThreadsBinary(message : MessageReader) {
@@ -185,10 +185,10 @@ export class Section {
         for (let i = 0; i < numberOfThreads; i++) {
             this.threadController.addThreadBinary(new MessageReader(message.getBinary()));
         }
-        if (this.showThreadWhenLoaded != -1) {
+        if (this.showThreadWhenLoaded != null) {
             this.threadController.showThread(this.showThreadWhenLoaded);
             //console.log("Told to show thread ${this.showThreadWhenLoaded}");
-            this.showThreadWhenLoaded = -1;
+            this.showThreadWhenLoaded = null;
         }
     }
 

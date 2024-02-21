@@ -41,6 +41,20 @@ namespace ROIDForumServer
 			}
 			return byteData.Buffer;
 		}
+		public byte[] ToBufferWithoutLength()
+		{
+			//Take length of all data and add the message length holder
+			uint totalLength = this.innerByteLength;
+			ByteArray byteData = new ByteArray((int)totalLength);
+			uint loc = 0;
+			//Append the message
+			foreach (MessageData data in dataArray)
+			{
+				data.AddToByteData(byteData, (int)loc);
+				loc += data.GetLength();
+			}
+			return byteData.Buffer;
+		}
 
 		public void AddUint8(byte value)
 		{
