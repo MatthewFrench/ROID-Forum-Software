@@ -9,13 +9,13 @@ namespace ROIDForumServer
         public SectionMessageSender messageSender;
         public ThreadController threadController;
         public List<ConnectedUser> usersViewing = new List<ConnectedUser>();
-        public String name = "";
-        int saveTimer = -1;
-        public SectionController(ServerController s, String name)
+        public String name;
+        private int saveTimer = -1;
+        public SectionController(ServerController s, String name, Guid sectionID)
         {
             server = s;
             this.name = name;
-            sectionID = server.GetDatabase().LoadSectionID(this.name);
+            this.sectionID = sectionID;
             messageSender = new SectionMessageSender(this);
             threadController = new ThreadController(this, server.GetDatabase());
         }
@@ -28,9 +28,6 @@ namespace ROIDForumServer
         public void removeUser(ConnectedUser u)
         {
             usersViewing.Remove(u);
-        }
-        public void logic()
-        {
         }
         public void onMessage(ConnectedUser p, Dictionary<string, object> message)
         {

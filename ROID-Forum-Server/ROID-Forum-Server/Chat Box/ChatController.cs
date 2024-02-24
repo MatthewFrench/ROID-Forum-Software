@@ -68,9 +68,6 @@ namespace ROIDForumServer
             }
             Console.WriteLine(list);
         }
-        public void logic()
-        {
-        }
         public void addChat(ConnectedUser u, String chat)
         {
             if (u.accountID == null)

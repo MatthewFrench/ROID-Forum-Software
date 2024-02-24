@@ -10,12 +10,7 @@ namespace ROIDForumServer
         Networking networking;
         LoginController loginController;
         ChatController chatController;
-        HighResolutionTimer logicTimer;
-        //SectionController allSection;
-        SectionController codingSection;
-        SectionController gameSection;
-        SectionController graphicsSection;
-        SectionController otherSection;
+        Dictionary<Guid, SectionController> sections;
         public ServerController()
         {
             database = new Database(this);
@@ -23,12 +18,10 @@ namespace ROIDForumServer
 
             loginController = new LoginController(this);
             chatController = new ChatController(this);
-            logicTimer = new HighResolutionTimer(8, logic); //120 fps logic timer
-            codingSection = new SectionController(this, "Coding Section");
-            //allSection = new SectionController(this);
-            gameSection = new SectionController(this, "Game Section");
-            graphicsSection = new SectionController(this, "Graphics Section");
-            otherSection = new SectionController(this, "Other Section");
+            CreateOrLoadSection("Coding Section");
+            CreateOrLoadSection("Game Section");
+            CreateOrLoadSection("Graphics Section");
+            CreateOrLoadSection("Other Section");
 
             networking.Start();
 
@@ -43,15 +36,10 @@ namespace ROIDForumServer
 			Thread.Sleep(1000);
         }
 
-        public void logic(float delta)
+        private void CreateOrLoadSection(String sectionName)
         {
-            chatController.logic();
-
-            //allSection.logic();
-            codingSection.logic();
-            gameSection.logic();
-            graphicsSection.logic();
-            otherSection.logic();
+            Guid sectionID = database.LoadSectionID(sectionName);
+            sections.Add(sectionID, new SectionController(this, sectionName, sectionID));
         }
 
         public void accountLoggedIn(ConnectedUser u)
@@ -86,15 +74,15 @@ namespace ROIDForumServer
                 {
                     loginController.onMessage(u, m);
                 }
-                if ((string)m["Controller"] == codingSection.name) codingSection.onMessage(u, m);
-                //if ((string)m["Controller"] == allSection.name) allSection.onMessage(u, m);
-                if ((string)m["Controller"] == graphicsSection.name) graphicsSection.onMessage(u, m);
-                if ((string)m["Controller"] == gameSection.name) gameSection.onMessage(u, m);
-                if ((string)m["Controller"] == otherSection.name) otherSection.onMessage(u, m);
                 if ((string)m["Controller"] == "Server" && (string)m["Title"] == "Viewing")
                 {
                     disengageFromSection(u.viewingSection, u);
                     engageToSection((string)m["Section"], u);
+                }
+                Guid sectionID = Guid.Parse((string)m["Controller"]);
+                if (sections.ContainsKey(sectionID))
+                {
+                    sections[sectionID].onMessage(u, m);
                 }
             }
             /*
