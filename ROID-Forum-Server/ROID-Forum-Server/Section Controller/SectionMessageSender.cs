@@ -3,47 +3,46 @@ using Cassandra;
 
 namespace ROIDForumServer
 {
-    public class SectionMessageSender(SectionController sectionController, ISession databaseSession)
+    public static class SectionMessageSender
     {
-        private ISession DatabaseSession { get; } = databaseSession;
-
-        public void SendAllThreadsToUser(ConnectedUser user)
+        public static void SendAllThreadsToUser(ServerState serverState, ConnectedUser user, Guid sectionId)
         {
-            user.Send(SectionSendMessages.AllThreadsMessage(sectionController,
-                DatabaseThread.GetThreadsInSection(DatabaseSession, sectionController.SectionId)));
+            user.Send(SectionSendMessages.AllThreadsMessage(
+                DatabaseThread.GetThreadsInSection(serverState.Database.GetSession(), sectionId))
+            );
         }
 
-        public void SendAddThreadToAll(Guid threadId, Guid creatorAccountId, String title)
+        public static void SendAddThreadToAll(ServerState serverState, Guid sectionId, Guid threadId, Guid creatorAccountId, String title)
         {
-            byte[] message = SectionSendMessages.AddThreadMessage(sectionController, creatorAccountId, threadId, title);
-            foreach (ConnectedUser user in sectionController.UsersViewing)
+            byte[] message = SectionSendMessages.AddThreadMessage(creatorAccountId, threadId, title);
+            foreach (ConnectedUser user in serverState.Networking.GetUsersViewingSection(sectionId))
             {
                 user.Send(message);
             }
         }
 
-        public void SendRemoveThreadToAll(Guid threadId)
+        public static void SendRemoveThreadToAll(ServerState serverState, Guid sectionId, Guid threadId)
         {
-            byte[] message = SectionSendMessages.RemoveThreadMessage(sectionController, threadId);
-            foreach (ConnectedUser user in sectionController.UsersViewing)
+            byte[] message = SectionSendMessages.RemoveThreadMessage(threadId);
+            foreach (ConnectedUser user in serverState.Networking.GetUsersViewingSection(sectionId))
             {
                 user.Send(message);
             }
         }
 
-        public void SendUpdateThreadToAll(Guid threadId, String title)
+        public static void SendUpdateThreadToAll(ServerState serverState, Guid sectionId, Guid threadId, String title)
         {
-            byte[] message = SectionSendMessages.UpdateThreadMessage(sectionController, threadId, title);
-            foreach (ConnectedUser user in sectionController.UsersViewing)
+            byte[] message = SectionSendMessages.UpdateThreadMessage(threadId, title);
+            foreach (ConnectedUser user in serverState.Networking.GetUsersViewingSection(sectionId))
             {
                 user.Send(message);
             }
         }
 
-        public void SendMoveThreadToTopToAll(Guid threadId)
+        public static void SendMoveThreadToTopToAll(ServerState serverState, Guid sectionId, Guid threadId)
         {
-            byte[] message = SectionSendMessages.MoveToTopThreadMessage(sectionController, threadId);
-            foreach (ConnectedUser user in sectionController.UsersViewing)
+            byte[] message = SectionSendMessages.MoveToTopThreadMessage(threadId);
+            foreach (ConnectedUser user in serverState.Networking.GetUsersViewingSection(sectionId))
             {
                 user.Send(message);
             }

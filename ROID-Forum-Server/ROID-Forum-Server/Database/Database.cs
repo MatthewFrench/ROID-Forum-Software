@@ -32,11 +32,17 @@ public class Database
         // Set up default keyspace
         _session.Execute(@"CREATE KEYSPACE IF NOT EXISTS """ + DefaultKeyspace + 
                         "\" WITH replication = {'class': 'SimpleStrategy',  'replication_factor': '1' }; ");
+        // These are not multi-instance safe. These should be ran only on one instance or from elsewhere
+        // if running multiple instances.
         DatabaseAccount.CreateTablesIfNotExist(_session);
         DatabaseChat.CreateTablesIfNotExist(_session);
         DatabaseSection.CreateTablesIfNotExist(_session);
         DatabaseThread.CreateTablesIfNotExist(_session);
         DatabaseComment.CreateTablesIfNotExist(_session);
+        DatabaseSection.CreateSectionIfNotExists(_session, "Coding Section");
+        DatabaseSection.CreateSectionIfNotExists(_session, "Game Section");
+        DatabaseSection.CreateSectionIfNotExists(_session, "Graphics Section");
+        DatabaseSection.CreateSectionIfNotExists(_session, "Other Section");
     }
 
     public ISession GetSession()

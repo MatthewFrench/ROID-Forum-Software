@@ -1,63 +1,48 @@
 ﻿using System;
-using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace ROIDForumServer
 {
     public class ServerController
     {
-        public Database Database { get; }
-        public Networking Networking { get; }
-        private ProfileController ProfileController { get; }
-        private ChatController ChatController { get; }
-        private Dictionary<Guid, SectionController> SectionControllers { get; }
+        private ServerState ServerState { get; }
 
         public ServerController()
         {
-            Database = new Database();
-            Networking = new Networking(this);
-            ProfileController = new ProfileController(this);
-            ChatController = new ChatController(this);
-            SectionControllers = new Dictionary<Guid, SectionController>();
-            CreateOrLoadSection("Coding Section");
-            CreateOrLoadSection("Game Section");
-            CreateOrLoadSection("Graphics Section");
-            CreateOrLoadSection("Other Section");
-            Networking.Start();
+            ServerState = new ServerState();
+            ServerState.Networking.Start();
         }
 
-        private void CreateOrLoadSection(String sectionName)
+        public void Stop()
         {
-            var sectionId = DatabaseSection.CreateOrLoadSection(Database.GetSession(), sectionName);
-            SectionControllers.Add(sectionId, new SectionController(this, sectionName, sectionId));
+            ServerState.Networking.Stop();
         }
 
-        public void AccountLoggedIn(ConnectedUser user)
+        public static void AccountLoggedIn(ServerState serverState, ConnectedUser user)
         {
             if (user.AccountId != null)
             {
                 Console.WriteLine($"Account logged in {user.AccountId}");
             }
 
-            ChatController.SendListUpdateToAll();
+            ChatController.SendListUpdateToAll(serverState);
         }
 
-        public void AccountLoggedOut(ConnectedUser user)
+        public static void AccountLoggedOut(ServerState serverState, ConnectedUser user)
         {
             if (user.AccountId != null)
             {
                 Console.WriteLine($"Account logged out {user.AccountId}");
             }
 
-            ChatController.SendListUpdateToAll();
+            ChatController.SendListUpdateToAll(serverState);
         }
 
-        public void OnOpen(ConnectedUser user)
+        public static void OnOpen(ServerState serverState, ConnectedUser user)
         {
-            ChatController.AddUser(user);
+            ChatController.AddUser(serverState, user);
         }
 
-        public void OnMessage(ConnectedUser user, MessageReader message)
+        public static void OnMessage(ServerState serverState, ConnectedUser user, MessageReader message)
         {
             if (!message.HasUint8())
             {
@@ -67,10 +52,10 @@ namespace ROIDForumServer
             var messageController = message.GetUint8();
             if (ServerReceiveControllers.Chat.Equals(messageController))
             {
-                ChatController.OnMessage(user, message);
+                ChatController.OnMessage(serverState, user, message);
             } else if (ServerReceiveControllers.Profile.Equals(messageController))
             {
-                ProfileController.OnMessage(user, message);
+                ProfileController.OnMessage(serverState, user, message);
             } else if (ServerReceiveControllers.Section.Equals(messageController))
             {
                 if (!message.HasString())
@@ -78,32 +63,32 @@ namespace ROIDForumServer
                     return;
                 }
                 var sectionId = Guid.Parse(message.GetString());
-                if (!SectionControllers.TryGetValue(sectionId, out var section)) return;
-                section.OnMessage(user, message);
+                if (DatabaseSection.SectionIdExists(serverState.Database.GetSession(), sectionId))
+                {
+                    SectionController.OnMessage(serverState, user, sectionId, message);
+                }
             }
         }
 
-        public void OnClose(ConnectedUser user)
+        public static void OnClose(ServerState serverState, ConnectedUser user)
         {
             if (user.ViewingSectionId != null)
             {
-                DisengageFromSection((Guid)user.ViewingSectionId, user);
+                DisengageFromSection(serverState, (Guid)user.ViewingSectionId, user);
             }
 
-            ChatController.RemoveUser(user);
+            ChatController.RemoveUser(serverState, user);
         }
 
-        public void EngageToSection(Guid sectionId, ConnectedUser user)
+        public static void EngageToSection(ServerState serverState, Guid sectionId, ConnectedUser user)
         {
-            if (!SectionControllers.TryGetValue(sectionId, out var section)) return;
-            section.AddUser(user);
+            SectionController.AddUser(serverState, user, sectionId);
             user.ViewingSectionId = sectionId;
         }
 
-        public void DisengageFromSection(Guid sectionId, ConnectedUser user)
+        public static void DisengageFromSection(ServerState serverState, Guid sectionId, ConnectedUser user)
         {
-            if (!SectionControllers.TryGetValue(sectionId, out var section)) return;
-            section.RemoveUser(user);
+            SectionController.RemoveUser(serverState, user);
             user.ViewingSectionId = null;
         }
     }

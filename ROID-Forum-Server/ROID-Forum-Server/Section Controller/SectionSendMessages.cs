@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ROIDForumServer;
 
-public class SectionSendMessages
+public static class SectionSendMessages
 {
         private enum SectionMsg {
             AllThreads = 0,
@@ -16,12 +16,12 @@ public class SectionSendMessages
             UpdateComment = 7
         }
 
-        public static byte[] AllThreadsMessage(SectionController controller, List<DatabaseThread.DatabaseThreadData> threads)
+        public static byte[] AllThreadsMessage(List<DatabaseThread.DatabaseThreadData> threads)
         {
             var message = new MessageWriter();
             message.AddUint8((byte)ServerSendControllers.Section);
             message.AddUint8((byte)SectionMsg.AllThreads);
-            message.AddString(controller.SectionName);
+            //message.AddString(controller.SectionName);
             message.AddUint32((uint)threads.Count);
             foreach (var thread in threads)
             {
@@ -45,48 +45,48 @@ public class SectionSendMessages
             return message.ToBuffer();
         }
 
-        public static byte[] AddThreadMessage(SectionController controller, Guid creatorAccountId, Guid threadId, String title) {
+        public static byte[] AddThreadMessage(Guid creatorAccountId, Guid threadId, String title) {
 
             var message = new MessageWriter();
             message.AddUint8((byte)ServerSendControllers.Section);
             message.AddUint8((byte)SectionMsg.AddThread);
-            message.AddString(controller.SectionName);
+            //message.AddString(controller.SectionName);
             message.AddString(creatorAccountId.ToString());
             message.AddString(threadId.ToString());
             message.AddString(title);
             return message.ToBuffer();
         }
 
-        public static byte[] RemoveThreadMessage(SectionController controller, Guid threadId)
+        public static byte[] RemoveThreadMessage(Guid threadId)
         {
             // Todo: This needs updated on client side
             var message = new MessageWriter();
             message.AddUint8((byte)ServerSendControllers.Section);
             message.AddUint8((byte)SectionMsg.RemoveThread);
-            message.AddString(controller.SectionName);
+            //message.AddString(controller.SectionName);
             message.AddString(threadId.ToString());
             return message.ToBuffer();
         }
 
-        public static byte[] UpdateThreadMessage(SectionController controller, Guid threadId, String title)
+        public static byte[] UpdateThreadMessage(Guid threadId, String title)
         {
             // Todo: This needs updated on client side
             var message = new MessageWriter();
             message.AddUint8((byte)ServerSendControllers.Section);
             message.AddUint8((byte)SectionMsg.UpdateThread);
-            message.AddString(controller.SectionName);
+            //message.AddString(controller.SectionName);
             message.AddString(threadId.ToString());
             message.AddString(title);
             return message.ToBuffer();
         }
 
-        public static byte[] MoveToTopThreadMessage(SectionController controller, Guid threadId)
+        public static byte[] MoveToTopThreadMessage(Guid threadId)
         {
             // Todo: This needs updated on client side
             var message = new MessageWriter();
             message.AddUint8((byte)ServerSendControllers.Section);
             message.AddUint8((byte)SectionMsg.MoveThreadToTop);
-            message.AddString(controller.SectionName);
+            //message.AddString(controller.SectionName);
             message.AddString(threadId.ToString());
             return message.ToBuffer();
         }

@@ -1,14 +1,10 @@
 ﻿using System;
-using Cassandra;
 
 namespace ROIDForumServer
 {
-    public class ProfileController(ServerController serverController)
+    public static class ProfileController
     {
-        private ServerController Server { get; } = serverController;
-        private ISession DatabaseSession { get; } = serverController.Database.GetSession();
-
-        public void OnMessage(ConnectedUser user, MessageReader message)
+        public static void OnMessage(ServerState serverState, ConnectedUser user, MessageReader message)
         {
             if (!message.HasUint8()) return;
 
@@ -19,22 +15,22 @@ namespace ROIDForumServer
                 Guid viewingSectionId = Guid.Parse(message.GetString());
                 if (user.ViewingSectionId != null)
                 {
-                    Server.DisengageFromSection((Guid)user.ViewingSectionId, user);
+                    ServerController.DisengageFromSection(serverState, (Guid)user.ViewingSectionId, user);
                 }
 
-                Server.EngageToSection(viewingSectionId, user);
+                ServerController.EngageToSection(serverState, viewingSectionId, user);
             }
             else if (ProfileReceiveMessages.SetAvatar.Equals(messageId))
             {
                 if (!message.HasString()) return;
                 if (user.AccountId == null) return;
-                DatabaseAccount.SetAvatarUrl(DatabaseSession, (Guid)user.AccountId, message.GetString());
+                DatabaseAccount.SetAvatarUrl(serverState.Database.GetSession(), (Guid)user.AccountId, message.GetString());
             }
             else if (ProfileReceiveMessages.GetAvatar.Equals(messageId))
             {
                 if (user.AccountId == null) return;
                 user.Send(ProfileSendMessages.GetAvatarMessage(
-                    DatabaseAccount.GetAvatarUrl(DatabaseSession, (Guid)user.AccountId)));
+                    DatabaseAccount.GetAvatarUrl(serverState.Database.GetSession(), (Guid)user.AccountId)));
             }
             else if (ProfileReceiveMessages.Login.Equals(messageId))
             {
@@ -49,7 +45,7 @@ namespace ROIDForumServer
                 }
                 else
                 {
-                    Guid? accountId = DatabaseAccount.GetAccountIdForCredentials(DatabaseSession, username, password);
+                    Guid? accountId = DatabaseAccount.GetAccountIdForCredentials(serverState.Database.GetSession(), username, password);
                     if (accountId == null)
                     {
                         user.Send(ProfileSendMessages.LoginFailedMessage());
@@ -58,8 +54,8 @@ namespace ROIDForumServer
                     {
                         user.AccountId = accountId;
                         user.Send(ProfileSendMessages.LoggedInMessage(
-                            DatabaseAccount.GetAccountDisplayName(DatabaseSession, (Guid)user.AccountId)));
-                        Server.AccountLoggedIn(user);
+                            DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId)));
+                        ServerController.AccountLoggedIn(serverState, user);
                     }
                 }
             }
@@ -68,7 +64,7 @@ namespace ROIDForumServer
                 if (user.AccountId == null) return;
                 user.AccountId = null;
                 user.Send(ProfileSendMessages.LoggedOutMessage());
-                Server.AccountLoggedOut(user);
+                ServerController.AccountLoggedOut(serverState, user);
             }
             else if (ProfileReceiveMessages.Register.Equals(messageId))
             {
@@ -87,7 +83,7 @@ namespace ROIDForumServer
                 }
 
                 var (createAccountStatus, accountId) =
-                    DatabaseAccount.CreateAccount(DatabaseSession, username, password, email);
+                    DatabaseAccount.CreateAccount(serverState.Database.GetSession(), username, password, email);
                 if (createAccountStatus == DatabaseAccount.CreateAccountStatus.AlreadyExists || accountId == null)
                 {
                     user.Send(ProfileSendMessages.RegisterFailedMessage());
@@ -98,8 +94,8 @@ namespace ROIDForumServer
                 user.AccountId = accountId;
                 //Send login notification
                 user.Send(ProfileSendMessages.LoggedInMessage(
-                    DatabaseAccount.GetAccountDisplayName(DatabaseSession, (Guid)user.AccountId)));
-                Server.AccountLoggedIn(user);
+                    DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId)));
+                ServerController.AccountLoggedIn(serverState, user);
             }
         }
     }

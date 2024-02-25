@@ -14,7 +14,7 @@ namespace ROIDForumServer
                 exitEvent.Set();
             };
             exitEvent.WaitOne();
-            server.Networking.Stop();
+            server.Stop();
             Thread.Sleep(1000);
         }
     }

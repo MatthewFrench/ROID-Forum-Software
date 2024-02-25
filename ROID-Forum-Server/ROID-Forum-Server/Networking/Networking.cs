@@ -5,7 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
 namespace ROIDForumServer
 {
-	public class Networking(ServerController serverController)
+	public class Networking(ServerState serverState)
     {
 	    private WebSocketServer _websocketServer;
 	    private readonly List<IWebSocketConnection> _webSockets = new List<IWebSocketConnection>();
@@ -21,7 +21,7 @@ namespace ROIDForumServer
             ConnectedUser connectedUser = new ConnectedUser(socket);
             Users.Add(connectedUser);
             _userMap.Add(socket, connectedUser);
-            serverController.OnOpen(connectedUser);
+            ServerController.OnOpen(serverState, connectedUser);
 		}
         
         private void ClientDisconnectedEvent(IWebSocketConnection socket)
@@ -30,14 +30,14 @@ namespace ROIDForumServer
             Console.WriteLine("Close!");
             var user = _userMap.GetValueOrDefault(socket);
             Users.Remove(user);
-            serverController.OnClose(user);
+            ServerController.OnClose(serverState, user);
             _userMap.Remove(socket);
         }
 
 		private void ClientBinaryMessageEvent(IWebSocketConnection socket, byte[] binary) {
             try
             {
-                serverController.OnMessage(_userMap.GetValueOrDefault(socket), new MessageReader(binary));
+                ServerController.OnMessage(serverState, _userMap.GetValueOrDefault(socket), new MessageReader(binary));
             }
             catch (Exception e) {
                 Console.WriteLine(e);
@@ -79,6 +79,16 @@ namespace ROIDForumServer
 
 		private int GetNumberOfConnectedClients() {
 			return _webSockets.Count;
+		}
+
+		public List<ConnectedUser> GetUsersViewingSection(Guid sectionId)
+		{
+			return Users.FindAll(user => user.ViewingSectionId == sectionId);
+		}
+
+		public List<ConnectedUser> GetUsersViewingThread(Guid threadId)
+		{
+			return Users.FindAll(user => user.ViewingThreadId == threadId);
 		}
 	}
 }

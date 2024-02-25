@@ -1,80 +1,71 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace ROIDForumServer
 {
-    public class SectionController
+    public static class SectionController
     {
-        public Guid SectionId { get; }
-        public SectionMessageSender MessageSender { get; }
-        public ThreadController ThreadController { get; }
-        public List<ConnectedUser> UsersViewing { get; } = new List<ConnectedUser>();
-        public String SectionName { get; }
-
-        public SectionController(ServerController serverController, String sectionName, Guid sectionId)
+        public static void AddUser(ServerState serverState, ConnectedUser user, Guid sectionId)
         {
-            SectionName = sectionName;
-            SectionId = sectionId;
-            MessageSender = new SectionMessageSender(this, serverController.Database.GetSession());
-            ThreadController = new ThreadController(this, serverController.Database.GetSession());
+            SectionMessageSender.SendAllThreadsToUser(serverState, user, sectionId);
         }
 
-        public void AddUser(ConnectedUser user)
+        public static void RemoveUser(ServerState serverState, ConnectedUser user)
         {
-            UsersViewing.Add(user);
-            MessageSender.SendAllThreadsToUser(user);
         }
 
-        public void RemoveUser(ConnectedUser user)
+        public static void OnMessage(ServerState serverState, ConnectedUser user, Guid sectionId, MessageReader message)
         {
-            UsersViewing.Remove(user);
-        }
-
-        public void OnMessage(ConnectedUser user, MessageReader message)
-        {
-            switch ((string)message["Title"])
+            if (user.AccountId == null)
             {
-                case "New Post":
-                {
-                    String postTitle = (string)message["Post Title"];
-                    String postDescription = (string)message["Post Description"];
-                    ThreadController.AddThread(user, postTitle, postDescription);
-                }
-                    break;
-                case "Edit Post":
-                {
-                    Guid threadId = Guid.Parse((string)message["Thread Id"]);
-                    String title = (string)message["Edit Title"];
-                    String description = (string)message["Text"];
-                    ThreadController.EditThread(user, SectionId, threadId, title, description);
-                }
-                    break;
-                case "Delete Post":
-                {
-                    Guid threadId = Guid.Parse((string)message["Thread Id"]);
-                    ThreadController.DeleteThread(user, SectionId, threadId);
-                }
-                    break;
-                case "Add Comment":
-                {
-                    Guid threadId = Guid.Parse((string)message["Thread Id"]);
-                    String text = (string)message["Text"];
-                    ThreadController.AddComment(user, threadId, SectionId, text);
-                }
-                    break;
-                case "Edit Comment":
-                {
-                    Guid commentId = Guid.Parse((string)message["Comment Id"]);
-                    String description = (string)message["Text"];
-                    ThreadController.EditComment(user, commentId, description);
-                }
-                    break;
-                case "Delete Comment":
-                {
-                    Guid commentId = Guid.Parse((string)message["Comment Id"]);
-                    ThreadController.DeleteComment(user, commentId);
-                }
-                    break;
+                return;
+            }
+            if (!message.HasUint8())
+            {
+                return;
+            }
+
+            byte messageId = message.GetUint8();
+
+            if (SectionReceiveMessages.NewPost.Equals(messageId))
+            {
+                if (!message.HasString()) return;
+                String postTitle = message.GetString();
+                if (!message.HasString()) return;
+                String postDescription = message.GetString();
+                ThreadController.AddThread(serverState, user, sectionId, postTitle, postDescription);
+            } else if (SectionReceiveMessages.EditPost.Equals(messageId))
+            {
+                if (!message.HasString()) return;
+                Guid threadId = Guid.Parse(message.GetString());
+                if (!message.HasString()) return;
+                String title = message.GetString();
+                if (!message.HasString()) return;
+                String description = message.GetString();
+                ThreadController.EditThread(serverState, user, sectionId, threadId, title, description);
+            } else if (SectionReceiveMessages.DeletePost.Equals(messageId))
+            {
+                if (!message.HasString()) return;
+                Guid threadId = Guid.Parse(message.GetString());
+                ThreadController.DeleteThread(serverState, user, sectionId, threadId);
+            } else if (SectionReceiveMessages.AddComment.Equals(messageId))
+            {
+                if (!message.HasString()) return;
+                Guid threadId = Guid.Parse(message.GetString());
+                if (!message.HasString()) return;
+                String text = message.GetString();
+                ThreadController.AddComment(serverState, user, threadId, sectionId, text);
+            } else if (SectionReceiveMessages.EditComment.Equals(messageId))
+            {
+                if (!message.HasString()) return;
+                Guid commentId = Guid.Parse(message.GetString());
+                if (!message.HasString()) return;
+                String description = message.GetString();
+                ThreadController.EditComment(serverState, user, commentId, description);
+            } else if (SectionReceiveMessages.DeleteComment.Equals(messageId))
+            {
+                if (!message.HasString()) return;
+                Guid commentId = Guid.Parse(message.GetString());
+                ThreadController.DeleteComment(serverState, user, commentId);
             }
         }
     }

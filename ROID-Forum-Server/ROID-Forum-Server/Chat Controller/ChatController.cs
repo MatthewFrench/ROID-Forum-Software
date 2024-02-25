@@ -1,38 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using Cassandra;
 
 namespace ROIDForumServer
 {
-    public class ChatController(ServerController serverController)
+    public static class ChatController
     {
         // Todo: We can use cassandra, redis, or nats to properly show
         // active users and allow subscribing them to events.
         // This will allow multi-instance scaling of the server.
-        private readonly List<ConnectedUser> _users = new List<ConnectedUser>();
-        private ISession DatabaseSession { get; } = serverController.Database.GetSession();
-        private Networking Networking { get; } = serverController.Networking;
-        public void AddUser(ConnectedUser user)
+        public static void AddUser(ServerState serverState, ConnectedUser user)
         {
-            _users.Add(user);
-            SendListUpdateToAll();
-            SendAllChats(user);
+            SendListUpdateToAll(serverState);
+            SendAllChats(serverState, user);
         }
-        public void RemoveUser(ConnectedUser user)
+
+        public static void RemoveUser(ServerState serverState, ConnectedUser user)
         {
-            _users.Remove(user);
-            SendListUpdateToAll();
+            SendListUpdateToAll(serverState);
         }
-        public void SendListUpdateToAll()
+
+        public static void SendListUpdateToAll(ServerState serverState)
         {
-            String list = $"Online({_users.Count}): ";
+            String list = $"Online({serverState.Networking.Users.Count}): ";
             int guests = 0;
             bool addComma = false;
             // Todo: Fix bulk account name lookups, either cache names
             // or make an active online table in Cassandra, or
             // make a bunch of async parallel queries to be distributed
             // among cassandra nodes.
-    foreach (ConnectedUser user in _users)
+            foreach (ConnectedUser user in serverState.Networking.Users)
             {
                 if (user.AccountId != null)
                 {
@@ -44,13 +39,16 @@ namespace ROIDForumServer
                     {
                         addComma = true;
                     }
-                    list += DatabaseAccount.GetAccountDisplayName(DatabaseSession, (Guid)user.AccountId);
+
+                    list += DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(),
+                        (Guid)user.AccountId);
                 }
                 else
                 {
                     guests += 1;
                 }
             }
+
             if (addComma)
             {
                 list += $" and {guests} Guests";
@@ -61,36 +59,43 @@ namespace ROIDForumServer
             }
 
             byte[] message = ChatSendMessages.ChatOnlineList(list);
-            foreach (ConnectedUser user in _users)
+            foreach (ConnectedUser user in serverState.Networking.Users)
             {
                 user.Send(message);
             }
+
             Console.WriteLine(list);
         }
-        private void AddChat(ConnectedUser user, String chat)
+
+        private static void AddChat(ServerState serverState, ConnectedUser user, String chat)
         {
             if (user.AccountId == null)
             {
                 return;
             }
-            chat = $"{DatabaseAccount.GetAccountDisplayName(DatabaseSession, (Guid)user.AccountId)}: " + chat;
-            DatabaseChat.SubmitChat(DatabaseSession, (Guid)user.AccountId, chat);
+
+            chat =
+                $"{DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId)}: " +
+                chat;
+            DatabaseChat.SubmitChat(serverState.Database.GetSession(), (Guid)user.AccountId, chat);
             // Send chat to all connected websockets
             // Todo: Switch to a NATS subscription model
             byte[] chatMsg = ChatSendMessages.ChatMessage(chat);
-            foreach (var user2 in Networking.Users)
+            foreach (var user2 in serverState.Networking.Users)
             {
                 user2.Send(chatMsg);
             }
         }
-        private void SendAllChats(ConnectedUser user)
+
+        private static void SendAllChats(ServerState serverState, ConnectedUser user)
         {
-            foreach (var (_, _, content, _) in DatabaseChat.GetRecentChats(DatabaseSession))
+            foreach (var (_, _, content, _) in DatabaseChat.GetRecentChats(serverState.Database.GetSession()))
             {
                 user.Send(ChatSendMessages.ChatMessage(content));
             }
         }
-        public void OnMessage(ConnectedUser user, MessageReader message)
+
+        public static void OnMessage(ServerState serverState, ConnectedUser user, MessageReader message)
         {
             if (!message.HasUint8())
             {
@@ -104,7 +109,8 @@ namespace ROIDForumServer
                 {
                     return;
                 }
-                AddChat(user, message.GetString());
+
+                AddChat(serverState, user, message.GetString());
             }
         }
     }

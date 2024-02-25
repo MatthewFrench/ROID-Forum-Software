@@ -1,6 +1,6 @@
 namespace ROIDForumServer;
 
-public class ProfileSendMessages
+public static class ProfileSendMessages
 {
     private enum LoginMsg
     {

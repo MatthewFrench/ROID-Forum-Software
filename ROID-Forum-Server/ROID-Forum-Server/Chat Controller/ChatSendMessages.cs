@@ -1,6 +1,6 @@
 namespace ROIDForumServer;
 
-public class ChatSendMessages
+public static class ChatSendMessages
 {
     private enum ChatMsg : byte
     {
