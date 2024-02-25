@@ -93,14 +93,14 @@ namespace ROIDForumServer
             ChatController.RemoveUser(user);
         }
 
-        private void EngageToSection(Guid sectionId, ConnectedUser user)
+        public void EngageToSection(Guid sectionId, ConnectedUser user)
         {
             if (!SectionControllers.TryGetValue(sectionId, out var section)) return;
             section.AddUser(user);
             user.ViewingSectionId = sectionId;
         }
 
-        private void DisengageFromSection(Guid sectionId, ConnectedUser user)
+        public void DisengageFromSection(Guid sectionId, ConnectedUser user)
         {
             if (!SectionControllers.TryGetValue(sectionId, out var section)) return;
             section.RemoveUser(user);

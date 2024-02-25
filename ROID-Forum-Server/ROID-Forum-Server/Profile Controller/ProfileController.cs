@@ -1,37 +1,48 @@
 ﻿using System;
-using System.Collections.Generic;
 using Cassandra;
+
 namespace ROIDForumServer
 {
-    public class ProfileController (ServerController serverController)
+    public class ProfileController(ServerController serverController)
     {
         private ServerController Server { get; } = serverController;
         private ISession DatabaseSession { get; } = serverController.Database.GetSession();
+
         public void OnMessage(ConnectedUser user, MessageReader message)
         {
-            /*
-             * if ((string)message["Controller"] == "Server" && (string)message["Title"] == "Viewing")
-               {
-                   if (user.ViewingSectionId != null)
-                   {
-                       DisengageFromSection((Guid) user.ViewingSectionId, user);   
-                   }
-                   EngageToSection(Guid.Parse((string)message["Section ID"]), user);
-               }
-             */
-            
-            if ((string)message["Title"] == "Set Avatar" && user.AccountId != null)
+            if (!message.HasUint8()) return;
+
+            byte messageId = message.GetUint8();
+            if (ProfileReceiveMessages.ViewingSection.Equals(messageId))
             {
-                DatabaseAccount.SetAvatarUrl(DatabaseSession, (Guid)user.AccountId, (string)message["AvatarURL"]);
+                if (!message.HasString()) return;
+                Guid viewingSectionId = Guid.Parse(message.GetString());
+                if (user.ViewingSectionId != null)
+                {
+                    Server.DisengageFromSection((Guid)user.ViewingSectionId, user);
+                }
+
+                Server.EngageToSection(viewingSectionId, user);
             }
-            if ((string)message["Title"] == "Get Avatar" && user.AccountId != null)
+            else if (ProfileReceiveMessages.SetAvatar.Equals(messageId))
             {
-                user.Send(ProfileSendMessages.GetAvatarMessage(DatabaseAccount.GetAvatarUrl(DatabaseSession, (Guid)user.AccountId)));
+                if (!message.HasString()) return;
+                if (user.AccountId == null) return;
+                DatabaseAccount.SetAvatarUrl(DatabaseSession, (Guid)user.AccountId, message.GetString());
             }
-            if ((string)message["Title"] == "Login" && user.AccountId == null)
+            else if (ProfileReceiveMessages.GetAvatar.Equals(messageId))
             {
-                string username = (string)message["Name"];
-                string password = (string)message["Password"];
+                if (user.AccountId == null) return;
+                user.Send(ProfileSendMessages.GetAvatarMessage(
+                    DatabaseAccount.GetAvatarUrl(DatabaseSession, (Guid)user.AccountId)));
+            }
+            else if (ProfileReceiveMessages.Login.Equals(messageId))
+            {
+                if (user.AccountId != null) return;
+                if (!message.HasString()) return;
+                string username = message.GetString();
+                if (!message.HasString()) return;
+                string password = message.GetString();
                 if (String.IsNullOrWhiteSpace(username) || String.IsNullOrWhiteSpace(password))
                 {
                     user.Send(ProfileSendMessages.LoginFailedMessage());
@@ -46,39 +57,48 @@ namespace ROIDForumServer
                     else
                     {
                         user.AccountId = accountId;
-                        user.Send(ProfileSendMessages.LoggedInMessage(DatabaseAccount.GetAccountName(DatabaseSession, (Guid)user.AccountId)));
+                        user.Send(ProfileSendMessages.LoggedInMessage(
+                            DatabaseAccount.GetAccountDisplayName(DatabaseSession, (Guid)user.AccountId)));
                         Server.AccountLoggedIn(user);
                     }
                 }
             }
-            if ((string)message["Title"] == "Logout" && user.AccountId != null)
+            else if (ProfileReceiveMessages.Logout.Equals(messageId))
             {
-                //Perhaps an account method can be called for saving or other logic
+                if (user.AccountId == null) return;
                 user.AccountId = null;
-                //Send logout notification
                 user.Send(ProfileSendMessages.LoggedOutMessage());
                 Server.AccountLoggedOut(user);
             }
-            if ((string)message["Title"] == "Register" && user.AccountId == null)
+            else if (ProfileReceiveMessages.Register.Equals(messageId))
             {
-                string username = (string)message["Name"];
-                string password = (string)message["Password"];
-                string email = (string)message["Email"];
-                if (String.IsNullOrWhiteSpace(username) || String.IsNullOrWhiteSpace(password) || String.IsNullOrWhiteSpace(email))
+                if (user.AccountId != null) return;
+                if (!message.HasString()) return;
+                string username = message.GetString();
+                if (!message.HasString()) return;
+                string password = message.GetString();
+                if (!message.HasString()) return;
+                string email = message.GetString();
+                if (String.IsNullOrWhiteSpace(username) || String.IsNullOrWhiteSpace(password) ||
+                    String.IsNullOrWhiteSpace(email))
                 {
                     user.Send(ProfileSendMessages.RegisterFailedMessage());
                     return;
                 }
-                var (createAccountStatus, accountId) = DatabaseAccount.CreateAccount(DatabaseSession, username, password, email);
+
+                var (createAccountStatus, accountId) =
+                    DatabaseAccount.CreateAccount(DatabaseSession, username, password, email);
                 if (createAccountStatus == DatabaseAccount.CreateAccountStatus.AlreadyExists || accountId == null)
                 {
                     user.Send(ProfileSendMessages.RegisterFailedMessage());
                     return;
                 }
+
                 // Set the account ID to log them in
                 user.AccountId = accountId;
                 //Send login notification
-                user.Send(ProfileSendMessages.LoggedInMessage(DatabaseAccount.GetAccountName(DatabaseSession, (Guid)user.AccountId)));
+                user.Send(ProfileSendMessages.LoggedInMessage(
+                    DatabaseAccount.GetAccountDisplayName(DatabaseSession, (Guid)user.AccountId)));
                 Server.AccountLoggedIn(user);
             }
         }

@@ -44,7 +44,7 @@ namespace ROIDForumServer
                     {
                         addComma = true;
                     }
-                    list += DatabaseAccount.GetAccountName(DatabaseSession, (Guid)user.AccountId);
+                    list += DatabaseAccount.GetAccountDisplayName(DatabaseSession, (Guid)user.AccountId);
                 }
                 else
                 {
@@ -73,7 +73,7 @@ namespace ROIDForumServer
             {
                 return;
             }
-            chat = $"{DatabaseAccount.GetAccountName(DatabaseSession, (Guid)user.AccountId)}: " + chat;
+            chat = $"{DatabaseAccount.GetAccountDisplayName(DatabaseSession, (Guid)user.AccountId)}: " + chat;
             DatabaseChat.SubmitChat(DatabaseSession, (Guid)user.AccountId, chat);
             // Send chat to all connected websockets
             // Todo: Switch to a NATS subscription model
@@ -96,7 +96,9 @@ namespace ROIDForumServer
             {
                 return;
             }
-            if (ChatReceiveMessages.Message.Equals(message.GetUint8()) && user.AccountId != null)
+
+            byte messageId = message.GetUint8();
+            if (ChatReceiveMessages.Message.Equals(messageId) && user.AccountId != null)
             {
                 if (!message.HasString())
                 {

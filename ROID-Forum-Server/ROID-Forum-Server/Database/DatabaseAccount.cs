@@ -88,7 +88,7 @@ public static class DatabaseAccount
 	    return (CreateAccountStatus.Created, accountId);
     }
     
-    public static string GetAccountName(ISession session, Guid accountId)
+    public static string GetAccountDisplayName(ISession session, Guid accountId)
     {
 	    var selectStatement = session.Prepare($"SELECT display_name FROM \"{Database.DefaultKeyspace}\".\"{TableAccount}\" where account_id=?");
 	    var result = session.Execute(selectStatement.Bind(accountId));
