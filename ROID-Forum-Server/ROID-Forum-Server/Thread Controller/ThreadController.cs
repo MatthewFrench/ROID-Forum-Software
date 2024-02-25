@@ -4,6 +4,19 @@ namespace ROIDForumServer
 {
     public static class ThreadController
     {
+        public static void AddUser(ServerState serverState, ConnectedUser user, Guid sectionId, Guid threadId)
+        {
+            user.ViewingThreadId = threadId;
+            //SectionMessageSender.SendAllThreadsToUser(serverState, user, sectionId);
+        }
+
+        public static void RemoveUser(ServerState serverState, ConnectedUser user, Guid sectionId, Guid threadId)
+        {
+            if (user.ViewingThreadId == threadId)
+            {
+                user.ViewingSectionId = null;
+            }
+        }
         public static void AddThread(ServerState serverState, ConnectedUser user, Guid sectionId, string title, string description)
         {
             if (user.AccountId == null)

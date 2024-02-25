@@ -9,21 +9,7 @@ namespace ROIDForumServer
             if (!message.HasUint8()) return;
 
             byte messageId = message.GetUint8();
-            if (ProfileReceiveMessages.ViewingSection.Equals(messageId))
-            {
-                if (!message.HasString()) return;
-                if (user.ViewingSectionId != null)
-                {
-                    SectionController.RemoveUser(serverState, user, (Guid)user.ViewingSectionId);
-                }
-                
-                Guid viewingSectionId = Guid.Parse(message.GetString());
-                if (DatabaseSection.SectionIdExists(serverState.Database.GetSession(), viewingSectionId))
-                {
-                    SectionController.AddUser(serverState, user, viewingSectionId);
-                }
-            }
-            else if (ProfileReceiveMessages.SetAvatar.Equals(messageId))
+            if (ProfileReceiveMessages.SetAvatar.Equals(messageId))
             {
                 if (!message.HasString()) return;
                 if (user.AccountId == null) return;
@@ -32,7 +18,7 @@ namespace ROIDForumServer
             else if (ProfileReceiveMessages.GetAvatar.Equals(messageId))
             {
                 if (user.AccountId == null) return;
-                user.Send(ProfileSendMessages.GetAvatarMessage(
+                user.Send(ProfileSendMessages.ReturnAvatarMessage(
                     DatabaseAccount.GetAvatarUrl(serverState.Database.GetSession(), (Guid)user.AccountId)));
             }
             else if (ProfileReceiveMessages.Login.Equals(messageId))

@@ -20,10 +20,23 @@ namespace ROIDForumServer
 
         public static void OnMessage(ServerState serverState, ConnectedUser user, Guid sectionId, MessageReader message)
         {
-            if (user.AccountId == null)
-            {
-                return;
-            }
+            /*
+             * if (ProfileReceiveMessages.ViewingSection.Equals(messageId))
+               {
+                   if (!message.HasString()) return;
+                   if (user.ViewingSectionId != null)
+                   {
+                       SectionController.RemoveUser(serverState, user, (Guid)user.ViewingSectionId);
+                   }
+                   
+                   Guid viewingSectionId = Guid.Parse(message.GetString());
+                   if (DatabaseSection.SectionIdExists(serverState.Database.GetSession(), viewingSectionId))
+                   {
+                       SectionController.AddUser(serverState, user, viewingSectionId);
+                   }
+               }
+               else 
+             */
             if (!message.HasUint8())
             {
                 return;
@@ -31,6 +44,10 @@ namespace ROIDForumServer
 
             byte messageId = message.GetUint8();
 
+            if (user.AccountId == null)
+            {
+                return;
+            }
             if (SectionReceiveMessages.NewPost.Equals(messageId))
             {
                 if (!message.HasString()) return;

@@ -4,11 +4,12 @@ public static class ProfileSendMessages
 {
     private enum LoginMsg
     {
-        GetAvatar = 0,
+        ReturnAvatar = 0,
         LoginFailed = 1,
         LoggedOut = 2,
         RegisterFailed = 3,
         LoggedIn = 4,
+        ReturnDisplayName = 5,
     }
 
     public static byte[] LoggedInMessage(string displayName)
@@ -45,11 +46,11 @@ public static class ProfileSendMessages
         return message.ToBuffer();
     }
 
-    public static byte[] GetAvatarMessage(string avatarUrl)
+    public static byte[] ReturnAvatarMessage(string avatarUrl)
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Profile);
-        message.AddUint8((byte)LoginMsg.GetAvatar);
+        message.AddUint8((byte)LoginMsg.ReturnAvatar);
         message.AddString(avatarUrl);
         return message.ToBuffer();
     }

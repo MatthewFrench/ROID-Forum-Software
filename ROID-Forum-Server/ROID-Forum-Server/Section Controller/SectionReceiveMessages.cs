@@ -7,5 +7,7 @@ public enum SectionReceiveMessages : byte
     DeletePost = 2,
     AddComment = 3,
     EditComment = 4,
-    DeleteComment = 5
+    DeleteComment = 5,
+    ViewingSection = 6,
+    ViewingThread = 7
 }

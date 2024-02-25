@@ -6,42 +6,41 @@ namespace ROIDForumServer;
 public static class SectionSendMessages
 {
         private enum SectionMsg {
-            AllThreads = 0,
+            AllThreadHeaders = 0,
             AddThread = 1,
             RemoveThread = 2,
-            UpdateThread = 3,
-            MoveThreadToTop = 4,
-            AddComment = 5,
-            RemoveComment = 6,
-            UpdateComment = 7
+            UpdateThreadTitle = 3,
+            UpdateThreadDescription = 4,
+            MoveThreadToTop = 5,
+            ThreadAndComments = 6,
+            AddComment = 7,
+            RemoveComment = 8,
+            UpdateComment = 9,
+            SectionViewers = 10,
+            SectionAddViewer = 11,
+            SectionRemoveViewer = 12,
+            ThreadViewers = 13,
+            ThreadAddViewer = 14,
+            ThreadRemoveViewer = 15,
+            AvatarUpdate = 16,
+            DisplayNameUpdate = 17
         }
 
-        public static byte[] AllThreadsMessage(List<DatabaseThread.DatabaseThreadData> threads)
+        public static byte[] AllThreadHeaders(List<DatabaseThread.DatabaseThreadHeaderData> threadHeaders)
         {
             var message = new MessageWriter();
             message.AddUint8((byte)ServerSendControllers.Section);
-            message.AddUint8((byte)SectionMsg.AllThreads);
-            //message.AddString(controller.SectionName);
-            message.AddUint32((uint)threads.Count);
-            foreach (var thread in threads)
+            message.AddUint8((byte)SectionMsg.AllThreadHeaders);
+            message.AddUint32((uint)threadHeaders.Count);
+            foreach (var threadHeader in threadHeaders)
             {
-                message.AddBinary(InnerThreadMessage(thread));
+                message.AddString(threadHeader.sectionId.ToString());
+                message.AddString(threadHeader.threadId.ToString());
+                message.AddString(threadHeader.creatorAccountId.ToString());
+                message.AddString(threadHeader.createdTime.ToString());
+                message.AddString(threadHeader.updated_time.ToString());
+                message.AddString(threadHeader.title);
             }
-            return message.ToBuffer();
-        }
-        
-        private static byte[] InnerThreadMessage(DatabaseThread.DatabaseThreadData threadData) {
-            var message = new MessageWriter();
-            message.AddString(threadData.creatorAccountId.ToString());
-            message.AddString(threadData.threadId.ToString());
-            message.AddString(threadData.title);
-            /*
-            message.AddUint32((uint)comments.Count);
-            for (int i = 0; i < comments.Count; i++)
-            {
-                message.AddBinary(comments[i].toBinary());
-            }
-            */
             return message.ToBuffer();
         }
 
@@ -68,12 +67,12 @@ public static class SectionSendMessages
             return message.ToBuffer();
         }
 
-        public static byte[] UpdateThreadMessage(Guid threadId, String title)
+        public static byte[] UpdateThreadTitleMessage(Guid threadId, String title)
         {
             // Todo: This needs updated on client side
             var message = new MessageWriter();
             message.AddUint8((byte)ServerSendControllers.Section);
-            message.AddUint8((byte)SectionMsg.UpdateThread);
+            message.AddUint8((byte)SectionMsg.UpdateThreadTitle);
             //message.AddString(controller.SectionName);
             message.AddString(threadId.ToString());
             message.AddString(title);

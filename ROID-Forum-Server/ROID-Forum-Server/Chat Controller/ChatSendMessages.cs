@@ -5,7 +5,10 @@ public static class ChatSendMessages
     private enum ChatMsg : byte
     {
         Message = 0,
-        OnlineList = 1
+        OnlineList = 1,
+        OnlineListAddUser = 2,
+        OnlineListRemoveUser = 3,
+        DisplayNameUpdate = 4,
     }
     
     public static byte[] ChatMessage(string chat) {
