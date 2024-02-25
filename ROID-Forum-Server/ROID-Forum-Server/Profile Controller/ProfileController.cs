@@ -12,13 +12,16 @@ namespace ROIDForumServer
             if (ProfileReceiveMessages.ViewingSection.Equals(messageId))
             {
                 if (!message.HasString()) return;
-                Guid viewingSectionId = Guid.Parse(message.GetString());
                 if (user.ViewingSectionId != null)
                 {
-                    ServerController.DisengageFromSection(serverState, (Guid)user.ViewingSectionId, user);
+                    SectionController.RemoveUser(serverState, user, (Guid)user.ViewingSectionId);
                 }
-
-                ServerController.EngageToSection(serverState, viewingSectionId, user);
+                
+                Guid viewingSectionId = Guid.Parse(message.GetString());
+                if (DatabaseSection.SectionIdExists(serverState.Database.GetSession(), viewingSectionId))
+                {
+                    SectionController.AddUser(serverState, user, viewingSectionId);
+                }
             }
             else if (ProfileReceiveMessages.SetAvatar.Equals(messageId))
             {

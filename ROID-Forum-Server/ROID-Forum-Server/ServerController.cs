@@ -74,22 +74,10 @@ namespace ROIDForumServer
         {
             if (user.ViewingSectionId != null)
             {
-                DisengageFromSection(serverState, (Guid)user.ViewingSectionId, user);
+                SectionController.RemoveUser(serverState, user, (Guid) user.ViewingSectionId);
             }
 
             ChatController.RemoveUser(serverState, user);
-        }
-
-        public static void EngageToSection(ServerState serverState, Guid sectionId, ConnectedUser user)
-        {
-            SectionController.AddUser(serverState, user, sectionId);
-            user.ViewingSectionId = sectionId;
-        }
-
-        public static void DisengageFromSection(ServerState serverState, Guid sectionId, ConnectedUser user)
-        {
-            SectionController.RemoveUser(serverState, user);
-            user.ViewingSectionId = null;
         }
     }
 }

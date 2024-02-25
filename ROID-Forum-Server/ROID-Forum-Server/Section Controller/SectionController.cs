@@ -6,11 +6,16 @@ namespace ROIDForumServer
     {
         public static void AddUser(ServerState serverState, ConnectedUser user, Guid sectionId)
         {
+            user.ViewingSectionId = sectionId;
             SectionMessageSender.SendAllThreadsToUser(serverState, user, sectionId);
         }
 
-        public static void RemoveUser(ServerState serverState, ConnectedUser user)
+        public static void RemoveUser(ServerState serverState, ConnectedUser user, Guid sectionId)
         {
+            if (user.ViewingSectionId == sectionId)
+            {
+                user.ViewingSectionId = null;
+            }
         }
 
         public static void OnMessage(ServerState serverState, ConnectedUser user, Guid sectionId, MessageReader message)
