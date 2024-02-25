@@ -8,17 +8,17 @@ namespace ROIDForumServer
     {
         public Database Database { get; }
         public Networking Networking { get; }
-        public LoginController LoginController { get; }
-        public ChatController ChatController { get; }
-        public Dictionary<Guid, SectionController> Sections { get; }
+        private ProfileController ProfileController { get; }
+        private ChatController ChatController { get; }
+        private Dictionary<Guid, SectionController> SectionControllers { get; }
 
         public ServerController()
         {
             Database = new Database();
             Networking = new Networking(this);
-            LoginController = new LoginController(this);
+            ProfileController = new ProfileController(this);
             ChatController = new ChatController(this);
-            Sections = new Dictionary<Guid, SectionController>();
+            SectionControllers = new Dictionary<Guid, SectionController>();
             CreateOrLoadSection("Coding Section");
             CreateOrLoadSection("Game Section");
             CreateOrLoadSection("Graphics Section");
@@ -28,8 +28,8 @@ namespace ROIDForumServer
 
         private void CreateOrLoadSection(String sectionName)
         {
-            var sectionId = DatabaseSection.LoadSectionId(Database.GetSession(), sectionName);
-            Sections.Add(sectionId, new SectionController(this, sectionName, sectionId));
+            var sectionId = DatabaseSection.CreateOrLoadSection(Database.GetSession(), sectionName);
+            SectionControllers.Add(sectionId, new SectionController(this, sectionName, sectionId));
         }
 
         public void AccountLoggedIn(ConnectedUser user)
@@ -57,33 +57,30 @@ namespace ROIDForumServer
             ChatController.AddUser(user);
         }
 
-        public void OnMessage(ConnectedUser user, Object rawMessage)
+        public void OnMessage(ConnectedUser user, MessageReader message)
         {
-            if ((string)rawMessage == null) return;
-            //Console.WriteLine("Message: " + message);
-            Dictionary<string, object> message = JsonConvert.DeserializeObject<Dictionary<string, object>>((string)rawMessage);
-            if ((string)message["Controller"] == "Chat")
+            if (!message.HasUint8())
+            {
+                return;
+            }
+
+            var messageController = message.GetUint8();
+            if (ServerReceiveControllers.Chat.Equals(messageController))
             {
                 ChatController.OnMessage(user, message);
-            }
-
-            if ((string)message["Controller"] == "Login")
+            } else if (ServerReceiveControllers.Profile.Equals(messageController))
             {
-                LoginController.OnMessage(user, message);
-            }
-
-            if ((string)message["Controller"] == "Server" && (string)message["Title"] == "Viewing")
+                ProfileController.OnMessage(user, message);
+            } else if (ServerReceiveControllers.Section.Equals(messageController))
             {
-                if (user.ViewingSectionId != null)
+                if (!message.HasString())
                 {
-                    DisengageFromSection((Guid) user.ViewingSectionId, user);   
+                    return;
                 }
-                EngageToSection(Guid.Parse((string)message["Section ID"]), user);
+                var sectionId = Guid.Parse(message.GetString());
+                if (!SectionControllers.TryGetValue(sectionId, out var section)) return;
+                section.OnMessage(user, message);
             }
-
-            Guid sectionId = Guid.Parse((string)message["Controller"]);
-            if (!Sections.TryGetValue(sectionId, out var section)) return;
-            section.OnMessage(user, message);
         }
 
         public void OnClose(ConnectedUser user)
@@ -98,14 +95,14 @@ namespace ROIDForumServer
 
         private void EngageToSection(Guid sectionId, ConnectedUser user)
         {
-            if (!Sections.TryGetValue(sectionId, out var section)) return;
+            if (!SectionControllers.TryGetValue(sectionId, out var section)) return;
             section.AddUser(user);
             user.ViewingSectionId = sectionId;
         }
 
         private void DisengageFromSection(Guid sectionId, ConnectedUser user)
         {
-            if (!Sections.TryGetValue(sectionId, out var section)) return;
+            if (!SectionControllers.TryGetValue(sectionId, out var section)) return;
             section.RemoveUser(user);
             user.ViewingSectionId = null;
         }

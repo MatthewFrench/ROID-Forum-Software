@@ -15,9 +15,6 @@
     <PackageReference Include="Soly.Utilities.ByteArray" Version="1.2.6" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Section Controller\" />
-  </ItemGroup>
-  <ItemGroup>
     <None Remove="Convert Server Code\GMGServer\bin\Server\Chatbox Games\BlockGame\BlockController.dart" />
     <None Remove="Convert Server Code\GMGServer\bin\Server\Chatbox Games\BlockGame\BlockGameController.dart" />
     <None Remove="Convert Server Code\GMGServer\bin\Server\Sections\All Section Controller\AllSectionController.dart" />

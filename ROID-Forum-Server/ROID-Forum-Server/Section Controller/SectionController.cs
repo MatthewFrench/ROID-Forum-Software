@@ -30,7 +30,7 @@ namespace ROIDForumServer
             UsersViewing.Remove(user);
         }
 
-        public void OnMessage(ConnectedUser user, Dictionary<string, object> message)
+        public void OnMessage(ConnectedUser user, MessageReader message)
         {
             switch ((string)message["Title"])
             {

@@ -130,9 +130,7 @@ namespace ROIDForumServer
 
 		public override void AddToByteData(ByteArray byteData, int loc)
 		{
-			//Write total length (total length + string length)
-			byteData.Write(_totalLength, loc, Endianness.BigEndian);
-            //Write string
+			byteData.Write(_totalLength - 4, loc, Endianness.BigEndian);
 			byteData.Write(_value, 0, _value.Length, loc + 4);
 		}
         
@@ -150,15 +148,12 @@ namespace ROIDForumServer
 		public MessageDataBinary(byte[] value)
 		{
 			_value = value;
-			//Total length is buffer plus length of buffer
 			_totalLength = 4 + (uint)_value.Length;
 		}
 
 		public override void AddToByteData(ByteArray byteData, int loc)
 		{
-            //Write total length (total length + string length)
-            byteData.Write(_totalLength, loc, Endianness.BigEndian);
-            //Write string
+            byteData.Write(_totalLength - 4, loc, Endianness.BigEndian);
             byteData.Write(_value, 0, _value.Length, loc + 4);
 		}
 

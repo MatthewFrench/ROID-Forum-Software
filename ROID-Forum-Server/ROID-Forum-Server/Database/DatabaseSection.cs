@@ -43,7 +43,7 @@ public static class DatabaseSection
                 CREATE INDEX IF NOT EXISTS ON ""{Database.DefaultKeyspace}"".""{TableActiveInSection}"" (account_id)");
     }
     
-    public static Guid LoadSectionId(ISession session, String sectionName)
+    public static Guid CreateOrLoadSection(ISession session, String sectionName)
     {
             // Create the section if it doesn't already exist
             PreparedStatement insertStatement = session.Prepare($"INSERT INTO \"{Database.DefaultKeyspace}\".\"{TableSection}\" (section_id, name) VALUES (uuid(), ?) IF NOT EXISTS");

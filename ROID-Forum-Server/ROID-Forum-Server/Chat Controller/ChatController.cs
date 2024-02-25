@@ -60,7 +60,7 @@ namespace ROIDForumServer
                 list += $"{guests} Guests";
             }
 
-            byte[] message = ServerMessages.ChatOnlineList(list);
+            byte[] message = ChatSendMessages.ChatOnlineList(list);
             foreach (ConnectedUser user in _users)
             {
                 user.Send(message);
@@ -75,9 +75,9 @@ namespace ROIDForumServer
             }
             chat = $"{DatabaseAccount.GetAccountName(DatabaseSession, (Guid)user.AccountId)}: " + chat;
             DatabaseChat.SubmitChat(DatabaseSession, (Guid)user.AccountId, chat);
-            //Send chat to all connected websockets
+            // Send chat to all connected websockets
             // Todo: Switch to a NATS subscription model
-            byte[] chatMsg = ServerMessages.ChatMessage(chat);
+            byte[] chatMsg = ChatSendMessages.ChatMessage(chat);
             foreach (var user2 in Networking.Users)
             {
                 user2.Send(chatMsg);
@@ -87,14 +87,22 @@ namespace ROIDForumServer
         {
             foreach (var (_, _, content, _) in DatabaseChat.GetRecentChats(DatabaseSession))
             {
-                user.Send(ServerMessages.ChatMessage(content));
+                user.Send(ChatSendMessages.ChatMessage(content));
             }
         }
-        public void OnMessage(ConnectedUser user, Dictionary<string, object> message)
+        public void OnMessage(ConnectedUser user, MessageReader message)
         {
-            if ((string)message["Title"] == "Msg" && user.AccountId != null)
+            if (!message.HasUint8())
             {
-                AddChat(user, (string)message["Data"]);
+                return;
+            }
+            if (ChatReceiveMessages.Message.Equals(message.GetUint8()) && user.AccountId != null)
+            {
+                if (!message.HasString())
+                {
+                    return;
+                }
+                AddChat(user, message.GetString());
             }
         }
     }

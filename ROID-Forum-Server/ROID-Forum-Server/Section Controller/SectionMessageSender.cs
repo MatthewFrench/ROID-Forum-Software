@@ -9,13 +9,13 @@ namespace ROIDForumServer
 
         public void SendAllThreadsToUser(ConnectedUser user)
         {
-            user.Send(ServerMessages.AllThreadsMessage(sectionController,
+            user.Send(SectionSendMessages.AllThreadsMessage(sectionController,
                 DatabaseThread.GetThreadsInSection(DatabaseSession, sectionController.SectionId)));
         }
 
         public void SendAddThreadToAll(Guid threadId, Guid creatorAccountId, String title)
         {
-            byte[] message = ServerMessages.AddThreadMessage(sectionController, creatorAccountId, threadId, title);
+            byte[] message = SectionSendMessages.AddThreadMessage(sectionController, creatorAccountId, threadId, title);
             foreach (ConnectedUser user in sectionController.UsersViewing)
             {
                 user.Send(message);
@@ -24,7 +24,7 @@ namespace ROIDForumServer
 
         public void SendRemoveThreadToAll(Guid threadId)
         {
-            byte[] message = ServerMessages.RemoveThreadMessage(sectionController, threadId);
+            byte[] message = SectionSendMessages.RemoveThreadMessage(sectionController, threadId);
             foreach (ConnectedUser user in sectionController.UsersViewing)
             {
                 user.Send(message);
@@ -33,7 +33,7 @@ namespace ROIDForumServer
 
         public void SendUpdateThreadToAll(Guid threadId, String title)
         {
-            byte[] message = ServerMessages.UpdateThreadMessage(sectionController, threadId, title);
+            byte[] message = SectionSendMessages.UpdateThreadMessage(sectionController, threadId, title);
             foreach (ConnectedUser user in sectionController.UsersViewing)
             {
                 user.Send(message);
@@ -42,7 +42,7 @@ namespace ROIDForumServer
 
         public void SendMoveThreadToTopToAll(Guid threadId)
         {
-            byte[] message = ServerMessages.MoveToTopThreadMessage(sectionController, threadId);
+            byte[] message = SectionSendMessages.MoveToTopThreadMessage(sectionController, threadId);
             foreach (ConnectedUser user in sectionController.UsersViewing)
             {
                 user.Send(message);
