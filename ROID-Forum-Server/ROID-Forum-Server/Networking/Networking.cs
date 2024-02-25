@@ -5,28 +5,23 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
 namespace ROIDForumServer
 {
-	public class Networking
+	public class Networking(ServerController serverController)
     {
-        string ip = "0.0.0.0";
-		int port = 7779;
-		public WebSocketServer websocketServer;
-        public ServerController serverController;
-        public List<IWebSocketConnection> webSockets = new List<IWebSocketConnection>();
-        public List<ConnectedUser> users = new List<ConnectedUser>();
-        public Dictionary<IWebSocketConnection, ConnectedUser> userMap = new Dictionary<IWebSocketConnection, ConnectedUser>();
-		public Networking(ServerController controller) {
-			serverController = controller;
-		}
-        
-		public void ClientConnectedEvent(IWebSocketConnection socket) {
-			webSockets.Add(socket);
+	    private WebSocketServer _websocketServer;
+	    private readonly List<IWebSocketConnection> _webSockets = new List<IWebSocketConnection>();
+	    private readonly Dictionary<IWebSocketConnection, ConnectedUser> _userMap = new Dictionary<IWebSocketConnection, ConnectedUser>();
+
+	    public List<ConnectedUser> Users { get; } = new List<ConnectedUser>();
+
+	    private void ClientConnectedEvent(IWebSocketConnection socket) {
+			_webSockets.Add(socket);
 			Console.WriteLine("Open!");
 			Console.WriteLine("Clients connected: " + GetNumberOfConnectedClients());
 
-            ConnectedUser p = new ConnectedUser(socket);
-            users.Add(p);
-            userMap.Add(socket, p);
-            serverController.onOpen(p);
+            ConnectedUser connectedUser = new ConnectedUser(socket);
+            Users.Add(connectedUser);
+            _userMap.Add(socket, connectedUser);
+            serverController.OnOpen(connectedUser);
            
             /*
             var message = new MessageWriter();
@@ -46,17 +41,17 @@ namespace ROIDForumServer
 			*/
 		}
         
-        public void ClientDisconnectedEvent(IWebSocketConnection socket)
+        private void ClientDisconnectedEvent(IWebSocketConnection socket)
         {
-			webSockets.Remove(socket);
+			_webSockets.Remove(socket);
             Console.WriteLine("Close!");
-            var user = userMap.GetValueOrDefault(socket);
-            serverController.onClose(user);
-            users.Remove(user);
-            userMap.Remove(socket);
+            var user = _userMap.GetValueOrDefault(socket);
+            Users.Remove(user);
+            serverController.OnClose(user);
+            _userMap.Remove(socket);
         }
 
-		public void ClientBinaryMessageEvent(IWebSocketConnection socket, byte[] binary) {
+		private void ClientBinaryMessageEvent(IWebSocketConnection socket, byte[] binary) {
             try
             {
                 //serverController.onMessage(userMap.GetValueOrDefault(socket), binary);
@@ -95,11 +90,11 @@ namespace ROIDForumServer
 			*/
 		}
 
-        public void ClientMessageEvent(IWebSocketConnection socket, string message)
+        private void ClientMessageEvent(IWebSocketConnection socket, string message)
         {
             try
             {
-                serverController.onMessage(userMap.GetValueOrDefault(socket), message);
+                serverController.OnMessage(_userMap.GetValueOrDefault(socket), message);
             }
             catch (Exception e)
             {
@@ -111,38 +106,41 @@ namespace ROIDForumServer
 
         public void Start()
         {
+	        // Todo: Move this to configuration or environment variables
+	        var ip = "0.0.0.0";
+	        var port = 7779;
 	        if (Environment.IsRunningLocally())
 	        {
-		        websocketServer = new WebSocketServer("ws://"+ip+":" + port);
+		        _websocketServer = new WebSocketServer("ws://"+ip+":" + port);
 	        }
 	        else
 	        {
-		        websocketServer = new WebSocketServer("wss://"+ip+":" + port);
+		        _websocketServer = new WebSocketServer("wss://"+ip+":" + port);
 		        // Note: This should not be done if running the project locally
-		        websocketServer.Certificate = new X509Certificate2("../certs/cert.pfx", "password");
-		        websocketServer.EnabledSslProtocols = SslProtocols.Tls12;
+		        _websocketServer.Certificate = new X509Certificate2("../certs/cert.pfx", "password");
+		        _websocketServer.EnabledSslProtocols = SslProtocols.Tls12;
 	        }
-            websocketServer.Start(socket =>
+            _websocketServer.Start(socket =>
             {
                 socket.OnOpen = () => { ClientConnectedEvent(socket); };
                 socket.OnClose = () => { ClientDisconnectedEvent(socket); };
-                socket.OnBinary = (byte[] binary) => { ClientBinaryMessageEvent(socket, binary); };
-                socket.OnMessage = (string message) => { ClientMessageEvent(socket, message); };
-                socket.OnError = (Exception error) => { Console.WriteLine("Client Error: " + error); };
+                socket.OnBinary = (binary) => { ClientBinaryMessageEvent(socket, binary); };
+                socket.OnMessage = (message) => { ClientMessageEvent(socket, message); };
+                socket.OnError = (error) => { Console.WriteLine("Client Error: " + error); };
             });
         }
 
 		public void Stop() {
-			foreach (var socket in webSockets) {
+			foreach (var socket in _webSockets) {
 				socket.Close();
 			}
-            webSockets.Clear();
-			websocketServer.ListenerSocket.Close();
-			websocketServer.Dispose();
+            _webSockets.Clear();
+			_websocketServer.ListenerSocket.Close();
+			_websocketServer.Dispose();
 		}
 
-		public int GetNumberOfConnectedClients() {
-			return webSockets.Count;
+		private int GetNumberOfConnectedClients() {
+			return _webSockets.Count;
 		}
 	}
 }

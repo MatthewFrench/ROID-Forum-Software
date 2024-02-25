@@ -3,22 +3,22 @@ using System.Collections.Generic;
 
 namespace ROIDForumServer
 {
-    public class ServerMessages
+    public static class ServerMessages
     {
-        public enum Controller
+        private enum Controller
         {
             Chat = 0,
             Login = 1,
             Section = 2
         }
 
-        public enum ChatMsg
+        private enum ChatMsg
         {
             Msg = 0,
             OnlineList = 1
         }
 
-        public enum SectionMsg {
+        private enum SectionMsg {
             AllThreads = 0,
             AddThread = 1,
             RemoveThread = 2,
@@ -29,7 +29,7 @@ namespace ROIDForumServer
             UpdateComment = 7
         }
 
-        public enum LoginMsg {
+        private enum LoginMsg {
             GetAvatar = 0,
             LoginFailed = 1,
             LoggedOut = 2,
@@ -71,33 +71,33 @@ namespace ROIDForumServer
             return message.ToBuffer();
         }
 
-        public static byte[] GetAvatarMessage(String avatarURL)
+        public static byte[] GetAvatarMessage(String avatarUrl)
         {
             var message = new MessageWriter();
             message.AddUint8((byte)Controller.Login);
             message.AddUint8((byte)LoginMsg.GetAvatar);
-            message.AddString(avatarURL);
+            message.AddString(avatarUrl);
             return message.ToBuffer();
         }
 
-        public static byte[] AllThreadsMessage(SectionController controller, List<Database.DatabaseThreadData> threads)
+        public static byte[] AllThreadsMessage(SectionController controller, List<DatabaseThread.DatabaseThreadData> threads)
         {
             var message = new MessageWriter();
             message.AddUint8((byte)Controller.Section);
             message.AddUint8((byte)SectionMsg.AllThreads);
-            message.AddString(controller.name);
+            message.AddString(controller.SectionName);
             message.AddUint32((uint)threads.Count);
-            for (int i = 0; i < threads.Count; i++)
+            foreach (var thread in threads)
             {
-                message.AddBinary(InnerThreadMessage(threads[i]));
+                message.AddBinary(InnerThreadMessage(thread));
             }
             return message.ToBuffer();
         }
         
-        public static byte[] InnerThreadMessage(Database.DatabaseThreadData threadData) {
+        private static byte[] InnerThreadMessage(DatabaseThread.DatabaseThreadData threadData) {
             var message = new MessageWriter();
-            message.AddString(threadData.creatorAccountID.ToString());
-            message.AddString(threadData.threadID.ToString());
+            message.AddString(threadData.creatorAccountId.ToString());
+            message.AddString(threadData.threadId.ToString());
             message.AddString(threadData.title);
             /*
             message.AddUint32((uint)comments.Count);
@@ -109,49 +109,49 @@ namespace ROIDForumServer
             return message.ToBuffer();
         }
 
-        public static byte[] AddThreadMessage(SectionController controller, Guid creatorAccountID, Guid threadID, String title) {
+        public static byte[] AddThreadMessage(SectionController controller, Guid creatorAccountId, Guid threadId, String title) {
 
             var message = new MessageWriter();
             message.AddUint8((byte)Controller.Section);
             message.AddUint8((byte)SectionMsg.AddThread);
-            message.AddString(controller.name);
-            message.AddString(creatorAccountID.ToString());
-            message.AddString(threadID.ToString());
+            message.AddString(controller.SectionName);
+            message.AddString(creatorAccountId.ToString());
+            message.AddString(threadId.ToString());
             message.AddString(title);
             return message.ToBuffer();
         }
 
-        public static byte[] RemoveThreadMessage(SectionController controller, Guid threadID)
+        public static byte[] RemoveThreadMessage(SectionController controller, Guid threadId)
         {
             // Todo: This needs updated on client side
             var message = new MessageWriter();
             message.AddUint8((byte)Controller.Section);
             message.AddUint8((byte)SectionMsg.RemoveThread);
-            message.AddString(controller.name);
-            message.AddString(threadID.ToString());
+            message.AddString(controller.SectionName);
+            message.AddString(threadId.ToString());
             return message.ToBuffer();
         }
 
-        public static byte[] UpdateThreadMessage(SectionController controller, Guid threadID, String title)
+        public static byte[] UpdateThreadMessage(SectionController controller, Guid threadId, String title)
         {
             // Todo: This needs updated on client side
             var message = new MessageWriter();
             message.AddUint8((byte)Controller.Section);
             message.AddUint8((byte)SectionMsg.UpdateThread);
-            message.AddString(controller.name);
-            message.AddString(threadID.ToString());
+            message.AddString(controller.SectionName);
+            message.AddString(threadId.ToString());
             message.AddString(title);
             return message.ToBuffer();
         }
 
-        public static byte[] MoveToTopThreadMessage(SectionController controller, Guid threadID)
+        public static byte[] MoveToTopThreadMessage(SectionController controller, Guid threadId)
         {
             // Todo: This needs updated on client side
             var message = new MessageWriter();
             message.AddUint8((byte)Controller.Section);
             message.AddUint8((byte)SectionMsg.MoveThreadToTop);
-            message.AddString(controller.name);
-            message.AddString(threadID.ToString());
+            message.AddString(controller.SectionName);
+            message.AddString(threadId.ToString());
             return message.ToBuffer();
         }
 /*
@@ -165,27 +165,27 @@ namespace ROIDForumServer
             return message.ToBuffer();
         }
 
-        public static byte[] RemoveCommentMessage(SectionController controller, Guid commentID, Guid threadID)
+        public static byte[] RemoveCommentMessage(SectionController controller, Guid commentId, Guid threadId)
         {
             // Todo: This needs updated on client side
             var message = new MessageWriter();
             message.AddUint8((byte)Controller.Section);
             message.AddUint8((byte)SectionMsg.RemoveComment);
             message.AddString(controller.name);
-            message.AddString(commentID.ToString());
-            message.AddString(threadID.ToString());
+            message.AddString(commentId.ToString());
+            message.AddString(threadId.ToString());
             return message.ToBuffer();
         }
 
-        public static byte[] UpdateCommentMessage(SectionController controller, Guid commentID, Guid threadID, String text)
+        public static byte[] UpdateCommentMessage(SectionController controller, Guid commentId, Guid threadId, String text)
         {
             // Todo: This needs updated on client side
             var message = new MessageWriter();
             message.AddUint8((byte)Controller.Section);
             message.AddUint8((byte)SectionMsg.UpdateComment);
             message.AddString(controller.name);
-            message.AddString(commentID.ToString());
-            message.AddString(threadID.ToString());
+            message.AddString(commentId.ToString());
+            message.AddString(threadId.ToString());
             message.AddString(text);
             return message.ToBuffer();
         }

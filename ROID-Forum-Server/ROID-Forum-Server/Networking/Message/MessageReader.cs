@@ -4,167 +4,167 @@ namespace ROIDForumServer
 {
 	public class MessageReader
 	{
-		private uint currentLoc;
-		private ByteArray byteData;
-		private readonly uint byteLength;
+		private uint _currentLoc;
+		private readonly ByteArray _byteData;
+		private readonly uint _byteLength;
 
 		public MessageReader(byte[] messageData)
 		{
-			this.byteData = new ByteArray(messageData);
-			this.currentLoc = 0;
-			this.byteLength = this.GetUint32();
+			this._byteData = new ByteArray(messageData);
+			this._currentLoc = 0;
+			this._byteLength = GetUint32();
 			//Throw an error if the message is an incorrect length
-			if (this.byteLength != messageData.Length)
+			if (this._byteLength != messageData.Length)
 			{
 				throw new Exception("Message Incorrect Length");
 			}
 		}
 		public bool IsAtEndOfData()
 		{
-			return this.byteLength == this.currentLoc;
+			return _byteLength == _currentLoc;
 		}
 
 		public bool HasUint8()
 		{
-			return (this.currentLoc + 1) <= this.byteLength;
+			return _currentLoc + 1 <= _byteLength;
 		}
 
 		public byte GetUint8()
 		{
-			var data = this.byteData.ReadU8((int)this.currentLoc);
-			this.currentLoc += 1;
+			var data = _byteData.ReadU8((int)_currentLoc);
+			_currentLoc += 1;
 			return data;
 		}
 
 		public bool HasInt8()
 		{
-			return (this.currentLoc + 1) <= this.byteLength;
+			return _currentLoc + 1 <= _byteLength;
 		}
 
 		public sbyte GetInt8()
 		{
-			var data = this.byteData.ReadI8((int)this.currentLoc);
+			var data = _byteData.ReadI8((int)_currentLoc);
 
-			this.currentLoc += 1;
+			_currentLoc += 1;
 			return data;
 
 		}
 
 		public bool HasUint16()
 		{
-			return (this.currentLoc + 2) <= this.byteLength;
+			return _currentLoc + 2 <= _byteLength;
 		}
 
 		public ushort GetUint16()
 		{
-			var data = this.byteData.ReadU16((int)this.currentLoc, Endianness.BigEndian);
+			var data = _byteData.ReadU16((int)_currentLoc, Endianness.BigEndian);
 
-			this.currentLoc += 2;
+			_currentLoc += 2;
 			return data;
 
 		}
 
 		public bool HasInt16()
 		{
-			return (this.currentLoc + 2) <= this.byteLength;
+			return _currentLoc + 2 <= _byteLength;
 		}
 
 		public short GetInt16()
 		{
-			var data = this.byteData.ReadI16((int)this.currentLoc, Endianness.BigEndian);
+			var data = _byteData.ReadI16((int)_currentLoc, Endianness.BigEndian);
 
-			this.currentLoc += 2;
+			_currentLoc += 2;
 			return data;
 
 		}
 
 		public bool HasUint32()
 		{
-			return (this.currentLoc + 4) <= this.byteLength;
+			return _currentLoc + 4 <= _byteLength;
 		}
 
 		public uint GetUint32()
 		{
-			var data = this.byteData.ReadU32((int)this.currentLoc, Endianness.BigEndian);
-			this.currentLoc += 4;
+			var data = _byteData.ReadU32((int)_currentLoc, Endianness.BigEndian);
+			_currentLoc += 4;
 			return data;
 		}
 
 		public bool HasInt32()
 		{
-			return (this.currentLoc + 4) <= this.byteLength;
+			return _currentLoc + 4 <= _byteLength;
 		}
 
 		public int GetInt32()
 		{
-			var data = this.byteData.ReadI32((int)this.currentLoc, Endianness.BigEndian);
-			this.currentLoc += 4;
+			var data = _byteData.ReadI32((int)_currentLoc, Endianness.BigEndian);
+			_currentLoc += 4;
 			return data;
 		}
 
 		public double GetFloat64()
 		{
-			var data = this.byteData.ReadF64((int)this.currentLoc, Endianness.BigEndian);
-			this.currentLoc += 8;
+			var data = _byteData.ReadF64((int)_currentLoc, Endianness.BigEndian);
+			_currentLoc += 8;
 			return data;
 		}
 
 		public bool HasFloat64()
 		{
-			return (this.currentLoc + 8) <= this.byteLength;
+			return _currentLoc + 8 <= _byteLength;
 		}
 
 		public bool HasFloat32()
 		{
-			return (this.currentLoc + 4) <= this.byteLength;
+			return _currentLoc + 4 <= _byteLength;
 		}
 
 		public float GetFloat32()
 		{
-			var data = this.byteData.ReadF32((int)this.currentLoc, Endianness.BigEndian);
-			this.currentLoc += 4;
+			var data = _byteData.ReadF32((int)_currentLoc, Endianness.BigEndian);
+			_currentLoc += 4;
 			return data;
 		}
 
 		public bool HasString()
 		{
-			var length = this.byteData.ReadU32((int)this.currentLoc, Endianness.BigEndian);
-			return (this.currentLoc + length) <= this.byteLength;
+			var length = _byteData.ReadU32((int)_currentLoc, Endianness.BigEndian);
+			return _currentLoc + length <= _byteLength;
 		}
 
 		public string GetString()
 		{
-			var length = this.byteData.ReadU32((int)this.currentLoc, Endianness.BigEndian);
-			this.currentLoc += 4;
+			var length = _byteData.ReadU32((int)_currentLoc, Endianness.BigEndian);
+			_currentLoc += 4;
 			var innerLength = length - 4;
 
 			var byteArray = new byte[innerLength];
-			this.byteData.Read(byteArray, 0, (int)innerLength, (int)this.currentLoc);         
+			this._byteData.Read(byteArray, 0, (int)innerLength, (int)_currentLoc);         
 			var returnString = System.Text.Encoding.Unicode.GetString(byteArray);
-			this.currentLoc += innerLength;
+			_currentLoc += innerLength;
 			return returnString;
 		}
 
 		public bool HasBinary()
 		{
-			var length = this.byteData.ReadU32((int)this.currentLoc, Endianness.BigEndian);
-			return (this.currentLoc + length) <= this.byteLength;
+			var length = _byteData.ReadU32((int)_currentLoc, Endianness.BigEndian);
+			return (_currentLoc + length) <= _byteLength;
 		}
 
 		public byte[] GetBinary()
 		{
-			var length = this.byteData.ReadU32((int)this.currentLoc, Endianness.BigEndian);
-			this.currentLoc += 4;
+			var length = _byteData.ReadU32((int)_currentLoc, Endianness.BigEndian);
+			_currentLoc += 4;
 			var innerLength = length - 4;
             var byteArray = new byte[innerLength];
-            this.byteData.Read(byteArray, 0, (int)innerLength, (int)this.currentLoc);  
-			this.currentLoc += innerLength;
+            _byteData.Read(byteArray, 0, (int)innerLength, (int)_currentLoc);  
+			_currentLoc += innerLength;
 			return byteArray;
 		}
         
 		public uint GetLength()
 		{
-			return this.byteLength;
+			return _byteLength;
 		}
 	}
 }

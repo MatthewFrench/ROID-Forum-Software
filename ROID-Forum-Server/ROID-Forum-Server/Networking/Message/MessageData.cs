@@ -8,18 +8,11 @@ namespace ROIDForumServer
 		public abstract uint GetLength();
 	}
 
-	public class MessageDataUint8 : MessageData
+	public class MessageDataUint8(byte value) : MessageData
 	{
-		byte value;
-
-		public MessageDataUint8(byte value)
-		{
-			this.value = value;
-		}
-
 		public override void AddToByteData(ByteArray byteData, int loc)
 		{
-			byteData.Write(this.value, loc);
+			byteData.Write(value, loc);
 		}
 
 		public override uint GetLength()
@@ -27,21 +20,12 @@ namespace ROIDForumServer
 			return 1;
 		}
 	}
-
-
-
-	public class MessageDataInt8 : MessageData
+	
+	public class MessageDataInt8(sbyte value) : MessageData
 	{
-		sbyte value;
-
-		public MessageDataInt8(sbyte value)
-		{
-			this.value = value;
-		}
-
 		public override void AddToByteData(ByteArray byteData, int loc)
 		{
-            byteData.Write(this.value, loc);
+            byteData.Write(value, loc);
 		}
 
 		public override uint GetLength()
@@ -50,18 +34,11 @@ namespace ROIDForumServer
 		}
 	}
     
-	public class MessageDataUint16 : MessageData
+	public class MessageDataUint16(ushort value) : MessageData
 	{
-		ushort value;
-
-		public MessageDataUint16(ushort value)
-		{
-			this.value = value;
-		}
-
 		public override void AddToByteData(ByteArray byteData, int loc)
 		{
-            byteData.Write(this.value, loc, Endianness.BigEndian);
+            byteData.Write(value, loc, Endianness.BigEndian);
 		}
 
 		public override uint GetLength()
@@ -70,18 +47,11 @@ namespace ROIDForumServer
 		}
 	}
     
-	public class MessageDataInt16 : MessageData
+	public class MessageDataInt16(short value) : MessageData
 	{
-		short value;
-
-		public MessageDataInt16(short value)
-		{
-			this.value = value;
-		}
-
 		public override void AddToByteData(ByteArray byteData, int loc)
 		{
-            byteData.Write(this.value, loc, Endianness.BigEndian);
+            byteData.Write(value, loc, Endianness.BigEndian);
 		}
 
 		public override uint GetLength()
@@ -90,18 +60,11 @@ namespace ROIDForumServer
 		}
 	}
 
-	public class MessageDataUint32 : MessageData
+	public class MessageDataUint32(uint value) : MessageData
 	{
-		uint value;
-
-		public MessageDataUint32(uint value)
-		{
-			this.value = value;
-		}
-
 		public override void AddToByteData(ByteArray byteData, int loc)
 		{
-            byteData.Write(this.value, loc, Endianness.BigEndian);
+            byteData.Write(value, loc, Endianness.BigEndian);
 		}
 
 		public override uint GetLength()
@@ -110,18 +73,11 @@ namespace ROIDForumServer
 		}
 	}
 
-	public class MessageDataInt32 : MessageData
+	public class MessageDataInt32(int value) : MessageData
 	{
-		int value;
-
-		public MessageDataInt32(int value)
-		{
-			this.value = value;
-		}
-
 		public override void AddToByteData(ByteArray byteData, int loc)
 		{
-            byteData.Write(this.value, loc, Endianness.BigEndian);
+            byteData.Write(value, loc, Endianness.BigEndian);
 		}
 
 		public override uint GetLength()
@@ -130,18 +86,11 @@ namespace ROIDForumServer
 		}
 	}
 
-	public class MessageDataFloat32 : MessageData
+	public class MessageDataFloat32(float value) : MessageData
 	{
-		float value;
-
-		public MessageDataFloat32(float value)
-		{
-			this.value = value;
-		}
-
 		public override void AddToByteData(ByteArray byteData, int loc)
 		{
-            byte[] bytes = BitConverter.GetBytes(this.value);
+            byte[] bytes = BitConverter.GetBytes(value);
             if (BitConverter.IsLittleEndian)
                 Array.Reverse(bytes);
             
@@ -154,18 +103,11 @@ namespace ROIDForumServer
 		}
 	}
 
-	public class MessageDataFloat64 : MessageData
+	public class MessageDataFloat64(double value) : MessageData
 	{
-		double value;
-
-		public MessageDataFloat64(double value)
-		{
-			this.value = value;
-		}
-
 		public override void AddToByteData(ByteArray byteData, int loc)
 		{
-            byteData.Write(this.value, loc, Endianness.BigEndian);
+            byteData.Write(value, loc, Endianness.BigEndian);
 		}
 
 		public override uint GetLength()
@@ -176,53 +118,53 @@ namespace ROIDForumServer
 
 	public class MessageDataString : MessageData
 	{
-		byte[] value;
-		readonly uint totalLength;
+		private readonly byte[] _value;
+		private readonly uint _totalLength;
 
 		public MessageDataString(string value)
 		{
-			this.value = System.Text.Encoding.Unicode.GetBytes(value);
+			this._value = System.Text.Encoding.Unicode.GetBytes(value);
 			//Total length is buffer plus length of buffer
-			this.totalLength = 4 + (uint)this.value.Length;
+			this._totalLength = 4 + (uint)_value.Length;
 		}
 
 		public override void AddToByteData(ByteArray byteData, int loc)
 		{
 			//Write total length (total length + string length)
-			byteData.Write(this.totalLength, loc, Endianness.BigEndian);
+			byteData.Write(_totalLength, loc, Endianness.BigEndian);
             //Write string
-			byteData.Write(value, 0, value.Length, loc + 4);
+			byteData.Write(_value, 0, _value.Length, loc + 4);
 		}
         
 		public override uint GetLength()
 		{
-			return this.totalLength;
+			return _totalLength;
 		}
 	}
 
 	public class MessageDataBinary : MessageData
 	{
-		byte[] value;
-		readonly uint totalLength;
+		private readonly byte[] _value;
+		private readonly uint _totalLength;
 
 		public MessageDataBinary(byte[] value)
 		{
-			this.value = value;
+			_value = value;
 			//Total length is buffer plus length of buffer
-			this.totalLength = 4 + (uint)this.value.Length;
+			_totalLength = 4 + (uint)_value.Length;
 		}
 
 		public override void AddToByteData(ByteArray byteData, int loc)
 		{
             //Write total length (total length + string length)
-            byteData.Write(this.totalLength, loc, Endianness.BigEndian);
+            byteData.Write(_totalLength, loc, Endianness.BigEndian);
             //Write string
-            byteData.Write(value, 0, value.Length, loc + 4);
+            byteData.Write(_value, 0, _value.Length, loc + 4);
 		}
 
 		public override uint GetLength()
 		{
-			return this.totalLength;
+			return this._totalLength;
 		}
 	}
 }

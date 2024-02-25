@@ -1,16 +1,14 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Cassandra;
 
 namespace ROIDForumServer;
 
 public class Database
 {
-	public static string DEFAULT_KEYSPACE = "forum";
+	public const string DefaultKeyspace = "forum";
 	
-    private Cluster clusterConnection;
-    private ISession session;
+    private Cluster _clusterConnection;
+    private ISession _session;
     public Database() {
         ConnectToSession();
     }
@@ -20,30 +18,29 @@ public class Database
      */
     private void ConnectToSession() {
         // Todo: These should be moved to a configuration or environment variables
-        string IP = "0.0.0.0";
-        int PORT = 9042;
-        string USERNAME = "cassandra";
-        string PASSWORD = "cassandra";
-        Console.WriteLine($"Connecting to Cassandra cluster at {IP}:{PORT}!");
-        clusterConnection = Cluster.Builder()
-            .AddContactPoints(IP).WithPort(PORT)
-            .WithCredentials(USERNAME, PASSWORD)
+        string ip = "0.0.0.0";
+        int port = 9042;
+        string username = "cassandra";
+        string password = "cassandra";
+        Console.WriteLine($"Connecting to Cassandra cluster at {ip}:{port}!");
+        _clusterConnection = Cluster.Builder()
+            .AddContactPoints(ip).WithPort(port)
+            .WithCredentials(username, password)
             .WithCompression(CompressionType.Snappy)
             .Build();
-        session = clusterConnection.Connect();
+        _session = _clusterConnection.Connect();
         // Set up default keyspace
-        session.Execute(@"CREATE KEYSPACE IF NOT EXISTS """ + DEFAULT_KEYSPACE + 
+        _session.Execute(@"CREATE KEYSPACE IF NOT EXISTS """ + DefaultKeyspace + 
                         "\" WITH replication = {'class': 'SimpleStrategy',  'replication_factor': '1' }; ");
-        // Set up tables if they don't exist
-        DatabaseAccount.CreateTablesIfNotExist(session);
-        DatabaseChat.CreateTablesIfNotExist(session);
-        DatabaseSection.CreateTablesIfNotExist(session);
-        DatabaseThread.CreateTablesIfNotExist(session);
-        DatabaseComment.CreateTablesIfNotExist(session);
+        DatabaseAccount.CreateTablesIfNotExist(_session);
+        DatabaseChat.CreateTablesIfNotExist(_session);
+        DatabaseSection.CreateTablesIfNotExist(_session);
+        DatabaseThread.CreateTablesIfNotExist(_session);
+        DatabaseComment.CreateTablesIfNotExist(_session);
     }
 
     public ISession GetSession()
     {
-        return session;
+        return _session;
     }
 }

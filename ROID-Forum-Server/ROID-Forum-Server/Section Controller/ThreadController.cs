@@ -1,82 +1,77 @@
 ﻿using System;
-using System.Collections.Generic;
+using Cassandra;
+
 namespace ROIDForumServer
 {
-    public class ThreadController
+    public class ThreadController(SectionController sectionController, ISession databaseSession)
     {
-        public SectionController controller;
-        private Database database;
-        public ThreadController(SectionController c, Database database)
+        private ISession DatabaseSession { get; } = databaseSession;
+        public void AddThread(ConnectedUser user, string title, string description)
         {
-            controller = c;
-            this.database = database;
-        }
-        public void addThread(ConnectedUser p, String title, String description)
-        {
-            if (p.accountID == null)
+            if (user.AccountId == null)
             {
                 return;
             }
 
-            Guid threadID = database.CreateThread((Guid)p.accountID, controller.sectionID, title);
-            database.CreateComment((Guid)p.accountID, threadID, controller.sectionID, description);
-            controller.messageSender.sendAddThreadToAll(threadID, (Guid)p.accountID, title);
+            Guid threadId = DatabaseThread.CreateThread(DatabaseSession, (Guid)user.AccountId, sectionController.SectionId, title);
+            DatabaseComment.CreateComment(DatabaseSession, (Guid)user.AccountId, threadId, sectionController.SectionId, description);
+            sectionController.MessageSender.SendAddThreadToAll(threadId, (Guid)user.AccountId, title);
 
             //Send a message to the All Controller
-            //controller.server.allSection.threadController.addThread(controller.name, t.id, t.title, t.comments.length, t.owner);
+            //sectionController.server.allSection.threadController.addThread(sectionController.name, t.Id, t.title, t.comments.length, t.owner);
 
-            moveThreadToTop(threadID);
+            MoveThreadToTop(threadId);
         }
-        public void deleteThread(ConnectedUser p, Guid sectionID, Guid threadID)
+        public void DeleteThread(ConnectedUser user, Guid sectionId, Guid threadId)
         {
-            database.DeleteThread((Guid) p.accountID, sectionID, threadID);
-            controller.messageSender.sendRemoveThreadToAll(threadID);
+            DatabaseThread.DeleteThread(DatabaseSession, (Guid) user.AccountId, sectionId, threadId);
+            sectionController.MessageSender.SendRemoveThreadToAll(threadId);
             //Send a message to the All Controller
-            //controller.server.allSection.threadController.deleteThread(controller.name, t.id);
+            //sectionController.server.allSection.threadController.deleteThread(sectionController.name, t.Id);
         }
-        public void editThread(ConnectedUser p, Guid sectionID, Guid threadID, String title, String description)
+        public void EditThread(ConnectedUser user, Guid sectionId, Guid threadId, String title, String description)
         {
-            database.UpdateThreadTitle((Guid) p.accountID, sectionID, threadID, title);
-            var (commentID, commentOwnerAccountID) = database.GetThreadFirstComment(threadID);
-            if (commentOwnerAccountID == p.accountID)
+            DatabaseThread.UpdateThreadTitle(DatabaseSession, (Guid) user.AccountId, sectionId, threadId, title);
+            var (commentId, commentOwnerAccountId) = DatabaseComment.GetThreadFirstComment(DatabaseSession, threadId);
+            if (commentOwnerAccountId == user.AccountId)
             {
-                database.UpdateComment((Guid) p.accountID, commentID, description);
+                DatabaseComment.UpdateComment(DatabaseSession, (Guid) user.AccountId, commentId, description);
             }
-            controller.messageSender.sendUpdateThreadToAll(threadID, title);
+            sectionController.MessageSender.SendUpdateThreadToAll(threadId, title);
             //Send a message to the All Controller
-            //controller.server.allSection.threadController.editThread(controller.name, t.id, t.title);
+            //sectionController.server.allSection.threadController.editThread(sectionController.name, t.Id, t.title);
         }
-        public void moveThreadToTop(Guid threadID)
+        private void MoveThreadToTop(Guid threadId)
         {
-            controller.messageSender.sendMoveThreadToTopToAll(threadID);
+            sectionController.MessageSender.SendMoveThreadToTopToAll(threadId);
             //Send a message to the All Controller
-            //controller.server.allSection.threadController.moveThreadToTop(controller.name, t.id);
+            //sectionController.server.allSection.threadController.moveThreadToTop(sectionController.name, t.Id);
         }
-        public void addComment(ConnectedUser u, Guid threadID, Guid sectionID, String text)
+        public void AddComment(ConnectedUser user, Guid threadId, Guid sectionId, String text)
         {
-            database.CreateComment((Guid) u.accountID, threadID, sectionID, text);
+            DatabaseComment.CreateComment(DatabaseSession, (Guid) user.AccountId, threadId, sectionId, text);
             // Todo: Only send comment to those viewing the thread
-            //controller.messageSender.sendAddCommentToAll(c);
+            //sectionController.messageSender.sendAddCommentToAll(c);
 
             //Send a message to the All Controller
-            //controller.server.allSection.threadController.updateCommentCount(controller.name, t.id, t.comments.length);
+            //sectionController.server.allSection.threadController.updateCommentCount(sectionController.name, t.Id, t.comments.length);
 
-            moveThreadToTop(threadID);
+            MoveThreadToTop(threadId);
         }
-        public void deleteComment(ConnectedUser p, Guid commentID)
+        public void DeleteComment(ConnectedUser user, Guid commentId)
         {
-            database.DeleteComment((Guid) p.accountID, commentID);
+            DatabaseComment.DeleteComment(DatabaseSession, (Guid) user.AccountId, commentId);
             // Todo: Only send comment delete to those viewing the thread
-            //controller.messageSender.sendDeleteCommentToAll(c);
+            //sectionController.messageSender.sendDeleteCommentToAll(c);
 
             //Send a message to the All Controller
-            //controller.server.allSection.threadController.updateCommentCount(controller.name, t.id, t.comments.length);
+            //sectionController.server.allSection.threadController.updateCommentCount(sectionController.name, t.Id, t.comments.length);
         }
-        public void editComment(ConnectedUser p, Guid commentID, String description)
+        public void EditComment(ConnectedUser user, Guid commentId, string description)
         {
-            database.UpdateComment((Guid) p.accountID, commentID, description);
+            DatabaseComment.UpdateComment(DatabaseSession, (Guid) user.AccountId, commentId, description);
             // Todo: Only send comment update to those viewing the thread
-            //controller.messageSender.sendUpdateCommentToAll(c);
+            //sectionController.messageSender.sendUpdateCommentToAll(c);
         }
     }
 }

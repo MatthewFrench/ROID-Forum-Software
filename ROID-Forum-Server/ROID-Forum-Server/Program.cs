@@ -1,12 +1,21 @@
 ﻿using System;
+using System.Threading;
 
 namespace ROIDForumServer
 {
-    class Program
+    static class Server
     {
-        static void Main(string[] args)
+        private static void Main()
         {
-			var app = new ServerController();
+			var server = new ServerController();
+            var exitEvent = new ManualResetEvent(false);
+            Console.CancelKeyPress += (_, eventArgs) => {
+                eventArgs.Cancel = true;
+                exitEvent.Set();
+            };
+            exitEvent.WaitOne();
+            server.Networking.Stop();
+            Thread.Sleep(1000);
         }
     }
 }

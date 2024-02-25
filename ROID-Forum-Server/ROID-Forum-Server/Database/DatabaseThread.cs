@@ -5,15 +5,15 @@ using Cassandra;
 
 namespace ROIDForumServer;
 
-public class DatabaseThread
+public static class DatabaseThread
 {
-    private static string TABLE_THREAD = "Thread";
-    private static string TABLE_ACTIVE_IN_THREAD = "ActiveInThread";
+    private const string TableThread = "Thread";
+    private const string TableActiveInThread = "ActiveInThread";
     
     public static void CreateTablesIfNotExist(ISession session)
     {
         session.Execute($@"
-                CREATE TABLE IF NOT EXISTS ""{Database.DEFAULT_KEYSPACE}"".""{TABLE_THREAD}"" (
+                CREATE TABLE IF NOT EXISTS ""{Database.DefaultKeyspace}"".""{TableThread}"" (
                    section_id uuid,
                    thread_id uuid,
                    creator_account_id uuid,
@@ -22,29 +22,29 @@ public class DatabaseThread
                    PRIMARY KEY (thread_id)
                 )");
         session.Execute($@"
-                CREATE INDEX IF NOT EXISTS ON ""{Database.DEFAULT_KEYSPACE}"".""{TABLE_THREAD}"" (creator_account_id)");
+                CREATE INDEX IF NOT EXISTS ON ""{Database.DefaultKeyspace}"".""{TableThread}"" (creator_account_id)");
         session.Execute($@"
-                CREATE TABLE IF NOT EXISTS ""{Database.DEFAULT_KEYSPACE}"".""{TABLE_ACTIVE_IN_THREAD}"" (
+                CREATE TABLE IF NOT EXISTS ""{Database.DefaultKeyspace}"".""{TableActiveInThread}"" (
                    account_id uuid,
                    thread_id uuid,
                    PRIMARY KEY (thread_id, account_id)
                 )");
         session.Execute($@"
-                CREATE INDEX IF NOT EXISTS ON ""{Database.DEFAULT_KEYSPACE}"".""{TABLE_ACTIVE_IN_THREAD}"" (account_id)");
+                CREATE INDEX IF NOT EXISTS ON ""{Database.DefaultKeyspace}"".""{TableActiveInThread}"" (account_id)");
     }
     
-    public Guid CreateThread(ISession session, Guid accountID, Guid sectionID, string title)
+    public static Guid CreateThread(ISession session, Guid accountId, Guid sectionId, string title)
     {
-	    Guid threadID = Guid.NewGuid();
-	    PreparedStatement insertStatement = session.Prepare($"INSERT INTO \"{Database.DEFAULT_KEYSPACE}\".\"{TABLE_THREAD}\" (section_id, thread_id, creator_account_id, title, created_time) VALUES (?, ?, ?, ?, now())");
-	    session.Execute(insertStatement.Bind(sectionID, threadID, accountID, title));
-	    DatabaseSection.UpdateSectionThreadOrdering(session, sectionID, threadID);
-	    return threadID;
+	    Guid threadId = Guid.NewGuid();
+	    PreparedStatement insertStatement = session.Prepare($"INSERT INTO \"{Database.DefaultKeyspace}\".\"{TableThread}\" (section_id, thread_id, creator_account_id, title, created_time) VALUES (?, ?, ?, ?, now())");
+	    session.Execute(insertStatement.Bind(sectionId, threadId, accountId, title));
+	    DatabaseSection.UpdateSectionThreadOrdering(session, sectionId, threadId);
+	    return threadId;
     }
-    public Guid? GetThreadOwner(ISession session, Guid threadID)
+    public static Guid? GetThreadOwner(ISession session, Guid threadId)
     {
-	    PreparedStatement selectStatement = session.Prepare($"SELECT creator_account_id FROM \"{Database.DEFAULT_KEYSPACE}\".\"{TABLE_THREAD}\" where thread_id=?");
-	    var result = session.Execute(selectStatement.Bind(threadID));
+	    PreparedStatement selectStatement = session.Prepare($"SELECT creator_account_id FROM \"{Database.DefaultKeyspace}\".\"{TableThread}\" where thread_id=?");
+	    var result = session.Execute(selectStatement.Bind(threadId));
 	    var item = result.FirstOrDefault();
 	    if (item == null)
 	    {
@@ -52,47 +52,47 @@ public class DatabaseThread
 	    }
 	    return item.GetValue<Guid>("creator_account_id");
     }
-    public void UpdateThreadTitle(ISession session, Guid accountID, Guid sectionID, Guid threadID, string title)
+    public static void UpdateThreadTitle(ISession session, Guid accountId, Guid sectionId, Guid threadId, string title)
     {
 	    // Todo: Owner thread shouldn't be checked here unless the function name made that clear
-	    if (accountID != GetThreadOwner(session, threadID))
+	    if (accountId != GetThreadOwner(session, threadId))
 	    {
 		    return;
 	    }
-	    PreparedStatement updateStatement = session.Prepare($"UPDATE \"{Database.DEFAULT_KEYSPACE}\".\"{TABLE_THREAD}\" set title=? where thread_id=?");
-	    session.Execute(updateStatement.Bind(title, threadID));
+	    PreparedStatement updateStatement = session.Prepare($"UPDATE \"{Database.DefaultKeyspace}\".\"{TableThread}\" set title=? where thread_id=?");
+	    session.Execute(updateStatement.Bind(title, threadId));
 	    // Update also acts as an insert if the row doesn't exist.
-	    DatabaseSection.UpdateSectionThreadOrdering(session, sectionID, threadID);
+	    DatabaseSection.UpdateSectionThreadOrdering(session, sectionId, threadId);
     }
-    public void DeleteThread(ISession session, Guid accountID, Guid sectionID, Guid threadID)
+    public static void DeleteThread(ISession session, Guid accountId, Guid sectionId, Guid threadId)
     {
 	    // Todo: Owner thread shouldn't be checked here unless the function name made that clear
-	    if (accountID != GetThreadOwner(session, threadID))
+	    if (accountId != GetThreadOwner(session, threadId))
 	    {
 		    return;
 	    }
 	    // Delete ordering
-	    DatabaseSection.DeleteSectionThreadOrdering(session, sectionID, threadID);
-	    PreparedStatement deleteStatement = session.Prepare($"DELETE FROM \"{Database.DEFAULT_KEYSPACE}\".\"{TABLE_THREAD}\" where thread_id=?");
-	    session.Execute(deleteStatement.Bind(threadID));
-	    DatabaseComment.DeleteCommentsForThread(session, threadID);
+	    DatabaseSection.DeleteSectionThreadOrdering(session, sectionId, threadId);
+	    PreparedStatement deleteStatement = session.Prepare($"DELETE FROM \"{Database.DefaultKeyspace}\".\"{TableThread}\" where thread_id=?");
+	    session.Execute(deleteStatement.Bind(threadId));
+	    DatabaseComment.DeleteCommentsForThread(session, threadId);
     }
     
-    public record class DatabaseThreadData(Guid sectionID, Guid threadID, Guid creatorAccountID, string title, TimeUuid createdTime, TimeUuid updated_time);
+    public record class DatabaseThreadData(Guid sectionId, Guid threadId, Guid creatorAccountId, string title, TimeUuid createdTime, TimeUuid updated_time);
     // Todo: Add pagination and dynamic loading/lookback as the user scrolls down in a section
-    public List<DatabaseThreadData> GetThreadsInSection(ISession session, Guid sectionID)
+    public static List<DatabaseThreadData> GetThreadsInSection(ISession session, Guid sectionId)
     {
-	    var orderedThreadIDs = DatabaseSection.GetOrderedThreadIDsInSection(session, sectionID);
+	    var orderedThreadIds = DatabaseSection.GetOrderedThreadIdsInSection(session, sectionId);
 	    List<DatabaseThreadData> results = new List<DatabaseThreadData>();
-	    foreach (var (_, threadID, updatedTime) in orderedThreadIDs)
+	    foreach (var (_, threadId, updatedTime) in orderedThreadIds)
 	    {
 		    var selectThreadStatement = session.Prepare(
-			    $"SELECT creator_account_id, title, created_time FROM \"{Database.DEFAULT_KEYSPACE}\".\"{TABLE_THREAD}\" where thread_id=?");
-		    var threadResult = session.Execute(selectThreadStatement.Bind(threadID));
+			    $"SELECT creator_account_id, title, created_time FROM \"{Database.DefaultKeyspace}\".\"{TableThread}\" where thread_id=?");
+		    var threadResult = session.Execute(selectThreadStatement.Bind(threadId));
 		    var threadItem = threadResult.FirstOrDefault();
 		    results.Add(new DatabaseThreadData(
-			    sectionID,
-			    threadID, 
+			    sectionId,
+			    threadId, 
 			    threadItem.GetValue<Guid>("creator_account_id"),
 			    threadItem.GetValue<String>("title"), 
 			    threadItem.GetValue<TimeUuid>("created_time"),

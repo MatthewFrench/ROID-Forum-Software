@@ -1,81 +1,81 @@
 ﻿using System;
 using System.Collections.Generic;
+
 namespace ROIDForumServer
 {
     public class SectionController
     {
-        public ServerController server;
-        public Guid sectionID;
-        public SectionMessageSender messageSender;
-        public ThreadController threadController;
-        public List<ConnectedUser> usersViewing = new List<ConnectedUser>();
-        public String name;
-        private int saveTimer = -1;
-        public SectionController(ServerController s, String name, Guid sectionID)
+        public Guid SectionId { get; }
+        public SectionMessageSender MessageSender { get; }
+        public ThreadController ThreadController { get; }
+        public List<ConnectedUser> UsersViewing { get; } = new List<ConnectedUser>();
+        public String SectionName { get; }
+
+        public SectionController(ServerController serverController, String sectionName, Guid sectionId)
         {
-            server = s;
-            this.name = name;
-            this.sectionID = sectionID;
-            messageSender = new SectionMessageSender(this);
-            threadController = new ThreadController(this, server.GetDatabase());
+            SectionName = sectionName;
+            SectionId = sectionId;
+            MessageSender = new SectionMessageSender(this, serverController.Database.GetSession());
+            ThreadController = new ThreadController(this, serverController.Database.GetSession());
         }
 
-        public void addUser(ConnectedUser u)
+        public void AddUser(ConnectedUser user)
         {
-            usersViewing.Add(u);
-            messageSender.sendAllThreadsToUser(u);
+            UsersViewing.Add(user);
+            MessageSender.SendAllThreadsToUser(user);
         }
-        public void removeUser(ConnectedUser u)
+
+        public void RemoveUser(ConnectedUser user)
         {
-            usersViewing.Remove(u);
+            UsersViewing.Remove(user);
         }
-        public void onMessage(ConnectedUser p, Dictionary<string, object> message)
+
+        public void OnMessage(ConnectedUser user, Dictionary<string, object> message)
         {
             switch ((string)message["Title"])
             {
                 case "New Post":
-                    {
-                        String postTitle = (string)message["Post Title"];
-                        String postDescription = (string)message["Post Description"];
-                        threadController.addThread(p, postTitle, postDescription);
-                    }
+                {
+                    String postTitle = (string)message["Post Title"];
+                    String postDescription = (string)message["Post Description"];
+                    ThreadController.AddThread(user, postTitle, postDescription);
+                }
                     break;
                 case "Edit Post":
-                    {
-                        Guid threadID = Guid.Parse((string)message["Thread ID"]);
-                        String title = (string)message["Edit Title"];
-                        String description = (string)message["Text"];
-                        threadController.editThread(p, sectionID, threadID, title, description);
-                    }
+                {
+                    Guid threadId = Guid.Parse((string)message["Thread Id"]);
+                    String title = (string)message["Edit Title"];
+                    String description = (string)message["Text"];
+                    ThreadController.EditThread(user, SectionId, threadId, title, description);
+                }
                     break;
                 case "Delete Post":
-                    {
-                        Guid threadID = Guid.Parse((string)message["Thread ID"]);
-                        threadController.deleteThread(p, sectionID, threadID);
-                    }
+                {
+                    Guid threadId = Guid.Parse((string)message["Thread Id"]);
+                    ThreadController.DeleteThread(user, SectionId, threadId);
+                }
                     break;
                 case "Add Comment":
-                    {
-                        Guid threadID = Guid.Parse((string)message["Thread ID"]);
-                        String text = (string)message["Text"];
-                        threadController.addComment(p, threadID, sectionID, text);
-                    }
+                {
+                    Guid threadId = Guid.Parse((string)message["Thread Id"]);
+                    String text = (string)message["Text"];
+                    ThreadController.AddComment(user, threadId, SectionId, text);
+                }
                     break;
                 case "Edit Comment":
-                    {
-                        Guid commentID = Guid.Parse((string)message["Comment ID"]);
-                        String description = (string)message["Text"];
-                        threadController.editComment(p, commentID, description);
-                    }
+                {
+                    Guid commentId = Guid.Parse((string)message["Comment Id"]);
+                    String description = (string)message["Text"];
+                    ThreadController.EditComment(user, commentId, description);
+                }
                     break;
                 case "Delete Comment":
-                    {
-                        Guid commentID = Guid.Parse((string)message["Comment ID"]);
-                        threadController.deleteComment(p, commentID);
-                    }
+                {
+                    Guid commentId = Guid.Parse((string)message["Comment Id"]);
+                    ThreadController.DeleteComment(user, commentId);
+                }
                     break;
             }
-
         }
     }
 }

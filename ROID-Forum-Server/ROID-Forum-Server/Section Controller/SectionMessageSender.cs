@@ -1,74 +1,76 @@
 ﻿using System;
+using Cassandra;
+
 namespace ROIDForumServer
 {
-    public class SectionMessageSender
+    public class SectionMessageSender(SectionController sectionController, ISession databaseSession)
     {
-        private Database database;
-        SectionController controller;
-        public SectionMessageSender(SectionController c)
+        private ISession DatabaseSession { get; } = databaseSession;
+
+        public void SendAllThreadsToUser(ConnectedUser user)
         {
-            controller = c;
-            this.database = c.server.GetDatabase();
+            user.Send(ServerMessages.AllThreadsMessage(sectionController,
+                DatabaseThread.GetThreadsInSection(DatabaseSession, sectionController.SectionId)));
         }
-        public void sendAllThreadsToUser(ConnectedUser u)
+
+        public void SendAddThreadToAll(Guid threadId, Guid creatorAccountId, String title)
         {
-            u.sendBinary(ServerMessages.AllThreadsMessage(controller, database.GetThreadsInSection(controller.sectionID)));
-        }
-        public void sendAddThreadToAll(Guid threadID, Guid creatorAccountID, String title)
-        {
-            byte[] message = ServerMessages.AddThreadMessage(controller, creatorAccountID, threadID, title);
-            foreach (ConnectedUser u in controller.usersViewing)
+            byte[] message = ServerMessages.AddThreadMessage(sectionController, creatorAccountId, threadId, title);
+            foreach (ConnectedUser user in sectionController.UsersViewing)
             {
-                u.sendBinary(message);
+                user.Send(message);
             }
         }
-        public void sendRemoveThreadToAll(Guid threadID)
+
+        public void SendRemoveThreadToAll(Guid threadId)
         {
-            byte[] message = ServerMessages.RemoveThreadMessage(controller, threadID);
-            foreach (ConnectedUser u in controller.usersViewing)
+            byte[] message = ServerMessages.RemoveThreadMessage(sectionController, threadId);
+            foreach (ConnectedUser user in sectionController.UsersViewing)
             {
-                u.sendBinary(message);
+                user.Send(message);
             }
         }
-        public void sendUpdateThreadToAll(Guid threadID, String title)
+
+        public void SendUpdateThreadToAll(Guid threadId, String title)
         {
-            byte[] message = ServerMessages.UpdateThreadMessage(controller, threadID, title);
-            foreach (ConnectedUser u in controller.usersViewing)
+            byte[] message = ServerMessages.UpdateThreadMessage(sectionController, threadId, title);
+            foreach (ConnectedUser user in sectionController.UsersViewing)
             {
-                u.sendBinary(message);
+                user.Send(message);
             }
         }
-        public void sendMoveThreadToTopToAll(Guid threadID)
+
+        public void SendMoveThreadToTopToAll(Guid threadId)
         {
-            byte[] message = ServerMessages.MoveToTopThreadMessage(controller, threadID);
-            foreach (ConnectedUser u in controller.usersViewing)
+            byte[] message = ServerMessages.MoveToTopThreadMessage(sectionController, threadId);
+            foreach (ConnectedUser user in sectionController.UsersViewing)
             {
-                u.sendBinary(message);
+                user.Send(message);
             }
         }
         /*
         public void sendAddCommentToAll(CommentInfo c)
         {
             byte[] message = ServerMessages.AddCommentMessage(controller, c);
-            foreach (ConnectedUser u in controller.usersViewing)
+            foreach (ConnectedUser user in controller.usersViewing)
             {
-                u.sendBinary(message);
+                user.sendBinary(message);
             }
         }
         public void sendDeleteCommentToAll(CommentInfo c)
         {
             byte[] message = ServerMessages.RemoveCommentMessage(controller, c);
-            foreach (ConnectedUser u in controller.usersViewing)
+            foreach (ConnectedUser user in controller.usersViewing)
             {
-                u.sendBinary(message);
+                user.sendBinary(message);
             }
         }
         public void sendUpdateCommentToAll(CommentInfo c)
         {
             byte[] message = ServerMessages.UpdateCommentMessage(controller, c);
-            foreach (ConnectedUser u in controller.usersViewing)
+            foreach (ConnectedUser user in controller.usersViewing)
             {
-                u.sendBinary(message);
+                user.sendBinary(message);
             }
         }
         */

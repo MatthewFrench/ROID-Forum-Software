@@ -1,80 +1,74 @@
 ﻿using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using Cassandra;
 namespace ROIDForumServer
 {
-    public class LoginController
+    public class LoginController (ServerController serverController)
     {
-        ServerController server;
-        public LoginController(ServerController s)
+        private ServerController Server { get; } = serverController;
+        private ISession DatabaseSession { get; } = serverController.Database.GetSession();
+        public void OnMessage(ConnectedUser user, Dictionary<string, object> message)
         {
-            server = s;
-        }
-        public void logic()
-        {
-        }
-        public void onMessage(ConnectedUser u, Dictionary<string, object> message)
-        {
-            if ((string)message["Title"] == "Set Avatar" && u.accountID != null)
+            if ((string)message["Title"] == "Set Avatar" && user.AccountId != null)
             {
-                server.GetDatabase().SetAvatarUrl((Guid)u.accountID, (string)message["AvatarURL"]);
+                DatabaseAccount.SetAvatarUrl(DatabaseSession, (Guid)user.AccountId, (string)message["AvatarURL"]);
             }
-            if ((string)message["Title"] == "Get Avatar" && u.accountID != null)
+            if ((string)message["Title"] == "Get Avatar" && user.AccountId != null)
             {
-                u.sendBinary(ServerMessages.GetAvatarMessage(server.GetDatabase().GetAvatarUrl((Guid)u.accountID)));
+                user.Send(ServerMessages.GetAvatarMessage(DatabaseAccount.GetAvatarUrl(DatabaseSession, (Guid)user.AccountId)));
             }
-            if ((string)message["Title"] == "Login" && u.accountID == null)
+            if ((string)message["Title"] == "Login" && user.AccountId == null)
             {
                 string username = (string)message["Name"];
                 string password = (string)message["Password"];
                 if (String.IsNullOrWhiteSpace(username) || String.IsNullOrWhiteSpace(password))
                 {
-                    u.sendBinary(ServerMessages.LoginFailedMessage());
+                    user.Send(ServerMessages.LoginFailedMessage());
                 }
                 else
                 {
-                    Guid? accountID = server.GetDatabase().GetAccountIDForCredentials(username, password);
-                    if (accountID == null)
+                    Guid? accountId = DatabaseAccount.GetAccountIdForCredentials(DatabaseSession, username, password);
+                    if (accountId == null)
                     {
-                        u.sendBinary(ServerMessages.LoginFailedMessage());
+                        user.Send(ServerMessages.LoginFailedMessage());
                     }
                     else
                     {
-                        u.accountID = accountID;
-                        u.sendBinary(ServerMessages.LoggedInMessage(server.GetDatabase().GetAccountName((Guid)u.accountID)));
-                        server.accountLoggedIn(u);
+                        user.AccountId = accountId;
+                        user.Send(ServerMessages.LoggedInMessage(DatabaseAccount.GetAccountName(DatabaseSession, (Guid)user.AccountId)));
+                        Server.AccountLoggedIn(user);
                     }
                 }
             }
-            if ((string)message["Title"] == "Logout" && u.accountID != null)
+            if ((string)message["Title"] == "Logout" && user.AccountId != null)
             {
                 //Perhaps an account method can be called for saving or other logic
-                u.accountID = null;
+                user.AccountId = null;
                 //Send logout notification
-                u.sendBinary(ServerMessages.LoggedOutMessage());
-                server.accountLoggedOut(u);
+                user.Send(ServerMessages.LoggedOutMessage());
+                Server.AccountLoggedOut(user);
             }
-            if ((string)message["Title"] == "Register" && u.accountID == null)
+            if ((string)message["Title"] == "Register" && user.AccountId == null)
             {
                 string username = (string)message["Name"];
                 string password = (string)message["Password"];
                 string email = (string)message["Email"];
                 if (String.IsNullOrWhiteSpace(username) || String.IsNullOrWhiteSpace(password) || String.IsNullOrWhiteSpace(email))
                 {
-                    u.sendBinary(ServerMessages.RegisterFailedMessage());
+                    user.Send(ServerMessages.RegisterFailedMessage());
                     return;
                 }
-                var (createAccountStatus, accountID) = server.GetDatabase().CreateAccount(username, password, email);
-                if (createAccountStatus == Database.CreateAccountStatus.AlreadyExists || accountID == null)
+                var (createAccountStatus, accountId) = DatabaseAccount.CreateAccount(DatabaseSession, username, password, email);
+                if (createAccountStatus == DatabaseAccount.CreateAccountStatus.AlreadyExists || accountId == null)
                 {
-                    u.sendBinary(ServerMessages.RegisterFailedMessage());
+                    user.Send(ServerMessages.RegisterFailedMessage());
                     return;
                 }
                 // Set the account ID to log them in
-                u.accountID = accountID;
+                user.AccountId = accountId;
                 //Send login notification
-                u.sendBinary(ServerMessages.LoggedInMessage(server.GetDatabase().GetAccountName((Guid)u.accountID)));
-                server.accountLoggedIn(u);
+                user.Send(ServerMessages.LoggedInMessage(DatabaseAccount.GetAccountName(DatabaseSession, (Guid)user.AccountId)));
+                Server.AccountLoggedIn(user);
             }
         }
     }

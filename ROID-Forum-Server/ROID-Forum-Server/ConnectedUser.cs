@@ -1,30 +1,17 @@
 ﻿using System;
 using Fleck;
-using System.Collections.Generic;
-using Newtonsoft.Json;
 namespace ROIDForumServer
 {
-    public class ConnectedUser
+    public class ConnectedUser(IWebSocketConnection connection)
     {
-        public IWebSocketConnection connection;
-        // Null if the user is not logged in
-        public Guid? accountID;
-        public String viewingSection = "";
-        public ConnectedUser(IWebSocketConnection c) {
-            connection = c;
-            accountID = null;
-        }
-        public void sendBinary(byte[] data)
+        private IWebSocketConnection Connection { get; } = connection;
+        public Guid? AccountId { get; set; }
+        public Guid? ViewingSectionId { get; set; }
+        public Guid? ViewingThreadId { get; set; }
+
+        public void Send(byte[] data)
         {
-            connection.Send(data);
-        }
-        public void sendMap(Dictionary<string, object> m)
-        {
-            connection.Send(JsonConvert.SerializeObject(m));
-        }
-        public void sendString(String o)
-        {
-            connection.Send(o);
+            Connection.Send(data);
         }
     }
 }
