@@ -25,6 +25,11 @@ namespace ROIDForumServer
             {
                 SectionController.UserLoggedIn(serverState, user, (Guid)user.ViewingSectionId);
             }
+
+            if (user.ViewingThreadId != null)
+            {
+                ThreadController.UserLoggedIn(serverState, user, (Guid)user.ViewingThreadId);
+            }
         }
 
         public static void OnUserLoggedOut(ServerState serverState, ConnectedUser user)
@@ -33,6 +38,10 @@ namespace ROIDForumServer
             if (user.ViewingSectionId != null)
             {
                 SectionController.UserLoggedOut(serverState, user, (Guid)user.ViewingSectionId);
+            }
+            if (user.ViewingThreadId != null)
+            {
+                ThreadController.UserLoggedOut(serverState, user, (Guid)user.ViewingThreadId);
             }
         }
 
@@ -48,6 +57,10 @@ namespace ROIDForumServer
             {
                 SectionController.RemoveUserFromViewing(serverState, user, (Guid)user.ViewingSectionId);
             }
+            if (user.ViewingThreadId != null)
+            {
+                ThreadController.RemoveUserFromViewing(serverState, user, (Guid)user.ViewingThreadId);
+            }
 
             ChatController.UserDisconnected(serverState, user);
         }
@@ -55,11 +68,14 @@ namespace ROIDForumServer
         public static void OnUserDisplayNameChanged(ServerState serverState, ConnectedUser user)
         {
             ChatController.UserDisplayNameUpdated(serverState, user);
+            SectionController.UserDisplayNameUpdated(serverState, user);
+            ThreadController.UserDisplayNameUpdated(serverState, user);
         }
 
         public static void OnUserAvatarChanged(ServerState serverState, ConnectedUser user)
         {
             SectionController.UserAvatarUpdated(serverState, user);
+            ThreadController.UserAvatarUpdated(serverState, user);
         }
 
         public static void OnMessage(ServerState serverState, ConnectedUser user, MessageReader message)

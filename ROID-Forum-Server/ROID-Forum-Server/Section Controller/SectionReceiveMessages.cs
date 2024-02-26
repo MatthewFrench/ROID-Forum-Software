@@ -2,12 +2,9 @@ namespace ROIDForumServer;
 
 public enum SectionReceiveMessages : byte
 { 
-    NewPost = 0,
-    EditPost = 1,
-    DeletePost = 2,
-    AddComment = 3,
-    EditComment = 4,
-    DeleteComment = 5,
-    ViewingSection = 6,
-    ViewingThread = 7
+    ViewingSection = 0,
+    ExitViewingSection = 1,
+    NewPost = 2,
+    EditPost = 3,
+    DeletePost = 4,
 }

@@ -7,6 +7,7 @@ namespace ROIDForumServer
     {
         Chat = 0,
         Profile = 1,
-        Section = 2
+        Section = 2,
+        Thread = 3
     }
 }

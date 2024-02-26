@@ -6,24 +6,19 @@ namespace ROIDForumServer;
 public static class SectionSendMessages
 {
         private enum SectionMsg {
-            AllThreadHeaders = 0,
-            AddThread = 1,
-            RemoveThread = 2,
-            UpdateThreadTitle = 3,
-            UpdateThreadDescription = 4,
-            MoveThreadToTop = 5,
-            ThreadAndComments = 6,
-            AddComment = 7,
-            RemoveComment = 8,
-            UpdateComment = 9,
-            SectionViewers = 10,
-            SectionAddViewer = 11,
-            SectionRemoveViewer = 12,
-            ThreadViewers = 13,
-            ThreadAddViewer = 14,
-            ThreadRemoveViewer = 15,
-            AvatarUpdate = 16,
-            DisplayNameUpdate = 17
+            AllSectionViewers = 0,
+            SectionAddViewer = 1,
+            SectionRemoveViewer = 2,
+            SectionLoggedInViewer = 3,
+            SectionLoggedOutViewer = 4,
+            AllThreadHeaders = 5,
+            AddThread = 6,
+            RemoveThread = 7,
+            UpdateThreadTitle = 8,
+            UpdateThreadDescription = 9,
+            MoveThreadToTop = 10,
+            AvatarUpdate = 11,
+            DisplayNameUpdate = 12
         }
 
         public static byte[] AllThreadHeaders(List<DatabaseThread.DatabaseThreadHeaderData> threadHeaders)

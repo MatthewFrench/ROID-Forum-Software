@@ -4,6 +4,48 @@ namespace ROIDForumServer
 {
     public static class ThreadController
     {
+        public static void UserLoggedIn(ServerState serverState, ConnectedUser user, Guid threadId)
+        {
+            // Update everyone viewing this thread that this user logged in
+        }
+        public static void UserLoggedOut(ServerState serverState, ConnectedUser user, Guid threadId)
+        {
+            // Update everyone viewing this thread that this user logged out
+        }
+        public static void AddUserToViewing(ServerState serverState, ConnectedUser user, Guid threadId)
+        {
+            // Send all comments in the thread to the user
+            
+            // Update everyone in this thread that there is a new viewer
+            user.ViewingSectionId = sectionId;
+            SectionMessageSender.SendAllThreadsToUser(serverState, user, sectionId);
+        }
+
+        public static void RemoveUserFromViewing(ServerState serverState, ConnectedUser user, Guid threadId)
+        {
+            // Update everyone viewing this section, that this user is no longer viewing
+            if (user.ViewingSectionId == sectionId)
+            {
+                user.ViewingSectionId = null;
+            }
+        }
+        
+        public static void UserDisplayNameUpdated(ServerState serverState, ConnectedUser user)
+        {
+            // Update everyone connected that the display name was updated
+        }
+        
+        public static void UserAvatarUpdated(ServerState serverState, ConnectedUser user)
+        {
+            // Update everyone connected that the avatar was updated
+        }
+        
+        
+        
+        
+        
+        
+        
         public static void AddUser(ServerState serverState, ConnectedUser user, Guid sectionId, Guid threadId)
         {
             user.ViewingThreadId = threadId;
