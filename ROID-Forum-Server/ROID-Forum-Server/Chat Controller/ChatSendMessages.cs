@@ -49,12 +49,12 @@ public static class ChatSendMessages
         return message.ToBuffer();
     }
 
-    public static byte[] AllOnlineList(List<(Guid connectionId, Guid? accountId, string displayName)> onlineAccounts)
+    public static byte[] AllOnlineList(List<(Guid connectionId, Guid? accountId, string displayName)> users)
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
         message.AddUint8((byte)ChatMsg.AllOnlineList);
-        foreach ((Guid connectionId, Guid? accountId, string displayName) in onlineAccounts)
+        foreach ((Guid connectionId, Guid? accountId, string displayName) in users)
         {
             message.AddString(connectionId.ToString());
             message.AddUint8(accountId == null ? (byte)0 : (byte)1);
