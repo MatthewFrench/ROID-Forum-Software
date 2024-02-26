@@ -1,97 +1,100 @@
 ﻿using System;
+using System.Linq;
 
 namespace ROIDForumServer
 {
     public static class ChatController
     {
-        // Todo: We can use cassandra, redis, or nats to properly show
-        // active users and allow subscribing them to events.
-        // This will allow multi-instance scaling of the server.
-        public static void AddUser(ServerState serverState, ConnectedUser user)
+        public static void UserConnected(ServerState serverState, ConnectedUser user)
         {
-            SendListUpdateToAll(serverState);
-            SendAllChats(serverState, user);
+            // Send all chats to the newly connected user
+            user.Send(
+                ChatSendMessages.AllMessages(
+                    DatabaseChat.GetRecentChats(serverState.Database.GetSession())
+                        .Select(data => (creatorAccountId: data.CreatorAccountId, chatId: data.ChatId,
+                            createdTime: data.CreatedTime, ContentDisposition: data.Content))
+                        .ToList()
+                )
+            );
+            user.Send(ChatSendMessages.AllOnlineList(
+                serverState.Networking.Users.Select(connectedUser =>
+                    (
+                        connectionId: connectedUser.ConnectionId,
+                        accountId: connectedUser.AccountId,
+                        displayName: connectedUser.AccountId != null
+                            ? DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(),
+                                (Guid)connectedUser.AccountId)
+                            : ""
+                    )
+                ).ToList()
+            ));
+            // Tell everyone else that the user is connected
+            var addUserMessage = ChatSendMessages.AddUser(user.ConnectionId);
+            foreach (var otherUser in serverState.Networking.Users)
+            {
+                if (user == otherUser) return;
+                otherUser.Send(addUserMessage);
+            }
         }
 
-        public static void RemoveUser(ServerState serverState, ConnectedUser user)
+        public static void UserDisconnected(ServerState serverState, ConnectedUser user)
         {
-            SendListUpdateToAll(serverState);
+            var removeUserMessage = ChatSendMessages.RemoveUser(user.ConnectionId);
+            foreach (var otherUser in serverState.Networking.Users)
+            {
+                if (user == otherUser) return;
+                otherUser.Send(removeUserMessage);
+            }
         }
 
-        public static void SendListUpdateToAll(ServerState serverState)
+        public static void UserLoggedIn(ServerState serverState, ConnectedUser user)
         {
-            String list = $"Online({serverState.Networking.Users.Count}): ";
-            int guests = 0;
-            bool addComma = false;
-            // Todo: Fix bulk account name lookups, either cache names
-            // or make an active online table in Cassandra, or
-            // make a bunch of async parallel queries to be distributed
-            // among cassandra nodes.
-            foreach (ConnectedUser user in serverState.Networking.Users)
+            var userLoggedInMessage = ChatSendMessages.LoggedInUser(
+                user.ConnectionId,
+                (Guid)user.AccountId,
+                DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId)
+            );
+            foreach (var otherUser in serverState.Networking.Users)
             {
-                if (user.AccountId != null)
-                {
-                    if (addComma)
-                    {
-                        list += ", ";
-                    }
-                    else
-                    {
-                        addComma = true;
-                    }
-
-                    list += DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(),
-                        (Guid)user.AccountId);
-                }
-                else
-                {
-                    guests += 1;
-                }
+                otherUser.Send(userLoggedInMessage);
             }
-
-            if (addComma)
-            {
-                list += $" and {guests} Guests";
-            }
-            else
-            {
-                list += $"{guests} Guests";
-            }
-
-            byte[] message = ChatSendMessages.ChatOnlineList(list);
-            foreach (ConnectedUser user in serverState.Networking.Users)
-            {
-                user.Send(message);
-            }
-
-            Console.WriteLine(list);
         }
 
-        private static void AddChat(ServerState serverState, ConnectedUser user, String chat)
+        public static void UserLoggedOut(ServerState serverState, ConnectedUser user)
+        {
+            var userLoggedOutMessage = ChatSendMessages.LoggedOutUser(user.ConnectionId);
+            foreach (var otherUser in serverState.Networking.Users)
+            {
+                otherUser.Send(userLoggedOutMessage);
+            }
+        }
+
+        public static void UserDisplayNameUpdated(ServerState serverState, ConnectedUser user)
+        {
+            var userDisplayNameUpdatedMessage = ChatSendMessages.DisplayNameUpdate(
+                (Guid)user.AccountId,
+                DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId)
+            );
+            foreach (var otherUser in serverState.Networking.Users)
+            {
+                otherUser.Send(userDisplayNameUpdatedMessage);
+            }
+        }
+
+        private static void AddChat(ServerState serverState, ConnectedUser user, string chat)
         {
             if (user.AccountId == null)
             {
                 return;
             }
 
-            chat =
-                $"{DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId)}: " +
-                chat;
-            DatabaseChat.SubmitChat(serverState.Database.GetSession(), (Guid)user.AccountId, chat);
+            var chatData = DatabaseChat.SubmitChat(serverState.Database.GetSession(), (Guid)user.AccountId, chat);
             // Send chat to all connected websockets
             // Todo: Switch to a NATS subscription model
-            byte[] chatMsg = ChatSendMessages.ChatMessage(chat);
+            byte[] chatMsg = ChatSendMessages.NewMessage(chatData);
             foreach (var user2 in serverState.Networking.Users)
             {
                 user2.Send(chatMsg);
-            }
-        }
-
-        private static void SendAllChats(ServerState serverState, ConnectedUser user)
-        {
-            foreach (var (_, _, content, _) in DatabaseChat.GetRecentChats(serverState.Database.GetSession()))
-            {
-                user.Send(ChatSendMessages.ChatMessage(content));
             }
         }
 

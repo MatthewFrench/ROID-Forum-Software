@@ -44,7 +44,7 @@ namespace ROIDForumServer
                         user.AccountId = accountId;
                         user.Send(ProfileSendMessages.LoggedInMessage(
                             DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId)));
-                        ServerController.AccountLoggedIn(serverState, user);
+                        ServerController.OnUserLoggedIn(serverState, user);
                     }
                 }
             }
@@ -53,7 +53,7 @@ namespace ROIDForumServer
                 if (user.AccountId == null) return;
                 user.AccountId = null;
                 user.Send(ProfileSendMessages.LoggedOutMessage());
-                ServerController.AccountLoggedOut(serverState, user);
+                ServerController.OnUserLoggedOut(serverState, user);
             }
             else if (ProfileReceiveMessages.Register.Equals(messageId))
             {
@@ -84,7 +84,7 @@ namespace ROIDForumServer
                 //Send login notification
                 user.Send(ProfileSendMessages.LoggedInMessage(
                     DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId)));
-                ServerController.AccountLoggedIn(serverState, user);
+                ServerController.OnUserLoggedIn(serverState, user);
             }
         }
     }

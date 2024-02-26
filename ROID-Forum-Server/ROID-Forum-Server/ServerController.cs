@@ -17,29 +17,34 @@ namespace ROIDForumServer
             ServerState.Networking.Stop();
         }
 
-        public static void AccountLoggedIn(ServerState serverState, ConnectedUser user)
+        public static void OnUserLoggedIn(ServerState serverState, ConnectedUser user)
         {
-            if (user.AccountId != null)
-            {
-                Console.WriteLine($"Account logged in {user.AccountId}");
-            }
-
-            ChatController.SendListUpdateToAll(serverState);
+            Console.WriteLine($"Account logged in {user.AccountId}");
+            ChatController.UserLoggedIn(serverState, user);
         }
 
-        public static void AccountLoggedOut(ServerState serverState, ConnectedUser user)
+        public static void OnUserLoggedOut(ServerState serverState, ConnectedUser user)
         {
-            if (user.AccountId != null)
-            {
-                Console.WriteLine($"Account logged out {user.AccountId}");
-            }
-
-            ChatController.SendListUpdateToAll(serverState);
+            ChatController.UserLoggedOut(serverState, user);
         }
 
-        public static void OnOpen(ServerState serverState, ConnectedUser user)
+        public static void OnUserConnected(ServerState serverState, ConnectedUser user)
         {
-            ChatController.AddUser(serverState, user);
+            ChatController.UserConnected(serverState, user);
+        }
+
+        public static void OnUserDisconnected(ServerState serverState, ConnectedUser user)
+        {
+            if (user.ViewingSectionId != null)
+            {
+                SectionController.RemoveUser(serverState, user, (Guid)user.ViewingSectionId);
+            }
+
+            ChatController.UserDisconnected(serverState, user);
+        }
+
+        public static void OnUserDisplayNameChanged(ServerState serverState, ConnectedUser user)
+        {
         }
 
         public static void OnMessage(ServerState serverState, ConnectedUser user, MessageReader message)
@@ -53,31 +58,24 @@ namespace ROIDForumServer
             if (ServerReceiveControllers.Chat.Equals(messageController))
             {
                 ChatController.OnMessage(serverState, user, message);
-            } else if (ServerReceiveControllers.Profile.Equals(messageController))
+            }
+            else if (ServerReceiveControllers.Profile.Equals(messageController))
             {
                 ProfileController.OnMessage(serverState, user, message);
-            } else if (ServerReceiveControllers.Section.Equals(messageController))
+            }
+            else if (ServerReceiveControllers.Section.Equals(messageController))
             {
                 if (!message.HasString())
                 {
                     return;
                 }
+
                 var sectionId = Guid.Parse(message.GetString());
                 if (DatabaseSection.SectionIdExists(serverState.Database.GetSession(), sectionId))
                 {
                     SectionController.OnMessage(serverState, user, sectionId, message);
                 }
             }
-        }
-
-        public static void OnClose(ServerState serverState, ConnectedUser user)
-        {
-            if (user.ViewingSectionId != null)
-            {
-                SectionController.RemoveUser(serverState, user, (Guid) user.ViewingSectionId);
-            }
-
-            ChatController.RemoveUser(serverState, user);
         }
     }
 }

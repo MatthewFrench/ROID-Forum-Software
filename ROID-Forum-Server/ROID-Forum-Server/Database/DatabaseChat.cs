@@ -20,10 +20,13 @@ public static class DatabaseChat
                 ) WITH CLUSTERING ORDER BY (created_time DESC)");
     }
     
-    public static void SubmitChat(ISession session, Guid accountId, string content)
+    public static (Guid creatorAccountId, Guid chatId, TimeUuid createdTime, string content) SubmitChat(ISession session, Guid accountId, string content)
     {
-        PreparedStatement insertStatement = session.Prepare($"INSERT INTO \"{Database.DefaultKeyspace}\".\"{TableChat}\" (creator_account_id, chat_id, created_time, content) VALUES (?, uuid(), now(), ?)");
-        session.Execute(insertStatement.Bind(accountId, content));
+        var chatId = Guid.NewGuid();
+        var createdTime = TimeUuid.NewId();
+        var insertStatement = session.Prepare($"INSERT INTO \"{Database.DefaultKeyspace}\".\"{TableChat}\" (creator_account_id, chat_id, created_time, content) VALUES (?, ?, ?, ?)");
+        session.Execute(insertStatement.Bind(accountId, chatId, createdTime, content));
+        return (creatorAccountId: accountId, chatId, createdTime, content);
     }
     
     public record class DatabaseChatData(Guid CreatorAccountId, Guid ChatId, string Content, TimeUuid CreatedTime);

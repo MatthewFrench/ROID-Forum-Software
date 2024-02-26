@@ -21,7 +21,7 @@ namespace ROIDForumServer
             ConnectedUser connectedUser = new ConnectedUser(socket);
             Users.Add(connectedUser);
             _userMap.Add(socket, connectedUser);
-            ServerController.OnOpen(serverState, connectedUser);
+            ServerController.OnUserConnected(serverState, connectedUser);
 		}
         
         private void ClientDisconnectedEvent(IWebSocketConnection socket)
@@ -30,8 +30,8 @@ namespace ROIDForumServer
             Console.WriteLine("Close!");
             var user = _userMap.GetValueOrDefault(socket);
             Users.Remove(user);
-            ServerController.OnClose(serverState, user);
             _userMap.Remove(socket);
+            ServerController.OnUserDisconnected(serverState, user);
         }
 
 		private void ClientBinaryMessageEvent(IWebSocketConnection socket, byte[] binary) {
