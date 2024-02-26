@@ -54,4 +54,13 @@ public static class ProfileSendMessages
         message.AddString(avatarUrl);
         return message.ToBuffer();
     }
+
+    public static byte[] ReturnDisplayNameMessage(string displayName)
+    {
+        var message = new MessageWriter();
+        message.AddUint8((byte)ServerSendControllers.Profile);
+        message.AddUint8((byte)LoginMsg.ReturnDisplayName);
+        message.AddString(displayName);
+        return message.ToBuffer();
+    }
 }

@@ -21,23 +21,32 @@ namespace ROIDForumServer
         {
             Console.WriteLine($"Account logged in {user.AccountId}");
             ChatController.UserLoggedIn(serverState, user);
+            if (user.ViewingSectionId != null)
+            {
+                SectionController.UserLoggedIn(serverState, user, (Guid)user.ViewingSectionId);
+            }
         }
 
         public static void OnUserLoggedOut(ServerState serverState, ConnectedUser user)
         {
             ChatController.UserLoggedOut(serverState, user);
+            if (user.ViewingSectionId != null)
+            {
+                SectionController.UserLoggedOut(serverState, user, (Guid)user.ViewingSectionId);
+            }
         }
 
         public static void OnUserConnected(ServerState serverState, ConnectedUser user)
         {
             ChatController.UserConnected(serverState, user);
+            SectionController.UserConnected(serverState, user);
         }
 
         public static void OnUserDisconnected(ServerState serverState, ConnectedUser user)
         {
             if (user.ViewingSectionId != null)
             {
-                SectionController.RemoveUser(serverState, user, (Guid)user.ViewingSectionId);
+                SectionController.RemoveUserFromViewing(serverState, user, (Guid)user.ViewingSectionId);
             }
 
             ChatController.UserDisconnected(serverState, user);
@@ -45,6 +54,12 @@ namespace ROIDForumServer
 
         public static void OnUserDisplayNameChanged(ServerState serverState, ConnectedUser user)
         {
+            ChatController.UserDisplayNameUpdated(serverState, user);
+        }
+
+        public static void OnUserAvatarChanged(ServerState serverState, ConnectedUser user)
+        {
+            SectionController.UserAvatarUpdated(serverState, user);
         }
 
         public static void OnMessage(ServerState serverState, ConnectedUser user, MessageReader message)

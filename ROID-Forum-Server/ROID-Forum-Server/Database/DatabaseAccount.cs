@@ -105,7 +105,12 @@ public static class DatabaseAccount
     }
     public static void SetAvatarUrl(ISession session, Guid accountId, String text)
     {
-	    var selectStatement = session.Prepare($"UPDATE \"{Database.DefaultKeyspace}\".\"{TableAccount}\" set avatar_url=? where account_id=?");
-	    session.Execute(selectStatement.Bind(text, accountId));
+	    var updateStatement = session.Prepare($"UPDATE \"{Database.DefaultKeyspace}\".\"{TableAccount}\" set avatar_url=? where account_id=?");
+	    session.Execute(updateStatement.Bind(text, accountId));
+    }
+    public static void SetDisplayName(ISession session, Guid accountId, String text)
+    {
+	    var updateStatement = session.Prepare($"UPDATE \"{Database.DefaultKeyspace}\".\"{TableAccount}\" set display_name=? where account_id=?");
+	    session.Execute(updateStatement.Bind(text, accountId));
     }
 }

@@ -14,12 +14,25 @@ namespace ROIDForumServer
                 if (!message.HasString()) return;
                 if (user.AccountId == null) return;
                 DatabaseAccount.SetAvatarUrl(serverState.Database.GetSession(), (Guid)user.AccountId, message.GetString());
+                ServerController.OnUserAvatarChanged(serverState, user);
+            } else if (ProfileReceiveMessages.UpdateDisplayName.Equals(messageId))
+            {
+                if (!message.HasString()) return;
+                if (user.AccountId == null) return;
+                DatabaseAccount.SetDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId, message.GetString());
+                ServerController.OnUserDisplayNameChanged(serverState, user);
             }
             else if (ProfileReceiveMessages.GetAvatar.Equals(messageId))
             {
                 if (user.AccountId == null) return;
                 user.Send(ProfileSendMessages.ReturnAvatarMessage(
                     DatabaseAccount.GetAvatarUrl(serverState.Database.GetSession(), (Guid)user.AccountId)));
+            }
+            else if (ProfileReceiveMessages.GetDisplayName.Equals(messageId))
+            {
+                if (user.AccountId == null) return;
+                user.Send(ProfileSendMessages.ReturnDisplayNameMessage(
+                    DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId)));
             }
             else if (ProfileReceiveMessages.Login.Equals(messageId))
             {
