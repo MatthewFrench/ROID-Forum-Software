@@ -115,7 +115,7 @@ namespace ROIDForumServer
         }
 
 
-        public static void OnMessage(ServerState serverState, ConnectedUser user, Guid sectionId, MessageReader message)
+        public static void OnMessage(ServerState serverState, ConnectedUser user, Guid sectionId, Guid threadId, MessageReader message)
         {
             if (!message.HasUint8())
             {
@@ -126,21 +126,14 @@ namespace ROIDForumServer
 
             if (ThreadReceiveMessages.BeginViewingThread.Equals(messageId))
             {
-                if (!message.HasString()) return;
-                Guid viewingThreadId = Guid.Parse(message.GetString());
-                if (DatabaseThread.ThreadIdExists(serverState.Database.GetSession(), viewingThreadId))
-                {
-                    AddUserToViewing(serverState, user, viewingThreadId);
-                }
-
+                AddUserToViewing(serverState, user, threadId);
                 return;
             }
 
             if (ThreadReceiveMessages.ExitViewingThread.Equals(messageId))
             {
                 if (!message.HasString()) return;
-                Guid viewingThreadId = Guid.Parse(message.GetString());
-                RemoveUserFromViewing(serverState, user, viewingThreadId);
+                RemoveUserFromViewing(serverState, user, threadId);
                 return;
             }
 
@@ -149,83 +142,108 @@ namespace ROIDForumServer
                 return;
             }
 
-            if (SectionReceiveMessages.AddComment.Equals(messageId))
+            if (ThreadReceiveMessages.AddComment.Equals(messageId))
             {
-                if (!message.HasString()) return;
-                Guid threadId = Guid.Parse(message.GetString());
                 if (!message.HasString()) return;
                 String text = message.GetString();
-                ThreadController.AddComment(serverState, user, threadId, sectionId, text);
+                if (!DatabaseThread.ThreadIdExists(serverState.Database.GetSession(), threadId))
+                {
+                    return;
+                }
+
+                Guid commentId = DatabaseComment.CreateComment(serverState.Database.GetSession(), (Guid)user.AccountId,
+                    sectionId, threadId, text);
+                // Update thread ordering since a comment was added
+                var updatedTime =
+                    DatabaseSection.UpdateSectionThreadOrdering(serverState.Database.GetSession(), sectionId, threadId);
+                // Send updated comment count to all section viewers
+                var updateThreadCommentCountAndUpdatedTimeMessage =
+                    SectionSendMessages.UpdateThreadCommentCountAndUpdatedTime(sectionId, threadId,
+                        DatabaseComment.GetCommentCount(serverState.Database.GetSession(), threadId), updatedTime);
+                foreach (var otherUser in serverState.Networking.Users.Where(connectedUser =>
+                             connectedUser.ViewingSectionId == sectionId))
+                {
+                    otherUser.Send(updateThreadCommentCountAndUpdatedTimeMessage);
+                }
+
+                // Send add comment message to all users viewing the thread
+                var addCommentMessage =
+                    ThreadSendMessages.AddComment(DatabaseComment.GetComment(serverState.Database.GetSession(),
+                        commentId));
+                foreach (var otherUser in serverState.Networking.Users.Where(connectedUser =>
+                             connectedUser.ViewingThreadId == threadId))
+                {
+                    otherUser.Send(addCommentMessage);
+                }
+
+                // Send successfully created comment message to user
+                user.Send(ThreadSendMessages.CommentSuccessfullyCreated(sectionId, threadId, commentId));
             }
-            else if (SectionReceiveMessages.EditComment.Equals(messageId))
+            else if (ThreadReceiveMessages.EditComment.Equals(messageId))
             {
                 if (!message.HasString()) return;
                 Guid commentId = Guid.Parse(message.GetString());
+                if (!DatabaseComment.CommentIdExists(serverState.Database.GetSession(), commentId))
+                {
+                    return;
+                }
+
+                if (user.AccountId != DatabaseComment.GetCommentOwner(serverState.Database.GetSession(), commentId))
+                {
+                    return;
+                }
                 if (!message.HasString()) return;
                 String description = message.GetString();
-                ThreadController.EditComment(serverState, user, commentId, description);
+                if (String.IsNullOrWhiteSpace(description))
+                {
+                    return;
+                }
+                DatabaseComment.UpdateComment(serverState.Database.GetSession(), commentId, description);
+                
+                // Send update comment message to all users viewing the thread
+                var updateCommentMessage =
+                    ThreadSendMessages.UpdateComment(sectionId, threadId, commentId, description);
+                foreach (var otherUser in serverState.Networking.Users.Where(connectedUser =>
+                             connectedUser.ViewingThreadId == threadId))
+                {
+                    otherUser.Send(updateCommentMessage);
+                }
             }
-            else if (SectionReceiveMessages.DeleteComment.Equals(messageId))
+            else if (ThreadReceiveMessages.DeleteComment.Equals(messageId))
             {
                 if (!message.HasString()) return;
                 Guid commentId = Guid.Parse(message.GetString());
-                ThreadController.DeleteComment(serverState, user, commentId);
+                if (!DatabaseComment.CommentIdExists(serverState.Database.GetSession(), commentId))
+                {
+                    return;
+                }
+
+                if (user.AccountId != DatabaseComment.GetCommentOwner(serverState.Database.GetSession(), commentId))
+                {
+                    return;
+                }
+
+                DatabaseComment.DeleteComment(serverState.Database.GetSession(), commentId);
+
+                // Send remove comment message to all users viewing the thread
+                var removeCommentMessage =
+                    ThreadSendMessages.RemoveComment(sectionId, threadId, commentId);
+                foreach (var otherUser in serverState.Networking.Users.Where(connectedUser =>
+                             connectedUser.ViewingThreadId == threadId))
+                {
+                    otherUser.Send(removeCommentMessage);
+                }
+
+                // Send updated comment count to all section viewers
+                var updateThreadCommentCountMessage =
+                    SectionSendMessages.UpdateThreadCommentCount(sectionId, threadId,
+                        DatabaseComment.GetCommentCount(serverState.Database.GetSession(), threadId));
+                foreach (var otherUser in serverState.Networking.Users.Where(connectedUser =>
+                             connectedUser.ViewingSectionId == sectionId))
+                {
+                    otherUser.Send(updateThreadCommentCountMessage);
+                }
             }
         }
-
-
-        public static void AddComment(ServerState serverState, ConnectedUser user, Guid threadId, Guid sectionId,
-            String text)
-        {
-            DatabaseComment.CreateComment(serverState.Database.GetSession(), (Guid)user.AccountId, threadId, sectionId,
-                text);
-            // Todo: Only send comment to those viewing the thread
-            //sectionController.messageSender.sendAddCommentToAll(c);
-
-            MoveThreadToTop(serverState, sectionId, threadId);
-        }
-
-        public static void DeleteComment(ServerState serverState, ConnectedUser user, Guid commentId)
-        {
-            DatabaseComment.DeleteComment(serverState.Database.GetSession(), (Guid)user.AccountId, commentId);
-            // Todo: Only send comment delete to those viewing the thread
-            //sectionController.messageSender.sendDeleteCommentToAll(c);
-        }
-
-        public static void EditComment(ServerState serverState, ConnectedUser user, Guid commentId, string description)
-        {
-            DatabaseComment.UpdateComment(serverState.Database.GetSession(), (Guid)user.AccountId, commentId,
-                description);
-            // Todo: Only send comment update to those viewing the thread
-            //sectionController.messageSender.sendUpdateCommentToAll(c);
-        }
-
-
-/*
-public void sendAddCommentToAll(CommentInfo c)
-{
-    byte[] message = ServerMessages.AddCommentMessage(controller, c);
-    foreach (ConnectedUser user in controller.usersViewing)
-    {
-        user.sendBinary(message);
-    }
-}
-public void sendDeleteCommentToAll(CommentInfo c)
-{
-    byte[] message = ServerMessages.RemoveCommentMessage(controller, c);
-    foreach (ConnectedUser user in controller.usersViewing)
-    {
-        user.sendBinary(message);
-    }
-}
-public void sendUpdateCommentToAll(CommentInfo c)
-{
-    byte[] message = ServerMessages.UpdateCommentMessage(controller, c);
-    foreach (ConnectedUser user in controller.usersViewing)
-    {
-        user.sendBinary(message);
-    }
-}
-*/
     }
 }

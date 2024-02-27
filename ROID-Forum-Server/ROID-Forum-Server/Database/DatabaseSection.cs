@@ -82,13 +82,15 @@ public static class DatabaseSection
         }
     }
 
-    public static void UpdateSectionThreadOrdering(ISession session, Guid sectionId, Guid threadId)
+    public static TimeUuid UpdateSectionThreadOrdering(ISession session, Guid sectionId, Guid threadId)
     {
+        var updatedTime = TimeUuid.NewId();
         // Update also acts as an insert if the row doesn't exist.
         PreparedStatement updateOrderStatement =
             session.Prepare(
-                $"UPDATE \"{Database.DefaultKeyspace}\".\"{TableSectionThreadOrdering}\" SET updated_time=now() where section_id=? and thread_id=?");
-        session.Execute(updateOrderStatement.Bind(sectionId, threadId));
+                $"UPDATE \"{Database.DefaultKeyspace}\".\"{TableSectionThreadOrdering}\" SET updated_time=? where section_id=? and thread_id=?");
+        session.Execute(updateOrderStatement.Bind(updatedTime, sectionId, threadId));
+        return updatedTime;
     }
 
     public static void DeleteSectionThreadOrdering(ISession session, Guid sectionId, Guid threadId)

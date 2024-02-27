@@ -20,8 +20,9 @@ public static class SectionSendMessages
         RemoveThreadHeader = 9,
         UpdateThreadTitleAndDescription = 10,
         UpdateThreadCommentCountAndUpdatedTime = 11,
-        AvatarUpdate = 12,
-        DisplayNameUpdate = 13
+        UpdateThreadCommentCount = 12,
+        AvatarUpdate = 13,
+        DisplayNameUpdate = 14
     }
 
     public static byte[] AllSectionHeaders(List<(Guid sectionId, string name)> sections)
@@ -114,6 +115,18 @@ public static class SectionSendMessages
         message.AddString(threadId.ToString());
         message.AddUint32(commentCount);
         message.AddString(updatedTime.ToString());
+
+        return message.ToBuffer();
+    }
+
+    public static byte[] UpdateThreadCommentCount(Guid sectionId, Guid threadId, UInt32 commentCount)
+    {
+        var message = new MessageWriter();
+        message.AddUint8((byte)ServerSendControllers.Section);
+        message.AddUint8((byte)SectionMsg.UpdateThreadCommentCount);
+        message.AddString(sectionId.ToString());
+        message.AddString(threadId.ToString());
+        message.AddUint32(commentCount);
 
         return message.ToBuffer();
     }

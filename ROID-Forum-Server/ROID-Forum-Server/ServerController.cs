@@ -39,6 +39,7 @@ namespace ROIDForumServer
             {
                 SectionController.UserLoggedOut(serverState, user, (Guid)user.ViewingSectionId);
             }
+
             if (user.ViewingThreadId != null)
             {
                 ThreadController.UserLoggedOut(serverState, user, (Guid)user.ViewingThreadId);
@@ -57,6 +58,7 @@ namespace ROIDForumServer
             {
                 SectionController.RemoveUserFromViewing(serverState, user, (Guid)user.ViewingSectionId);
             }
+
             if (user.ViewingThreadId != null)
             {
                 ThreadController.RemoveUserFromViewing(serverState, user, (Guid)user.ViewingThreadId);
@@ -105,6 +107,21 @@ namespace ROIDForumServer
                 if (DatabaseSection.SectionIdExists(serverState.Database.GetSession(), sectionId))
                 {
                     SectionController.OnMessage(serverState, user, sectionId, message);
+                }
+            }
+            else if (ServerReceiveControllers.Thread.Equals(messageController))
+            {
+                if (!message.HasString())
+                {
+                    return;
+                }
+
+                var sectionId = Guid.Parse(message.GetString());
+                var threadId = Guid.Parse(message.GetString());
+                if (DatabaseSection.SectionIdExists(serverState.Database.GetSession(), sectionId) &&
+                    DatabaseThread.ThreadIdExists(serverState.Database.GetSession(), sectionId))
+                {
+                    ThreadController.OnMessage(serverState, user, sectionId, threadId, message);
                 }
             }
         }

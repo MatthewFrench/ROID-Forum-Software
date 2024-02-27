@@ -21,20 +21,72 @@ public static class ThreadSendMessages
         AvatarUpdate = 10,
         DisplayNameUpdate = 11
     }
-    
+
     public static byte[] AllComments(List<DatabaseComment.DatabaseCommentData> comments)
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
         message.AddUint8((byte)ThreadMsg.AllComments);
-        foreach ((Guid threadId, Guid commentId, Guid creatorAccountId, String text, TimeUuid createdTime) in comments)
+        foreach ((Guid sectionId, Guid threadId, Guid commentId, Guid creatorAccountId, String text, TimeUuid createdTime) in comments)
         {
+            message.AddString(sectionId.ToString());
             message.AddString(threadId.ToString());
             message.AddString(commentId.ToString());
             message.AddString(creatorAccountId.ToString());
             message.AddString(text);
             message.AddString(createdTime.ToString());
         }
+
+        return message.ToBuffer();
+    }
+
+    public static byte[] CommentSuccessfullyCreated(Guid sectionId, Guid threadId, Guid commentId)
+    {
+        var message = new MessageWriter();
+        message.AddUint8((byte)ServerSendControllers.Section);
+        message.AddUint8((byte)ThreadMsg.CommentSuccessfullyCreated);
+        message.AddString(sectionId.ToString());
+        message.AddString(threadId.ToString());
+        message.AddString(commentId.ToString());
+        return message.ToBuffer();
+    }
+
+    public static byte[] AddComment(DatabaseComment.DatabaseCommentData comment)
+    {
+        var message = new MessageWriter();
+        message.AddUint8((byte)ServerSendControllers.Section);
+        message.AddUint8((byte)ThreadMsg.AddComment);
+        message.AddString(comment.sectionId.ToString());
+        message.AddString(comment.threadId.ToString());
+        message.AddString(comment.commentId.ToString());
+        message.AddString(comment.creatorAccountId.ToString());
+        message.AddString(comment.text);
+        message.AddString(comment.createdTime.ToString());
+
+        return message.ToBuffer();
+    }
+
+    public static byte[] UpdateComment(Guid sectionId, Guid threadId, Guid commentId, string text)
+    {
+        var message = new MessageWriter();
+        message.AddUint8((byte)ServerSendControllers.Section);
+        message.AddUint8((byte)ThreadMsg.UpdateComment);
+        message.AddString(sectionId.ToString());
+        message.AddString(threadId.ToString());
+        message.AddString(commentId.ToString());
+        message.AddString(text);
+
+        return message.ToBuffer();
+    }
+
+    public static byte[] RemoveComment(Guid sectionId, Guid threadId, Guid commentId)
+    {
+        var message = new MessageWriter();
+        message.AddUint8((byte)ServerSendControllers.Section);
+        message.AddUint8((byte)ThreadMsg.RemoveComment);
+        message.AddString(sectionId.ToString());
+        message.AddString(threadId.ToString());
+        message.AddString(commentId.ToString());
 
         return message.ToBuffer();
     }

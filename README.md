@@ -9,9 +9,19 @@ Technologies:
 Client has a persistent connection and gets data pushed automatically with information on the forum. Information auto-updating includes people online, friends online, people typing, comments on threads, new thread creation and messages.
 
 Goals:
-• Server needs to connect to a database(s) through a configuration file.
-• Forum web client should have a default template usage page for testing the forum.
-• Forum web client should be an embeddable TS/(Compiled JS) library so it can be inserted and used in either a Typescript project or a Javascript project.
+* Server needs to connect to a database(s) through a configuration file.
+* Forum web client should have a default template usage page for testing the forum.
+* Forum web client should be an embeddable TS/(Compiled JS) library so it can be inserted and used in either a Typescript project or a Javascript project.
+
+Future Improvements:
+* Use an async logger to not block on the server side
+* Use parallelism to run multiple Cassandra queries in parallel on the server-side
+* Add pagination
+* Add Google/Facebook/Apple login
+* Add event publisher/subscriber so the client side can subscribe to events that the server side publishes. This would greatly reduce the manual network message configuration
+* Use a binary message to code generator, like proto or flatpak. That would greatly reduce manual configuration and accidental message mismatch
+* Add a file storage service so files can be uploaded and references (like avatar pictures and thread images/videos)
+* Add websocket wait on reply, so I don't need specific messages for sending and listening for a response, instead I can send the message and then wait for a reply using promises
 
 ## Server
 * Install dotnet 2.0

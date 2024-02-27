@@ -112,7 +112,7 @@ public static class DatabaseThread
                 threadItem.GetValue<String>("description"),
                 threadItem.GetValue<TimeUuid>("created_time"),
                 updatedTime,
-                (UInt32) DatabaseComment.GetCommentCount(session, threadId),
+                DatabaseComment.GetCommentCount(session, threadId),
                 DatabaseAccount.GetAccountDisplayName(session, creatorAccountId),
                 DatabaseAccount.GetAvatarUrl(session, creatorAccountId)
             ));
@@ -137,7 +137,7 @@ public static class DatabaseThread
             threadItem.GetValue<String>("description"),
             threadItem.GetValue<TimeUuid>("created_time"),
             DatabaseSection.GetThreadUpdatedTime(session, sectionId, threadId),
-            (UInt32) DatabaseComment.GetCommentCount(session, threadId),
+            DatabaseComment.GetCommentCount(session, threadId),
             DatabaseAccount.GetAccountDisplayName(session, creatorAccountId),
             DatabaseAccount.GetAvatarUrl(session, creatorAccountId)
         );

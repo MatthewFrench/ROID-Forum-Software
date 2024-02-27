@@ -128,20 +128,12 @@ namespace ROIDForumServer
 
             if (SectionReceiveMessages.BeginViewingSection.Equals(messageId))
             {
-                if (!message.HasString()) return;
-                Guid viewingSectionId = Guid.Parse(message.GetString());
-                if (DatabaseSection.SectionIdExists(serverState.Database.GetSession(), viewingSectionId))
-                {
-                    AddUserToViewing(serverState, user, viewingSectionId);
-                }
-
+                AddUserToViewing(serverState, user, sectionId);
                 return;
             }
             if (SectionReceiveMessages.ExitViewingSection.Equals(messageId))
             {
-                if (!message.HasString()) return;
-                Guid viewingSectionId = Guid.Parse(message.GetString());
-                RemoveUserFromViewing(serverState, user, viewingSectionId);
+                RemoveUserFromViewing(serverState, user, sectionId);
                 return;
             }
             
@@ -171,7 +163,10 @@ namespace ROIDForumServer
             {
                 if (!message.HasString()) return;
                 Guid threadId = Guid.Parse(message.GetString());
-                // Todo: Owner thread shouldn't be checked here unless the function name made that clear
+                if (!DatabaseThread.ThreadIdExists(serverState.Database.GetSession(), threadId))
+                {
+                    return;
+                }
                 if (user.AccountId != DatabaseThread.GetThreadOwner(serverState.Database.GetSession(), threadId))
                 {
                     return;
@@ -195,7 +190,10 @@ namespace ROIDForumServer
             {
                 if (!message.HasString()) return;
                 Guid threadId = Guid.Parse(message.GetString());
-                
+                if (!DatabaseThread.ThreadIdExists(serverState.Database.GetSession(), threadId))
+                {
+                    return;
+                }
                 if (user.AccountId != DatabaseThread.GetThreadOwner(serverState.Database.GetSession(), threadId))
                 {
                     return;
@@ -214,76 +212,5 @@ namespace ROIDForumServer
                 }
             }
         }
-
-        
-        
-        
-        
-        /*
-        public static void EditThread(ServerState serverState, ConnectedUser user, Guid sectionId, Guid threadId, String title, String description)
-        {
-            DatabaseThread.UpdateThreadTitle(serverState.Database.GetSession(), (Guid) user.AccountId, sectionId, threadId, title);
-            var (commentId, commentOwnerAccountId) = DatabaseComment.GetThreadFirstComment(serverState.Database.GetSession(), threadId);
-            if (commentOwnerAccountId == user.AccountId)
-            {
-                DatabaseComment.UpdateComment(serverState.Database.GetSession(), (Guid) user.AccountId, commentId, description);
-            }
-            SectionMessageSender.SendUpdateThreadToAll(serverState, sectionId, threadId, title);
-            //Send a message to the All Controller
-            //sectionController.server.allSection.threadController.editThread(sectionController.name, t.Id, t.title);
-        }
-        private static void MoveThreadToTop(ServerState serverState, Guid sectionId, Guid threadId)
-        {
-            SectionMessageSender.SendMoveThreadToTopToAll(serverState, sectionId, threadId);
-            //Send a message to the All Controller
-            //sectionController.server.allSection.threadController.moveThreadToTop(sectionController.name, t.Id);
-        }
-        */
-        
-        /*
-         *
-           public static void SendAllThreadsToUser(ServerState serverState, ConnectedUser user, Guid sectionId)
-           {
-               user.Send(SectionSendMessages.AllThreadsMessage(
-                   DatabaseThread.GetThreadsInSection(serverState.Database.GetSession(), sectionId))
-               );
-           }
-
-           public static void SendAddThreadToAll(ServerState serverState, Guid sectionId, Guid threadId, Guid creatorAccountId, String title)
-           {
-               byte[] message = SectionSendMessages.AddThreadMessage(creatorAccountId, threadId, title);
-               foreach (ConnectedUser user in serverState.Networking.GetUsersViewingSection(sectionId))
-               {
-                   user.Send(message);
-               }
-           }
-
-           public static void SendRemoveThreadToAll(ServerState serverState, Guid sectionId, Guid threadId)
-           {
-               byte[] message = SectionSendMessages.RemoveThreadMessage(threadId);
-               foreach (ConnectedUser user in serverState.Networking.GetUsersViewingSection(sectionId))
-               {
-                   user.Send(message);
-               }
-           }
-
-           public static void SendUpdateThreadToAll(ServerState serverState, Guid sectionId, Guid threadId, String title)
-           {
-               byte[] message = SectionSendMessages.UpdateThreadMessage(threadId, title);
-               foreach (ConnectedUser user in serverState.Networking.GetUsersViewingSection(sectionId))
-               {
-                   user.Send(message);
-               }
-           }
-
-           public static void SendMoveThreadToTopToAll(ServerState serverState, Guid sectionId, Guid threadId)
-           {
-               byte[] message = SectionSendMessages.MoveToTopThreadMessage(threadId);
-               foreach (ConnectedUser user in serverState.Networking.GetUsersViewingSection(sectionId))
-               {
-                   user.Send(message);
-               }
-           }
-         */
     }
 }
