@@ -110,4 +110,13 @@ public static class DatabaseSection
             row.GetValue<TimeUuid>("update_time"))
         ).ToList();
     }
+
+    public static TimeUuid GetThreadUpdatedTime(ISession session, Guid sectionId, Guid threadId)
+    {
+        var selectStatement = session.Prepare(
+            $"SELECT updated_time FROM \"{Database.DefaultKeyspace}\".\"{MaterializedViewSectionThreadOrdering}\" where section_id=? and thread_id=?");
+        return session.Execute(selectStatement.Bind(sectionId, threadId)).Select(row => 
+            row.GetValue<TimeUuid>("update_time"))
+        .FirstOrDefault();
+    }
 }

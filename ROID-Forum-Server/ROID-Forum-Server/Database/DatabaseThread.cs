@@ -60,31 +60,17 @@ public static class DatabaseThread
         return item.GetValue<Guid>("creator_account_id");
     }
 
-    public static void UpdateThreadTitleAndDescription(ISession session, Guid accountId, Guid sectionId, Guid threadId,
+    public static void UpdateThreadTitleAndDescription(ISession session, Guid threadId,
         string title, string description)
     {
-        // Todo: Owner thread shouldn't be checked here unless the function name made that clear
-        if (accountId != GetThreadOwner(session, threadId))
-        {
-            return;
-        }
-
         PreparedStatement updateStatement =
             session.Prepare(
                 $"UPDATE \"{Database.DefaultKeyspace}\".\"{TableThread}\" set title=? and description=? where thread_id=?");
         session.Execute(updateStatement.Bind(title, description, threadId));
-        // Update also acts as an insert if the row doesn't exist.
-        DatabaseSection.UpdateSectionThreadOrdering(session, sectionId, threadId);
     }
 
-    public static void DeleteThread(ISession session, Guid accountId, Guid sectionId, Guid threadId)
+    public static void DeleteThreadAndComments(ISession session, Guid accountId, Guid sectionId, Guid threadId)
     {
-        // Todo: Owner thread shouldn't be checked here unless the function name made that clear
-        if (accountId != GetThreadOwner(session, threadId))
-        {
-            return;
-        }
-
         // Delete ordering
         DatabaseSection.DeleteSectionThreadOrdering(session, sectionId, threadId);
         PreparedStatement deleteStatement =
@@ -135,29 +121,25 @@ public static class DatabaseThread
         return results;
     }
 
-    public record class DatabaseThreadFullData(
-        Guid sectionId,
-        Guid threadId,
-        Guid creatorAccountId,
-        string title,
-        string description,
-        TimeUuid createdTime,
-        TimeUuid updated_time);
-
-    public static DatabaseThreadFullData GetThreadFullData(ISession session, Guid threadId)
+    public static DatabaseThreadHeaderData GetThreadHeader(ISession session, Guid threadId)
     {
         var selectThreadStatement = session.Prepare(
-            $"SELECT section_id, updated_time, description, creator_account_id, title, created_time FROM \"{Database.DefaultKeyspace}\".\"{TableThread}\" where thread_id=?");
+            $"SELECT section_id, creator_account_id, title, description, created_time FROM \"{Database.DefaultKeyspace}\".\"{TableThread}\" where thread_id=?");
         var threadResult = session.Execute(selectThreadStatement.Bind(threadId));
         var threadItem = threadResult.FirstOrDefault();
-        return new DatabaseThreadFullData(
-            threadItem.GetValue<Guid>("section_id"),
+        var creatorAccountId = threadItem.GetValue<Guid>("creator_account_id");
+        var sectionId = threadItem.GetValue<Guid>("section_id");
+        return new DatabaseThreadHeaderData(
+            sectionId,
             threadId,
-            threadItem.GetValue<Guid>("creator_account_id"),
-            threadItem.GetValue<string>("title"),
-            threadItem.GetValue<string>("description"),
+            creatorAccountId,
+            threadItem.GetValue<String>("title"),
+            threadItem.GetValue<String>("description"),
             threadItem.GetValue<TimeUuid>("created_time"),
-            threadItem.GetValue<TimeUuid>("updated_time")
+            DatabaseSection.GetThreadUpdatedTime(session, sectionId, threadId),
+            (UInt32) DatabaseComment.GetCommentCount(session, threadId),
+            DatabaseAccount.GetAccountDisplayName(session, creatorAccountId),
+            DatabaseAccount.GetAvatarUrl(session, creatorAccountId)
         );
     }
 

@@ -153,26 +153,65 @@ namespace ROIDForumServer
             if (SectionReceiveMessages.NewThread.Equals(messageId))
             {
                 if (!message.HasString()) return;
-                String postTitle = message.GetString();
+                String title = message.GetString();
                 if (!message.HasString()) return;
-                String postDescription = message.GetString();
-                ThreadController.AddThread(serverState, user, sectionId, postTitle, postDescription);
+                String description = message.GetString();
+                
+                Guid threadId = DatabaseThread.CreateThread(serverState.Database.GetSession(), (Guid)user.AccountId, sectionId, title, description);
+                // Send add thread message to all users viewing the section
+                var addThreadMessage = SectionSendMessages.AddThreadHeader(DatabaseThread.GetThreadHeader(serverState.Database.GetSession(), threadId));
+                foreach (var otherUser in serverState.Networking.Users.Where(connectedUser => connectedUser.ViewingSectionId == sectionId))
+                {
+                    otherUser.Send(addThreadMessage);
+                }
+                // Send successfully created thread message to user
+                user.Send(SectionSendMessages.ThreadSuccessfullyCreated(sectionId, threadId));
             }
-            else if (SectionReceiveMessages.EditThread.Equals(messageId))
+            else if (SectionReceiveMessages.EditThreadTitleAndDescription.Equals(messageId))
             {
                 if (!message.HasString()) return;
                 Guid threadId = Guid.Parse(message.GetString());
+                // Todo: Owner thread shouldn't be checked here unless the function name made that clear
+                if (user.AccountId != DatabaseThread.GetThreadOwner(serverState.Database.GetSession(), threadId))
+                {
+                    return;
+                }
                 if (!message.HasString()) return;
                 String title = message.GetString();
                 if (!message.HasString()) return;
                 String description = message.GetString();
-                ThreadController.EditThread(serverState, user, sectionId, threadId, title, description);
+                if (String.IsNullOrWhiteSpace(title) || String.IsNullOrWhiteSpace(description))
+                {
+                    return;
+                }
+                DatabaseThread.UpdateThreadTitleAndDescription(serverState.Database.GetSession(), threadId, title, description);
+                var updateThreadMessage = SectionSendMessages.UpdateThreadTitleAndDescription(sectionId, threadId, title, description);
+                foreach (var otherUser in serverState.Networking.Users.Where(connectedUser => connectedUser.ViewingSectionId == sectionId || connectedUser.ViewingThreadId == threadId))
+                {
+                    otherUser.Send(updateThreadMessage);
+                }
             }
             else if (SectionReceiveMessages.DeleteThread.Equals(messageId))
             {
                 if (!message.HasString()) return;
                 Guid threadId = Guid.Parse(message.GetString());
-                ThreadController.DeleteThread(serverState, user, sectionId, threadId);
+                
+                if (user.AccountId != DatabaseThread.GetThreadOwner(serverState.Database.GetSession(), threadId))
+                {
+                    return;
+                }
+                DatabaseThread.DeleteThreadAndComments(serverState.Database.GetSession(), (Guid) user.AccountId, sectionId, threadId);
+                // Update all users that the thread was deleted
+                var deleteThreadMessage = SectionSendMessages.RemoveThreadHeader(sectionId, threadId);
+                foreach (var otherUser in serverState.Networking.Users.Where(connectedUser => connectedUser.ViewingSectionId == sectionId || connectedUser.ViewingThreadId == threadId))
+                {
+                    otherUser.Send(deleteThreadMessage);
+                }
+                // Kick out any users viewing the delete thread
+                foreach (var otherUser in serverState.Networking.Users)
+                {
+                    otherUser.ViewingThreadId = null;
+                }
             }
         }
 
@@ -181,24 +220,6 @@ namespace ROIDForumServer
         
         
         /*
-        public static void AddThread(ServerState serverState, ConnectedUser user, Guid sectionId, string title, string description)
-        {
-            if (user.AccountId == null)
-            {
-                return;
-            }
-
-            Guid threadId = DatabaseThread.CreateThread(serverState.Database.GetSession(), (Guid)user.AccountId, sectionId, title);
-            DatabaseComment.CreateComment(serverState.Database.GetSession(), (Guid)user.AccountId, threadId, sectionId, description);
-            SectionMessageSender.SendAddThreadToAll(serverState, sectionId, threadId, (Guid)user.AccountId, title);
-
-            MoveThreadToTop(serverState, sectionId, threadId);
-        }
-        public static void DeleteThread(ServerState serverState, ConnectedUser user, Guid sectionId, Guid threadId)
-        {
-            DatabaseThread.DeleteThread(serverState.Database.GetSession(), (Guid) user.AccountId, sectionId, threadId);
-            SectionMessageSender.SendRemoveThreadToAll(serverState, sectionId, threadId);
-        }
         public static void EditThread(ServerState serverState, ConnectedUser user, Guid sectionId, Guid threadId, String title, String description)
         {
             DatabaseThread.UpdateThreadTitle(serverState.Database.GetSession(), (Guid) user.AccountId, sectionId, threadId, title);
