@@ -14,11 +14,13 @@ namespace ROIDForumServer
                 DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId),
                 threadId
             );
-            foreach (var otherUser in serverState.Networking.Users.Where(connectedUser => connectedUser.ViewingThreadId == threadId))
+            foreach (var otherUser in serverState.Networking.Users.Where(connectedUser =>
+                         connectedUser.ViewingThreadId == threadId))
             {
                 otherUser.Send(userLoggedInMessage);
             }
         }
+
         public static void UserLoggedOut(ServerState serverState, ConnectedUser user, Guid threadId)
         {
             // Update everyone viewing this thread that this user logged out
@@ -26,11 +28,13 @@ namespace ROIDForumServer
                 user.ConnectionId,
                 threadId
             );
-            foreach (var otherUser in serverState.Networking.Users.Where(connectedUser => connectedUser.ViewingThreadId == threadId))
+            foreach (var otherUser in serverState.Networking.Users.Where(connectedUser =>
+                         connectedUser.ViewingThreadId == threadId))
             {
                 otherUser.Send(userLoggedOutMessage);
             }
         }
+
         public static void AddUserToViewing(ServerState serverState, ConnectedUser user, Guid threadId)
         {
             // Send all comments in the thread to the user
@@ -63,6 +67,7 @@ namespace ROIDForumServer
             {
                 user2.Send(viewingUserMessage);
             }
+
             user.ViewingThreadId = threadId;
         }
 
@@ -82,7 +87,7 @@ namespace ROIDForumServer
                 user2.Send(removeMessage);
             }
         }
-        
+
         public static void UserDisplayNameUpdated(ServerState serverState, ConnectedUser user)
         {
             // Update everyone connected that the display name was updated
@@ -108,34 +113,36 @@ namespace ROIDForumServer
                 otherUser.Send(avatarUpdatedMessage);
             }
         }
-        
-        
+
 
         public static void OnMessage(ServerState serverState, ConnectedUser user, Guid sectionId, MessageReader message)
         {
-            /*
-             * if (ProfileReceiveMessages.ViewingSection.Equals(messageId))
-               {
-                   if (!message.HasString()) return;
-                   if (user.ViewingSectionId != null)
-                   {
-                       SectionController.RemoveUser(serverState, user, (Guid)user.ViewingSectionId);
-                   }
-
-                   Guid viewingSectionId = Guid.Parse(message.GetString());
-                   if (DatabaseSection.SectionIdExists(serverState.Database.GetSession(), viewingSectionId))
-                   {
-                       SectionController.AddUser(serverState, user, viewingSectionId);
-                   }
-               }
-               else
-             */
             if (!message.HasUint8())
             {
                 return;
             }
 
             byte messageId = message.GetUint8();
+
+            if (ThreadReceiveMessages.BeginViewingThread.Equals(messageId))
+            {
+                if (!message.HasString()) return;
+                Guid viewingThreadId = Guid.Parse(message.GetString());
+                if (DatabaseThread.ThreadIdExists(serverState.Database.GetSession(), viewingThreadId))
+                {
+                    AddUserToViewing(serverState, user, viewingThreadId);
+                }
+
+                return;
+            }
+
+            if (ThreadReceiveMessages.ExitViewingThread.Equals(messageId))
+            {
+                if (!message.HasString()) return;
+                Guid viewingThreadId = Guid.Parse(message.GetString());
+                RemoveUserFromViewing(serverState, user, viewingThreadId);
+                return;
+            }
 
             if (user.AccountId == null)
             {
@@ -165,30 +172,60 @@ namespace ROIDForumServer
                 ThreadController.DeleteComment(serverState, user, commentId);
             }
         }
-        
-        
-        
-        
-        
-        public static void AddComment(ServerState serverState, ConnectedUser user, Guid threadId, Guid sectionId, String text)
+
+
+        public static void AddComment(ServerState serverState, ConnectedUser user, Guid threadId, Guid sectionId,
+            String text)
         {
-            DatabaseComment.CreateComment(serverState.Database.GetSession(), (Guid) user.AccountId, threadId, sectionId, text);
+            DatabaseComment.CreateComment(serverState.Database.GetSession(), (Guid)user.AccountId, threadId, sectionId,
+                text);
             // Todo: Only send comment to those viewing the thread
             //sectionController.messageSender.sendAddCommentToAll(c);
 
             MoveThreadToTop(serverState, sectionId, threadId);
         }
+
         public static void DeleteComment(ServerState serverState, ConnectedUser user, Guid commentId)
         {
-            DatabaseComment.DeleteComment(serverState.Database.GetSession(), (Guid) user.AccountId, commentId);
+            DatabaseComment.DeleteComment(serverState.Database.GetSession(), (Guid)user.AccountId, commentId);
             // Todo: Only send comment delete to those viewing the thread
             //sectionController.messageSender.sendDeleteCommentToAll(c);
         }
+
         public static void EditComment(ServerState serverState, ConnectedUser user, Guid commentId, string description)
         {
-            DatabaseComment.UpdateComment(serverState.Database.GetSession(), (Guid) user.AccountId, commentId, description);
+            DatabaseComment.UpdateComment(serverState.Database.GetSession(), (Guid)user.AccountId, commentId,
+                description);
             // Todo: Only send comment update to those viewing the thread
             //sectionController.messageSender.sendUpdateCommentToAll(c);
         }
+
+
+/*
+public void sendAddCommentToAll(CommentInfo c)
+{
+    byte[] message = ServerMessages.AddCommentMessage(controller, c);
+    foreach (ConnectedUser user in controller.usersViewing)
+    {
+        user.sendBinary(message);
+    }
+}
+public void sendDeleteCommentToAll(CommentInfo c)
+{
+    byte[] message = ServerMessages.RemoveCommentMessage(controller, c);
+    foreach (ConnectedUser user in controller.usersViewing)
+    {
+        user.sendBinary(message);
+    }
+}
+public void sendUpdateCommentToAll(CommentInfo c)
+{
+    byte[] message = ServerMessages.UpdateCommentMessage(controller, c);
+    foreach (ConnectedUser user in controller.usersViewing)
+    {
+        user.sendBinary(message);
+    }
+}
+*/
     }
 }

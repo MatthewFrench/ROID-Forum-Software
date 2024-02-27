@@ -160,4 +160,17 @@ public static class DatabaseThread
             threadItem.GetValue<TimeUuid>("updated_time")
         );
     }
+
+    public static bool ThreadIdExists(ISession session, Guid threadId)
+    {
+        PreparedStatement selectStatement =
+            session.Prepare($"SELECT thread_id FROM \"{Database.DefaultKeyspace}\".\"{TableThread}\" where thread_id=?");
+        var result = session.Execute(selectStatement.Bind(threadId));
+        if (result.FirstOrDefault() == null)
+        {
+            return false;
+        }
+
+        return true;
+    }
 }

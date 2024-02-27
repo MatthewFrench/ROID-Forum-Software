@@ -119,23 +119,6 @@ namespace ROIDForumServer
 
         public static void OnMessage(ServerState serverState, ConnectedUser user, Guid sectionId, MessageReader message)
         {
-            /*
-             * if (ProfileReceiveMessages.ViewingSection.Equals(messageId))
-               {
-                   if (!message.HasString()) return;
-                   if (user.ViewingSectionId != null)
-                   {
-                       SectionController.RemoveUser(serverState, user, (Guid)user.ViewingSectionId);
-                   }
-
-                   Guid viewingSectionId = Guid.Parse(message.GetString());
-                   if (DatabaseSection.SectionIdExists(serverState.Database.GetSession(), viewingSectionId))
-                   {
-                       SectionController.AddUser(serverState, user, viewingSectionId);
-                   }
-               }
-               else
-             */
             if (!message.HasUint8())
             {
                 return;
@@ -143,12 +126,31 @@ namespace ROIDForumServer
 
             byte messageId = message.GetUint8();
 
+            if (SectionReceiveMessages.BeginViewingSection.Equals(messageId))
+            {
+                if (!message.HasString()) return;
+                Guid viewingSectionId = Guid.Parse(message.GetString());
+                if (DatabaseSection.SectionIdExists(serverState.Database.GetSession(), viewingSectionId))
+                {
+                    AddUserToViewing(serverState, user, viewingSectionId);
+                }
+
+                return;
+            }
+            if (SectionReceiveMessages.ExitViewingSection.Equals(messageId))
+            {
+                if (!message.HasString()) return;
+                Guid viewingSectionId = Guid.Parse(message.GetString());
+                RemoveUserFromViewing(serverState, user, viewingSectionId);
+                return;
+            }
+            
             if (user.AccountId == null)
             {
                 return;
             }
 
-            if (SectionReceiveMessages.NewPost.Equals(messageId))
+            if (SectionReceiveMessages.NewThread.Equals(messageId))
             {
                 if (!message.HasString()) return;
                 String postTitle = message.GetString();
@@ -156,7 +158,7 @@ namespace ROIDForumServer
                 String postDescription = message.GetString();
                 ThreadController.AddThread(serverState, user, sectionId, postTitle, postDescription);
             }
-            else if (SectionReceiveMessages.EditPost.Equals(messageId))
+            else if (SectionReceiveMessages.EditThread.Equals(messageId))
             {
                 if (!message.HasString()) return;
                 Guid threadId = Guid.Parse(message.GetString());
@@ -166,7 +168,7 @@ namespace ROIDForumServer
                 String description = message.GetString();
                 ThreadController.EditThread(serverState, user, sectionId, threadId, title, description);
             }
-            else if (SectionReceiveMessages.DeletePost.Equals(messageId))
+            else if (SectionReceiveMessages.DeleteThread.Equals(messageId))
             {
                 if (!message.HasString()) return;
                 Guid threadId = Guid.Parse(message.GetString());
@@ -178,7 +180,7 @@ namespace ROIDForumServer
         
         
         
-        
+        /*
         public static void AddThread(ServerState serverState, ConnectedUser user, Guid sectionId, string title, string description)
         {
             if (user.AccountId == null)
@@ -215,6 +217,7 @@ namespace ROIDForumServer
             //Send a message to the All Controller
             //sectionController.server.allSection.threadController.moveThreadToTop(sectionController.name, t.Id);
         }
+        */
         
         /*
          *
@@ -260,32 +263,6 @@ namespace ROIDForumServer
                    user.Send(message);
                }
            }
-           /*
-           public void sendAddCommentToAll(CommentInfo c)
-           {
-               byte[] message = ServerMessages.AddCommentMessage(controller, c);
-               foreach (ConnectedUser user in controller.usersViewing)
-               {
-                   user.sendBinary(message);
-               }
-           }
-           public void sendDeleteCommentToAll(CommentInfo c)
-           {
-               byte[] message = ServerMessages.RemoveCommentMessage(controller, c);
-               foreach (ConnectedUser user in controller.usersViewing)
-               {
-                   user.sendBinary(message);
-               }
-           }
-           public void sendUpdateCommentToAll(CommentInfo c)
-           {
-               byte[] message = ServerMessages.UpdateCommentMessage(controller, c);
-               foreach (ConnectedUser user in controller.usersViewing)
-               {
-                   user.sendBinary(message);
-               }
-           }
-           * /
          */
     }
 }
