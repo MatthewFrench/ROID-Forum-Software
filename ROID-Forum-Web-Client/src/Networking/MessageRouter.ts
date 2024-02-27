@@ -1,4 +1,4 @@
-import {Controllers} from "./MessageDefinitions/ClientMessageDefinitions";
+import {Controllers} from "./MessageDefinitions/SendMessageDefinitions";
 import {ChatMessageHandler} from './Chat/ChatMessageHandler';
 import {MessageReader} from "../Utility/Message/MessageReader";
 import {MessageWriter} from "../Utility/Message/MessageWriter";

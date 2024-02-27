@@ -1,6 +1,6 @@
 //These are the definitions that the serverURL receives.
 
-export class ServerMessages {
+export class ReceiveMessages {
     public static Controller =
     {
         Chat : 0,

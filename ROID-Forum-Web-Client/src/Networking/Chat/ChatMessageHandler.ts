@@ -1,5 +1,5 @@
 import {MessageReader} from "../../Utility/Message/MessageReader";
-import {Controllers} from "../MessageDefinitions/ClientMessageDefinitions";
+import {Controllers} from "../MessageDefinitions/SendMessageDefinitions";
 import {AppController} from "../../AppController";
 
 export class ChatMessageHandler {

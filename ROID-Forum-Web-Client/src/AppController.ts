@@ -9,7 +9,7 @@ import {MainTopBarSection} from "./Interface/MainTopBarSection";
 import {Section} from "./Interface/Section/Section";
 import {Utility} from "./Utility/Utility";
 import {MessageReader} from "./Utility/Message/MessageReader";
-import {ServerMessages} from "./Networking/MessageDefinitions/ServerMessages";
+import {ReceiveMessages} from "./Networking/MessageDefinitions/ReceiveMessages";
 
 export class AppController {
     mainDiv: HTMLDivElement;
@@ -231,67 +231,67 @@ export class AppController {
         let controller = message.getUint8();
         let messageID = message.getUint8();
         switch(controller) {
-            case ServerMessages.Controller.Chat: {
+            case ReceiveMessages.Controller.Chat: {
                 switch(messageID) {
-                    case ServerMessages.ChatMsg.Msg: {
+                    case ReceiveMessages.ChatMsg.Msg: {
                         this.chatbox.gotMessageBinary(message);
                     }break;
-                    case ServerMessages.ChatMsg.OnlineList: {
+                    case ReceiveMessages.ChatMsg.OnlineList: {
                         this.chatbox.gotOnlineListBinary(message);
                     }break;
                 }
             } break;
-            case ServerMessages.Controller.Login: {
+            case ReceiveMessages.Controller.Login: {
                 switch(messageID) {
-                    case ServerMessages.LoginMsg.GetAvatar: {
+                    case ReceiveMessages.LoginMsg.GetAvatar: {
                         this.controlPanel.preferencesAvatarInput.value = message.getString();
                     }break;
-                    case ServerMessages.LoginMsg.LoggedIn: {
+                    case ReceiveMessages.LoginMsg.LoggedIn: {
                         this.database.processEvent('Logged In Binary', message);
                         this.controlPanel.processEvent('Logged In');
                         this.chatbox.processEvent('Logged In');
                         for (let section of this.sectionOrder) section.processEvent('Logged In');
                     }break;
-                    case ServerMessages.LoginMsg.LoggedOut: {
+                    case ReceiveMessages.LoginMsg.LoggedOut: {
                         this.database.processEvent('Logged Out', message);
                         this.controlPanel.processEvent('Logged Out');
                         this.chatbox.processEvent('Logged Out');
                         for (let section of this.sectionOrder) section.processEvent('Logged Out');
                     }break;
-                    case ServerMessages.LoginMsg.LoginFailed: {
+                    case ReceiveMessages.LoginMsg.LoginFailed: {
                         this.controlPanel.processEvent('Login Failed');
                     }break;
-                    case ServerMessages.LoginMsg.RegisterFailed: {
+                    case ReceiveMessages.LoginMsg.RegisterFailed: {
                         this.controlPanel.processEvent('Register Failed');
                     }break;
                 }
             } break;
-            case ServerMessages.Controller.Section: {
+            case ReceiveMessages.Controller.Section: {
                 let sectionName = message.getString();
                 let section = this.getSection(sectionName);
                 switch(messageID) {
-                    case ServerMessages.SectionMsg.AddComment: {
+                    case ReceiveMessages.SectionMsg.AddComment: {
                         section.addCommentBinary(message);
                     }break;
-                    case ServerMessages.SectionMsg.AddThread: {
+                    case ReceiveMessages.SectionMsg.AddThread: {
                         section.addThreadBinary(message);
                     }break;
-                    case ServerMessages.SectionMsg.UpdateThread: {
+                    case ReceiveMessages.SectionMsg.UpdateThread: {
                         section.updateThreadBinary(message);
                     }break;
-                    case ServerMessages.SectionMsg.UpdateComment: {
+                    case ReceiveMessages.SectionMsg.UpdateComment: {
                         section.updateCommentBinary(message);
                     }break;
-                    case ServerMessages.SectionMsg.RemoveThread: {
+                    case ReceiveMessages.SectionMsg.RemoveThread: {
                         section.removeThreadBinary(message);
                     }break;
-                    case ServerMessages.SectionMsg.RemoveComment: {
+                    case ReceiveMessages.SectionMsg.RemoveComment: {
                         section.removeCommentBinary(message);
                     }break;
-                    case ServerMessages.SectionMsg.MoveThreadToTop: {
+                    case ReceiveMessages.SectionMsg.MoveThreadToTop: {
                         section.moveThreadToTopBinary(message);
                     }break;
-                    case ServerMessages.SectionMsg.AllThreads: {
+                    case ReceiveMessages.SectionMsg.AllThreads: {
                         section.allThreadsBinary(message);
                     }break;
                 }

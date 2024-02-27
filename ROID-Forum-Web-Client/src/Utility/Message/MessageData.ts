@@ -148,12 +148,11 @@ export class MessageDataString implements MessageData {
 
     constructor(value: string) {
         this.value = Utility.StringToArrayBuffer(value);
-        //Total length is buffer plus length of buffer
-        this.totalLength = 4 + this.value.byteLength;
+        this.totalLength = this.value.byteLength + 4;
     }
 
     addToByteData(byteData: DataView, loc: number) {
-        byteData.setUint32(loc, this.totalLength, false);
+        byteData.setUint32(loc, this.totalLength - 4, false);
         //Copy each byte of the value to the byteData
         let stringData = new DataView(this.value);
         let byteIndex = loc + 4;
@@ -179,7 +178,7 @@ export class MessageDataBinary implements MessageData {
     }
 
     addToByteData(byteData: DataView, loc: number) {
-        byteData.setUint32(loc, this.totalLength, false);
+        byteData.setUint32(loc, this.totalLength - 4, false);
         //Copy each byte of the value to the byteData
         let data = new DataView(this.value);
         let byteIndex = loc + 4;

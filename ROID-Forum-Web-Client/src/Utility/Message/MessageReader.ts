@@ -99,31 +99,37 @@ export class MessageReader {
     }
 
     hasString() : boolean {
+        if (this.currentLoc + 4 > this.byteLength)
+        {
+            return false;
+        }
         let length = this.byteData.getUint32(this.currentLoc, false);
-        return (this.currentLoc + length) <= this.byteLength;
+        return (this.currentLoc + 4 + length) <= this.byteLength;
     }
 
     getString() : string {
         let length = this.byteData.getUint32(this.currentLoc, false);
         this.currentLoc += 4;
-        let innerLength = length - 4;
-        let stringBuffer = this.byteData.buffer.slice(this.currentLoc, this.currentLoc + innerLength);
+        let stringBuffer = this.byteData.buffer.slice(this.currentLoc, this.currentLoc + length);
         let string = Utility.ArrayBufferToString(stringBuffer);
-        this.currentLoc += innerLength;
+        this.currentLoc += length;
         return string;
     }
 
     hasBinary() : boolean {
+        if (this.currentLoc + 4 > this.byteLength)
+        {
+            return false;
+        }
         let length = this.byteData.getUint32(this.currentLoc, false);
-        return (this.currentLoc + length) <= this.byteLength;
+        return (this.currentLoc + 4 + length) <= this.byteLength;
     }
 
     getBinary() : ArrayBuffer {
         let length = this.byteData.getUint32(this.currentLoc, false);
         this.currentLoc += 4;
-        let innerLength = length - 4;
-        let buffer = this.byteData.buffer.slice(this.currentLoc, this.currentLoc + innerLength);
-        this.currentLoc += innerLength;
+        let buffer = this.byteData.buffer.slice(this.currentLoc, this.currentLoc + length);
+        this.currentLoc += length;
         return buffer;
     }
 
