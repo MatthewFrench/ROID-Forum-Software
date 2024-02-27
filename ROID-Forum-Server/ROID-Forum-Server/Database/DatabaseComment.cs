@@ -62,17 +62,18 @@ public static class DatabaseComment
 	    PreparedStatement deleteStatement = session.Prepare($"DELETE FROM \"{Database.DefaultKeyspace}\".\"{TableComment}\" where comment_id=?");
 	    session.Execute(deleteStatement.Bind(commentId));
     }
-    public record class DatabaseCommentData(Guid commentId, Guid creatorAccountId, String text, TimeUuid createdTime);
+    public record class DatabaseCommentData(Guid threadId, Guid commentId, Guid creatorAccountId, String text, TimeUuid createdTime);
     // Todo: Add pagination and dynamic loading/lookback as the user scrolls down in a section
     public static List<DatabaseCommentData> GetThreadComments(ISession session, Guid threadId)
     {
 	    List<DatabaseCommentData> commentDatas = new List<DatabaseCommentData>();
 	    var commentSelectStatement = session.Prepare(
-		    $"SELECT comment_id, content, creator_account_id, created_time FROM \"{Database.DefaultKeyspace}\".\"{TableComment}\" where thread_id=?");
+		    $"SELECT thread_id, comment_id, content, creator_account_id, created_time FROM \"{Database.DefaultKeyspace}\".\"{TableComment}\" where thread_id=?");
 	    var commentResult = session.Execute(commentSelectStatement.Bind(threadId));
 	    foreach (Row item in commentResult)
 	    {
 		    commentDatas.Add(new DatabaseCommentData(
+			    item.GetValue<Guid>("thread_id"),
 			    item.GetValue<Guid>("comment_id"),
 			    item.GetValue<Guid>("creator_account_id"), 
 			    item.GetValue<String>("content"),
@@ -88,6 +89,15 @@ public static class DatabaseComment
 	    var commentResult = session.Execute(commentSelectStatement.Bind(threadId));
 	    var item = commentResult.FirstOrDefault();
 	    return (item.GetValue<Guid>("comment_id"), item.GetValue<Guid>("creator_account_id"));
+    }
+    
+    public static int GetCommentCount(ISession session, Guid threadId)
+    {
+	    var commentSelectStatement = session.Prepare(
+		    $"SELECT count(*) FROM \"{Database.DefaultKeyspace}\".\"{TableComment}\" where thread_id=?");
+	    var commentResult = session.Execute(commentSelectStatement.Bind(threadId));
+	    var item = commentResult.FirstOrDefault();
+	    return item.GetValue<int>("count");
     }
 
     public static void DeleteCommentsForThread(ISession session, Guid threadId)

@@ -98,27 +98,37 @@ public static class DatabaseThread
         Guid threadId,
         Guid creatorAccountId,
         string title,
+        string description,
         TimeUuid createdTime,
-        TimeUuid updated_time);
+        TimeUuid updatedTime,
+        UInt32 commentCount,
+        string creatorDisplayName,
+        string creatorAvatarUrl
+    );
 
     // Todo: Add pagination and dynamic loading/lookback as the user scrolls down in a section
-    public static List<DatabaseThreadHeaderData> GetThreadsInSection(ISession session, Guid sectionId)
+    public static List<DatabaseThreadHeaderData> GetThreadHeadersInSection(ISession session, Guid sectionId)
     {
         var orderedThreadIds = DatabaseSection.GetOrderedThreadIdsInSection(session, sectionId);
         List<DatabaseThreadHeaderData> results = new List<DatabaseThreadHeaderData>();
         foreach (var (_, threadId, updatedTime) in orderedThreadIds)
         {
             var selectThreadStatement = session.Prepare(
-                $"SELECT creator_account_id, title, created_time FROM \"{Database.DefaultKeyspace}\".\"{TableThread}\" where thread_id=?");
+                $"SELECT creator_account_id, title, description, created_time FROM \"{Database.DefaultKeyspace}\".\"{TableThread}\" where thread_id=?");
             var threadResult = session.Execute(selectThreadStatement.Bind(threadId));
             var threadItem = threadResult.FirstOrDefault();
+            var creatorAccountId = threadItem.GetValue<Guid>("creator_account_id");
             results.Add(new DatabaseThreadHeaderData(
                 sectionId,
                 threadId,
-                threadItem.GetValue<Guid>("creator_account_id"),
+                creatorAccountId,
                 threadItem.GetValue<String>("title"),
+                threadItem.GetValue<String>("description"),
                 threadItem.GetValue<TimeUuid>("created_time"),
-                updatedTime
+                updatedTime,
+                (UInt32) DatabaseComment.GetCommentCount(session, threadId),
+                DatabaseAccount.GetAccountDisplayName(session, creatorAccountId),
+                DatabaseAccount.GetAvatarUrl(session, creatorAccountId)
             ));
         }
 

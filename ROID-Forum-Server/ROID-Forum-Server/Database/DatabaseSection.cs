@@ -55,6 +55,18 @@ public static class DatabaseSection
 
         return true;
     }
+    
+    public static List<(Guid sectionId, string name)> GetSections(ISession session)
+    {
+        var result = session.Execute($"SELECT section_id, name FROM \"{Database.DefaultKeyspace}\".\"{TableSection}\"");
+        List<(Guid sectionId, string name)> sections = new List<(Guid sectionId, string name)>();
+        foreach (var item in result)
+        {
+            sections.Add((sectionId: item.GetValue<Guid>("section_id"), name: item.GetValue<string>("name")));
+        }
+
+        return sections;
+    }
 
     public static void CreateSectionIfNotExists(ISession session, String sectionName)
     {

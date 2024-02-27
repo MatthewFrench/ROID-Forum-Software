@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cassandra;
 
 namespace ROIDForumServer;
 
@@ -12,14 +13,52 @@ public static class SectionSendMessages
         SectionRemoveViewer = 2,
         SectionLoggedInViewer = 3,
         SectionLoggedOutViewer = 4,
-        AllThreadHeaders = 5,
-        AddThread = 6,
-        RemoveThread = 7,
-        UpdateThreadTitle = 8,
-        UpdateThreadDescription = 9,
-        MoveThreadToTop = 10,
-        AvatarUpdate = 11,
-        DisplayNameUpdate = 12
+        AllSectionHeaders = 5,
+        AllThreadHeaders = 6,
+        ThreadSuccessfullyCreated = 7,
+        AddThread = 8,
+        RemoveThread = 9,
+        UpdateThreadTitle = 10,
+        UpdateThreadDescription = 11,
+        MoveThreadToTop = 12,
+        AvatarUpdate = 13,
+        DisplayNameUpdate = 14
+    }
+
+    public static byte[] AllSectionHeaders(List<(Guid sectionId, string name)> sections)
+    {
+        var message = new MessageWriter();
+        message.AddUint8((byte)ServerSendControllers.Section);
+        message.AddUint8((byte)SectionMsg.AllSectionHeaders);
+        foreach ((Guid sectionId, string name) in sections)
+        {
+            message.AddString(sectionId.ToString());
+            message.AddString(name);
+        }
+
+        return message.ToBuffer();
+    }
+    
+    public static byte[] AllThreadHeaders(List<DatabaseThread.DatabaseThreadHeaderData> threadHeaders)
+    {
+        var message = new MessageWriter();
+        message.AddUint8((byte)ServerSendControllers.Section);
+        message.AddUint8((byte)SectionMsg.AllThreadHeaders);
+        foreach ((Guid sectionId, Guid threadId, Guid creatorAccountId, string title, string description, TimeUuid createdTime, TimeUuid updatedTime, uint commentCount, string creatorDisplayName, string creatorAvatarUrl) in threadHeaders)
+        {
+            message.AddString(sectionId.ToString());
+            message.AddString(threadId.ToString());
+            message.AddString(creatorAccountId.ToString());
+            message.AddString(title);
+            message.AddString(description);
+            message.AddString(createdTime.ToString());
+            message.AddString(updatedTime.ToString());
+            message.AddUint32(commentCount);
+            message.AddString(creatorDisplayName);
+            message.AddString(creatorAvatarUrl);
+        }
+
+        return message.ToBuffer();
     }
 
     public static byte[] AllSectionViewers(List<(Guid connectionId, Guid? accountId, string displayName)> viewingUsers,
