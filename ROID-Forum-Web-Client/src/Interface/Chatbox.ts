@@ -18,7 +18,7 @@ export class Chatbox {
     chatOnlineBox : HTMLDivElement;
     ding : HTMLAudioElement;
     doneLoading = false;
-    chatMsgs : ChatMsg[] = [];
+    chatItems : ChatItem[] = [];
     onlineUsers: User[] = [];
     bottomNode : HTMLDivElement = null;
     constructor(w : AppController) {
@@ -72,13 +72,22 @@ export class Chatbox {
             this.textField.value = '';
         }
     };
-    addChat = (chat : string) => {
-        let d : HTMLDivElement = Interface.Create({type: 'div', className: 'ChatMsg'});
-        d.appendChild(DescriptionParser.parseDescription(chat));
-        this.chatMsgs.push(new ChatMsg(chat, d));
+    addChat = (chatMessage : ChatMessage) => {
+        let chatDiv : HTMLDivElement = Interface.Create({type: 'div', className: 'ChatMsg'});
+        let nameDiv = Interface.Create({type: 'span'});
+        let contentDiv = DescriptionParser.parseDescription(chatMessage.content);
+        if (contentDiv.childNodes.length > 0) {
+            contentDiv.insertBefore(nameDiv, contentDiv.childNodes[0]);
+        } else {
+            contentDiv.appendChild(nameDiv);
+        }
+        chatDiv.appendChild(contentDiv);
+        let chatItem = new ChatItem(chatMessage, chatDiv, nameDiv, contentDiv);
+        chatItem.updateNameRendering();
+        this.chatItems.push(chatItem);
         this.updateChatHighlights();
-        this.chatField.appendChild(d);
-        this.bottomNode = d;
+        this.chatField.appendChild(chatDiv);
+        this.bottomNode = chatDiv;
         //Loop to loaded image if there is one
         let loopNodesFunction = (d2 : Node) => {};
         loopNodesFunction = (d2 : Node) => {
@@ -92,7 +101,7 @@ export class Chatbox {
                 }
             }
         };
-        loopNodesFunction(d);
+        loopNodesFunction(chatDiv);
         this.scrollToBottom();
         if (this.doneLoading) {
             this.ding.play();
@@ -105,11 +114,10 @@ export class Chatbox {
         this.bottomNode.scrollIntoView({behavior: "smooth", block: "end", inline: "end"});
     }
     updateChatHighlights() {
-        let name : string = this.website.database.displayName;
-        for (let chatMsg of this.chatMsgs) {
-            let chatName : string = chatMsg.chat.substring(0, chatMsg.chat.indexOf(":"));
-            if (chatName == name) {
-                    chatMsg.div.classList.add('SelfMsg');
+        let accountId : string = this.website.database.accountId;
+        for (let chatItem of this.chatItems) {
+            if (chatItem.chatMessage.creatorAccountId == accountId) {
+                chatItem.parentDiv.classList.add('SelfMsg');
             }
         }
     }
@@ -149,6 +157,15 @@ export class Chatbox {
         ]
          */
         let count = message.getUint32()
+        for (let index = 0; index < count; index++) {
+            this.addChat({
+                chatId: message.getString(),
+                creatorAccountId: message.getString(),
+                creatorDisplayName: message.getString(),
+                createdTime: message.getString(),
+                content: message.getString(),
+            });
+        }
     }
     gotNewMessage(message : MessageReader) {
         /*
@@ -158,8 +175,13 @@ export class Chatbox {
         string createdTime
         string content
          */
-        let chatString = message.getString();
-        this.addChat(chatString);
+        this.addChat({
+            chatId: message.getString(),
+            creatorAccountId: message.getString(),
+            creatorDisplayName: message.getString(),
+            createdTime: message.getString(),
+            content: message.getString(),
+        });
     }
     gotAllOnlineList(message : MessageReader) {
         /*
@@ -252,19 +274,40 @@ export class Chatbox {
         for (let index = 0; index < this.onlineUsers.length; index++) {
             let user = this.onlineUsers[index];
             if (user.accountId == accountId) {
-                user.displayName = undefined;
+                user.displayName = displayName;
             }
         }
         this.updateChatOnlineDisplay();
+        for (let chatItem of this.chatItems) {
+            if (chatItem.chatMessage.creatorAccountId == accountId) {
+                chatItem.chatMessage.creatorDisplayName = displayName;
+                chatItem.updateNameRendering();
+            }
+        }
     }
 }
 
-class ChatMsg {
-    chat: string;
-    div: HTMLDivElement;
+type ChatMessage = {
+    chatId: string,
+    creatorAccountId: string,
+    creatorDisplayName: string,
+    createdTime: string,
+    content: string
+}
 
-    constructor(_chat: string, _div: HTMLDivElement) {
-        this.chat = _chat;
-        this.div = _div;
+class ChatItem {
+    chatMessage: ChatMessage;
+    parentDiv: HTMLDivElement;
+    nameDiv: HTMLDivElement;
+    contentDiv: HTMLDivElement;
+
+    constructor(_chatMessage: ChatMessage, _parentDiv: HTMLDivElement, _nameDiv: HTMLDivElement, _contentDiv: HTMLDivElement) {
+        this.chatMessage = _chatMessage;
+        this.parentDiv = _parentDiv;
+        this.nameDiv = _nameDiv;
+        this.contentDiv = _contentDiv;
+    }
+    updateNameRendering() {
+        this.nameDiv.textContent = `${this.chatMessage.creatorDisplayName}: `;
     }
 }
