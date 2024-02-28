@@ -6,7 +6,7 @@ namespace ROIDForumServer;
 
 public static class ThreadSendMessages
 {
-    private enum ThreadMsg
+    private enum ThreadMessage
     {
         AllThreadViewers = 0,
         ThreadAddViewer = 1,
@@ -26,7 +26,7 @@ public static class ThreadSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)ThreadMsg.AllComments);
+        message.AddUint8((byte)ThreadMessage.AllComments);
         foreach ((Guid sectionId, Guid threadId, Guid commentId, Guid creatorAccountId, String text, TimeUuid createdTime) in comments)
         {
             message.AddString(sectionId.ToString());
@@ -44,7 +44,7 @@ public static class ThreadSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)ThreadMsg.CommentSuccessfullyCreated);
+        message.AddUint8((byte)ThreadMessage.CommentSuccessfullyCreated);
         message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
         message.AddString(commentId.ToString());
@@ -55,7 +55,7 @@ public static class ThreadSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)ThreadMsg.AddComment);
+        message.AddUint8((byte)ThreadMessage.AddComment);
         message.AddString(comment.sectionId.ToString());
         message.AddString(comment.threadId.ToString());
         message.AddString(comment.commentId.ToString());
@@ -70,7 +70,7 @@ public static class ThreadSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)ThreadMsg.UpdateComment);
+        message.AddUint8((byte)ThreadMessage.UpdateComment);
         message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
         message.AddString(commentId.ToString());
@@ -83,7 +83,7 @@ public static class ThreadSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)ThreadMsg.RemoveComment);
+        message.AddUint8((byte)ThreadMessage.RemoveComment);
         message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
         message.AddString(commentId.ToString());
@@ -96,7 +96,7 @@ public static class ThreadSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Thread);
-        message.AddUint8((byte)ThreadMsg.AllThreadViewers);
+        message.AddUint8((byte)ThreadMessage.AllThreadViewers);
         message.AddString(threadId.ToString());
         foreach ((Guid connectionId, Guid? accountId, string displayName) in viewingUsers)
         {
@@ -116,7 +116,7 @@ public static class ThreadSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Thread);
-        message.AddUint8((byte)ThreadMsg.ThreadAddViewer);
+        message.AddUint8((byte)ThreadMessage.ThreadAddViewer);
         message.AddString(threadId.ToString());
         message.AddString(connectionId.ToString());
         if (accountId != null)
@@ -132,7 +132,7 @@ public static class ThreadSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Thread);
-        message.AddUint8((byte)ThreadMsg.ThreadRemoveViewer);
+        message.AddUint8((byte)ThreadMessage.ThreadRemoveViewer);
         message.AddString(threadId.ToString());
         message.AddString(connectionId.ToString());
         return message.ToBuffer();
@@ -142,7 +142,7 @@ public static class ThreadSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Thread);
-        message.AddUint8((byte)ThreadMsg.ThreadLoggedInViewer);
+        message.AddUint8((byte)ThreadMessage.ThreadLoggedInViewer);
         message.AddString(threadId.ToString());
         message.AddString(connectionId.ToString());
         message.AddString(accountId.ToString());
@@ -154,7 +154,7 @@ public static class ThreadSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Thread);
-        message.AddUint8((byte)ThreadMsg.ThreadLoggedOutViewer);
+        message.AddUint8((byte)ThreadMessage.ThreadLoggedOutViewer);
         message.AddString(threadId.ToString());
         message.AddString(connectionId.ToString());
         return message.ToBuffer();
@@ -164,7 +164,7 @@ public static class ThreadSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
-        message.AddUint8((byte)ThreadMsg.DisplayNameUpdate);
+        message.AddUint8((byte)ThreadMessage.DisplayNameUpdate);
         message.AddString(accountId.ToString());
         message.AddString(displayName);
         return message.ToBuffer();
@@ -174,7 +174,7 @@ public static class ThreadSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
-        message.AddUint8((byte)ThreadMsg.AvatarUpdate);
+        message.AddUint8((byte)ThreadMessage.AvatarUpdate);
         message.AddString(accountId.ToString());
         message.AddString(avatarUrl);
         return message.ToBuffer();

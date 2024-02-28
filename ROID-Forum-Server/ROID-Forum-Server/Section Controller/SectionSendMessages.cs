@@ -6,7 +6,7 @@ namespace ROIDForumServer;
 
 public static class SectionSendMessages
 {
-    private enum SectionMsg
+    private enum SectionMessage
     {
         AllSectionViewers = 0,
         SectionAddViewer = 1,
@@ -29,7 +29,7 @@ public static class SectionSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)SectionMsg.AllSectionHeaders);
+        message.AddUint8((byte)SectionMessage.AllSectionHeaders);
         foreach ((Guid sectionId, string name) in sections)
         {
             message.AddString(sectionId.ToString());
@@ -43,7 +43,7 @@ public static class SectionSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)SectionMsg.AllThreadHeaders);
+        message.AddUint8((byte)SectionMessage.AllThreadHeaders);
         foreach ((Guid sectionId, Guid threadId, Guid creatorAccountId, string title, string description,
                      TimeUuid createdTime, TimeUuid updatedTime, uint commentCount, string creatorDisplayName,
                      string creatorAvatarUrl) in threadHeaders)
@@ -67,7 +67,7 @@ public static class SectionSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)SectionMsg.AddThreadHeader);
+        message.AddUint8((byte)SectionMessage.AddThreadHeader);
         message.AddString(threadHeaderData.sectionId.ToString());
         message.AddString(threadHeaderData.threadId.ToString());
         message.AddString(threadHeaderData.creatorAccountId.ToString());
@@ -86,7 +86,7 @@ public static class SectionSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)SectionMsg.RemoveThreadHeader);
+        message.AddUint8((byte)SectionMessage.RemoveThreadHeader);
         message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
 
@@ -97,7 +97,7 @@ public static class SectionSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)SectionMsg.UpdateThreadTitleAndDescription);
+        message.AddUint8((byte)SectionMessage.UpdateThreadTitleAndDescription);
         message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
         message.AddString(title);
@@ -110,7 +110,7 @@ public static class SectionSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)SectionMsg.UpdateThreadCommentCountAndUpdatedTime);
+        message.AddUint8((byte)SectionMessage.UpdateThreadCommentCountAndUpdatedTime);
         message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
         message.AddUint32(commentCount);
@@ -123,7 +123,7 @@ public static class SectionSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)SectionMsg.UpdateThreadCommentCount);
+        message.AddUint8((byte)SectionMessage.UpdateThreadCommentCount);
         message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
         message.AddUint32(commentCount);
@@ -136,7 +136,7 @@ public static class SectionSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)SectionMsg.AllSectionViewers);
+        message.AddUint8((byte)SectionMessage.AllSectionViewers);
         message.AddString(sectionId.ToString());
         foreach ((Guid connectionId, Guid? accountId, string displayName) in viewingUsers)
         {
@@ -156,7 +156,7 @@ public static class SectionSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)SectionMsg.SectionAddViewer);
+        message.AddUint8((byte)SectionMessage.SectionAddViewer);
         message.AddString(sectionId.ToString());
         message.AddString(connectionId.ToString());
         if (accountId != null)
@@ -172,7 +172,7 @@ public static class SectionSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)SectionMsg.SectionRemoveViewer);
+        message.AddUint8((byte)SectionMessage.SectionRemoveViewer);
         message.AddString(sectionId.ToString());
         message.AddString(connectionId.ToString());
         return message.ToBuffer();
@@ -182,7 +182,7 @@ public static class SectionSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)SectionMsg.ThreadSuccessfullyCreated);
+        message.AddUint8((byte)SectionMessage.ThreadSuccessfullyCreated);
         message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
         return message.ToBuffer();
@@ -192,7 +192,7 @@ public static class SectionSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)SectionMsg.SectionLoggedInViewer);
+        message.AddUint8((byte)SectionMessage.SectionLoggedInViewer);
         message.AddString(sectionId.ToString());
         message.AddString(connectionId.ToString());
         message.AddString(accountId.ToString());
@@ -204,7 +204,7 @@ public static class SectionSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
-        message.AddUint8((byte)SectionMsg.SectionLoggedOutViewer);
+        message.AddUint8((byte)SectionMessage.SectionLoggedOutViewer);
         message.AddString(sectionId.ToString());
         message.AddString(connectionId.ToString());
         return message.ToBuffer();
@@ -214,7 +214,7 @@ public static class SectionSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
-        message.AddUint8((byte)SectionMsg.DisplayNameUpdate);
+        message.AddUint8((byte)SectionMessage.DisplayNameUpdate);
         message.AddString(accountId.ToString());
         message.AddString(displayName);
         return message.ToBuffer();
@@ -224,7 +224,7 @@ public static class SectionSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
-        message.AddUint8((byte)SectionMsg.AvatarUpdate);
+        message.AddUint8((byte)SectionMessage.AvatarUpdate);
         message.AddString(accountId.ToString());
         message.AddString(avatarUrl);
         return message.ToBuffer();

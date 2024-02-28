@@ -6,7 +6,7 @@ namespace ROIDForumServer;
 
 public static class ChatSendMessages
 {
-    private enum ChatMsg : byte
+    private enum ChatMessage : byte
     {
         // Todo: Add chat pagination
         AllMessages = 0,
@@ -24,7 +24,7 @@ public static class ChatSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
-        message.AddUint8((byte)ChatMsg.AllMessages);
+        message.AddUint8((byte)ChatMessage.AllMessages);
         message.AddUint32((uint)chats.Count);
         foreach ((Guid creatorAccountId, Guid chatId, TimeUuid createdTime, string content) in chats)
         {
@@ -41,7 +41,7 @@ public static class ChatSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
-        message.AddUint8((byte)ChatMsg.NewMessage);
+        message.AddUint8((byte)ChatMessage.NewMessage);
         message.AddString(chat.chatId.ToString());
         message.AddString(chat.creatorAccountId.ToString());
         message.AddString(chat.createdTime.ToString());
@@ -53,7 +53,7 @@ public static class ChatSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
-        message.AddUint8((byte)ChatMsg.AllOnlineList);
+        message.AddUint8((byte)ChatMessage.AllOnlineList);
         foreach ((Guid connectionId, Guid? accountId, string displayName) in users)
         {
             message.AddString(connectionId.ToString());
@@ -72,7 +72,7 @@ public static class ChatSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
-        message.AddUint8((byte)ChatMsg.OnlineListAddUser);
+        message.AddUint8((byte)ChatMessage.OnlineListAddUser);
         message.AddString(connectionId.ToString());
         return message.ToBuffer();
     }
@@ -81,7 +81,7 @@ public static class ChatSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
-        message.AddUint8((byte)ChatMsg.OnlineListRemoveUser);
+        message.AddUint8((byte)ChatMessage.OnlineListRemoveUser);
         message.AddString(connectionId.ToString());
         return message.ToBuffer();
     }
@@ -90,7 +90,7 @@ public static class ChatSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
-        message.AddUint8((byte)ChatMsg.OnlineListLoggedInUser);
+        message.AddUint8((byte)ChatMessage.OnlineListLoggedInUser);
         message.AddString(connectionId.ToString());
         message.AddString(accountId.ToString());
         message.AddString(displayName);
@@ -101,7 +101,7 @@ public static class ChatSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
-        message.AddUint8((byte)ChatMsg.OnlineListLoggedOutUser);
+        message.AddUint8((byte)ChatMessage.OnlineListLoggedOutUser);
         message.AddString(connectionId.ToString());
         return message.ToBuffer();
     }
@@ -110,7 +110,7 @@ public static class ChatSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
-        message.AddUint8((byte)ChatMsg.DisplayNameUpdate);
+        message.AddUint8((byte)ChatMessage.DisplayNameUpdate);
         message.AddString(accountId.ToString());
         message.AddString(displayName);
         return message.ToBuffer();

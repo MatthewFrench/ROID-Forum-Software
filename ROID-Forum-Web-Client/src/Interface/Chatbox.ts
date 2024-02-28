@@ -4,6 +4,7 @@ import {AppController} from "../AppController";
 import {Interface} from "../Utility/Interface";
 import {DescriptionParser} from "../Utility/DescriptionParser";
 import {MessageReader} from "../Utility/Message/MessageReader";
+import {MessageWriter} from "../Utility/Message/MessageWriter";
 const ding = require('./../../static/assets/ding8.wav');
 
 export class Chatbox {
@@ -59,6 +60,7 @@ export class Chatbox {
     }
     sendChat = (e : KeyboardEvent) => {
         if (e.keyCode == 13 && this.textField.value.length != 0 && this.website.database.loggedIn) {
+            let message = new MessageWriter();
             let m : any = {};
             m['Controller'] = 'Chat';
             m['Title'] = 'Msg';

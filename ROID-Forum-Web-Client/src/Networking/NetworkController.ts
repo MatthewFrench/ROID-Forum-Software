@@ -1,9 +1,4 @@
-import {MessageRouter} from "./MessageRouter";
-
 import {AppController} from "../AppController";
-//import {ChatMessageCreator} from "./Chat/ChatMessageCreator";
-//import {Controllers} from "./MessageDefinitions/ServerMessages";
-//import {MessageWriter} from "../Utility/Message/MessageWriter";
 import {MessageReader} from "../Utility/Message/MessageReader";
 
 export class NetworkController {
@@ -14,11 +9,9 @@ export class NetworkController {
     pingTime : number = 0;
     pingTimeArray : number[] = [];
     appController : AppController;
-    messageRouter : MessageRouter;
 
     constructor(appController : AppController) {
         this.appController = appController;
-        this.messageRouter = new MessageRouter(this);
     }
 
     initialize = () => {
@@ -45,35 +38,16 @@ export class NetworkController {
 
     connectedEvent = () => {
         this.connected = true;
-        //console.log('Client has connected to the server!');
         this.appController.connectedToServer();
-
-        /*
-        let message = new MessageWriter();
-        message.addUint8(1);
-        message.addInt8(-1);
-        message.addUint16(2);
-        message.addInt16(-2);
-        message.addUint32(3);
-        message.addInt32(-3);
-        message.addFloat32(3.3);
-        message.addFloat64(4.4);
-        message.addString("This is a test string");
-        let message2 = new MessageWriter();
-        message2.addString("Inner Binary");
-        message.addBinary(message2.toBuffer());
-        this.send(message.toBuffer());
-        */
     };
 
     disconnectedEvent = (close : CloseEvent) => {
         if (this.connected == false) {
             //Try to reconnect at an interval
-            setTimeout(()=>{this.appController.prepareReset();}, 10 * 1000);
+            setTimeout(()=>{this.appController.prepareReset();}, 5 * 1000);
         } else {
             //Was just connected and now isn't, try an immediate reconnect
             this.connected = false;
-            //console.log('The client has disconnected!');
             this.appController.prepareReset();
         }
     };
@@ -115,47 +89,15 @@ export class NetworkController {
     gotMessageEvent = (event : MessageEvent) => {
         let messageData = event.data;
 
-        if (typeof messageData === 'string') {
-            //console.log('Got string message: ' + messageData);
-            this.appController.Message(JSON.parse(messageData));
-            return;
-        } else if (messageData instanceof ArrayBuffer === false) {
+        if (!(messageData instanceof ArrayBuffer)) {
             console.error('Invalid Message Type Not Binary');
             console.trace();
             return;
         }
-        this.appController.BinaryMessage(new MessageReader(messageData));
-        //this.messageRouter.handleMessageEvent(messageData);
-
-        /*
-        //Handle test message
-        document.body.innerText += ("\n" + "Bytes: " + messageData.byteLength);
-        var enc = new TextDecoder("utf-8");
-        document.body.innerText +=("\n" + "Got Message! : new byte[] { " + messageData + " } = " + enc.decode(messageData));
-        document.body.innerText +=("\n" + "Parsed message: ");
-        var message = new MessageReader(messageData);
-        document.body.innerText +=("\n" + "GetUint8: " + message.getUint8());
-        document.body.innerText +=("\n" + "GetInt8: " + message.getInt8());
-        document.body.innerText +=("\n" + "GetUint16: " + message.getUint16());
-        document.body.innerText +=("\n" + "GetInt16: " + message.getInt16());
-        document.body.innerText +=("\n" + "GetUint32: " + message.getUint32());
-        document.body.innerText +=("\n" + "GetInt32: " + message.getInt32());
-        document.body.innerText +=("\n" + "GetFloat32: " + message.getFloat32());
-        document.body.innerText +=("\n" + "GetFloat64: " + message.getFloat64());
-        document.body.innerText +=("\n" + "GetString: " + message.getString());
-        var message2 = new MessageReader(message.getBinary());
-        document.body.innerText +=("\n" + "GetBinary GetString: " + message2.getString());
-        if (message.isAtEndOfData()) {
-            document.body.innerText +=("\n" + "End of Message");
-        }
-        */
+        this.appController.Message(new MessageReader(messageData));
     };
 
-    send(msg : {}) {
-        this.connection.send(JSON.stringify(msg));
-    }
-
-    sendBinary(msg : ArrayBuffer) {
-        this.connection.send(msg);
+    send(message : ArrayBuffer) {
+        this.connection.send(message);
     }
 }

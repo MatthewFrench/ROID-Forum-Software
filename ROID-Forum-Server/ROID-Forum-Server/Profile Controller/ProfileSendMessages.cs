@@ -2,7 +2,7 @@ namespace ROIDForumServer;
 
 public static class ProfileSendMessages
 {
-    private enum LoginMsg
+    private enum ProfileMessage
     {
         ReturnAvatar = 0,
         LoginFailed = 1,
@@ -16,7 +16,7 @@ public static class ProfileSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Profile);
-        message.AddUint8((byte)LoginMsg.LoggedIn);
+        message.AddUint8((byte)ProfileMessage.LoggedIn);
         message.AddString(displayName);
 
         return message.ToBuffer();
@@ -26,7 +26,7 @@ public static class ProfileSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Profile);
-        message.AddUint8((byte)LoginMsg.RegisterFailed);
+        message.AddUint8((byte)ProfileMessage.RegisterFailed);
         return message.ToBuffer();
     }
 
@@ -34,7 +34,7 @@ public static class ProfileSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Profile);
-        message.AddUint8((byte)LoginMsg.LoggedOut);
+        message.AddUint8((byte)ProfileMessage.LoggedOut);
         return message.ToBuffer();
     }
 
@@ -42,7 +42,7 @@ public static class ProfileSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Profile);
-        message.AddUint8((byte)LoginMsg.LoginFailed);
+        message.AddUint8((byte)ProfileMessage.LoginFailed);
         return message.ToBuffer();
     }
 
@@ -50,7 +50,7 @@ public static class ProfileSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Profile);
-        message.AddUint8((byte)LoginMsg.ReturnAvatar);
+        message.AddUint8((byte)ProfileMessage.ReturnAvatar);
         message.AddString(avatarUrl);
         return message.ToBuffer();
     }
@@ -59,7 +59,7 @@ public static class ProfileSendMessages
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Profile);
-        message.AddUint8((byte)LoginMsg.ReturnDisplayName);
+        message.AddUint8((byte)ProfileMessage.ReturnDisplayName);
         message.AddString(displayName);
         return message.ToBuffer();
     }
