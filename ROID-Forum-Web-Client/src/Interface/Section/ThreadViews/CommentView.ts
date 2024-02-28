@@ -98,7 +98,7 @@ export class CommentView {
     updateOwner() {
         this.owner.innerText = this.comment.getPosterName();
         //If owner is self add edit button
-        if (this.comment.getPosterName() == this.threadController.sectionController.website.database.name) {
+        if (this.comment.getPosterName() == this.threadController.sectionController.website.database.displayName) {
             this.descriptionSection.appendChild(this.editComment);
         }
     }

@@ -106,7 +106,7 @@ namespace ROIDForumServer
             }
 
             byte messageId = message.GetUint8();
-            if (ChatReceiveMessages.Message.Equals(messageId) && user.AccountId != null)
+            if ((byte)ChatReceiveMessages.Message == messageId && user.AccountId != null)
             {
                 if (!message.HasString())
                 {

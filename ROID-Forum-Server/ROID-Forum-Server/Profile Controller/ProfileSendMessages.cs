@@ -12,12 +12,13 @@ public static class ProfileSendMessages
         ReturnDisplayName = 5,
     }
 
-    public static byte[] LoggedInMessage(string displayName)
+    public static byte[] LoggedInMessage(string displayName, string accountId)
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Profile);
         message.AddUint8((byte)ProfileMessage.LoggedIn);
         message.AddString(displayName);
+        message.AddString(accountId);
 
         return message.ToBuffer();
     }

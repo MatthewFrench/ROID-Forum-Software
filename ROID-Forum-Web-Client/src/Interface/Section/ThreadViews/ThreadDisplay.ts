@@ -70,7 +70,7 @@ export class ThreadDisplay {
     updateOwner = () => {
         this.owner.innerText = this.controller.thread.getOwner();
         //If this.owner is self add edit button
-        if (this.controller.thread.getOwner() == this.controller.threadController.sectionController.website.database.name) {
+        if (this.controller.thread.getOwner() == this.controller.threadController.sectionController.website.database.displayName) {
             this.descriptionSection.appendChild(this.switchToEditViewButton);
         }
     };

@@ -126,12 +126,12 @@ namespace ROIDForumServer
 
             byte messageId = message.GetUint8();
 
-            if (SectionReceiveMessages.BeginViewingSection.Equals(messageId))
+            if ((byte)SectionReceiveMessages.BeginViewingSection == messageId)
             {
                 AddUserToViewing(serverState, user, sectionId);
                 return;
             }
-            if (SectionReceiveMessages.ExitViewingSection.Equals(messageId))
+            if ((byte)SectionReceiveMessages.ExitViewingSection == messageId)
             {
                 RemoveUserFromViewing(serverState, user, sectionId);
                 return;
@@ -142,7 +142,7 @@ namespace ROIDForumServer
                 return;
             }
 
-            if (SectionReceiveMessages.NewThread.Equals(messageId))
+            if ((byte)SectionReceiveMessages.NewThread == messageId)
             {
                 if (!message.HasString()) return;
                 String title = message.GetString();
@@ -159,7 +159,7 @@ namespace ROIDForumServer
                 // Send successfully created thread message to user
                 user.Send(SectionSendMessages.ThreadSuccessfullyCreated(sectionId, threadId));
             }
-            else if (SectionReceiveMessages.EditThreadTitleAndDescription.Equals(messageId))
+            else if ((byte)SectionReceiveMessages.EditThreadTitleAndDescription == messageId)
             {
                 if (!message.HasString()) return;
                 Guid threadId = Guid.Parse(message.GetString());
@@ -186,7 +186,7 @@ namespace ROIDForumServer
                     otherUser.Send(updateThreadMessage);
                 }
             }
-            else if (SectionReceiveMessages.DeleteThread.Equals(messageId))
+            else if ((byte)SectionReceiveMessages.DeleteThread == messageId)
             {
                 if (!message.HasString()) return;
                 Guid threadId = Guid.Parse(message.GetString());

@@ -7,11 +7,7 @@ export class MessageReader {
     constructor(messageData : ArrayBuffer) {
         this.byteData = new DataView(messageData);
         this.currentLoc = 0;
-        this.byteLength = this.getUint32();
-        //Throw an error if the message is an incorrect length
-        if (this.byteLength !== this.byteData.byteLength) {
-            throw 'Message Incorrect Length';
-        }
+        this.byteLength = this.byteData.byteLength;
     }
 
     isAtEndOfData() : boolean {

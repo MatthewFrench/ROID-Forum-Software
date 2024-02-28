@@ -249,8 +249,11 @@ export class AppController {
                     case Controllers.Profile.Messages.ReturnAvatar: {
                         this.controlPanel.preferencesAvatarInput.value = message.getString();
                     }break;
+                    case Controllers.Profile.Messages.ReturnDisplayName: {
+
+                    }break;
                     case Controllers.Profile.Messages.LoggedIn: {
-                        this.database.processEvent('Logged In Binary', message);
+                        this.database.processEvent('Logged In', message);
                         this.controlPanel.processEvent('Logged In');
                         this.chatbox.processEvent('Logged In');
                         for (let section of this.sectionOrder) section.processEvent('Logged In');

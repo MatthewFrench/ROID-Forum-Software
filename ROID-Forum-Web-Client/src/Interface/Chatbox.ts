@@ -102,7 +102,7 @@ export class Chatbox {
         this.bottomNode.scrollIntoView({behavior: "smooth", block: "end", inline: "end"});
     }
     updateChatHighlights() {
-        let name : string = this.website.database.name;
+        let name : string = this.website.database.displayName;
         for (let chatMsg of this.chatMsgs) {
             let chatName : string = chatMsg.chat.substring(0, chatMsg.chat.indexOf(":"));
             if (chatName == name) {

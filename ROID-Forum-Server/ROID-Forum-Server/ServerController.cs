@@ -88,15 +88,15 @@ namespace ROIDForumServer
             }
 
             var messageController = message.GetUint8();
-            if (ServerReceiveControllers.Chat.Equals(messageController))
+            if ((byte)ServerReceiveControllers.Chat == messageController)
             {
                 ChatController.OnMessage(serverState, user, message);
             }
-            else if (ServerReceiveControllers.Profile.Equals(messageController))
+            else if ((byte)ServerReceiveControllers.Profile == messageController)
             {
                 ProfileController.OnMessage(serverState, user, message);
             }
-            else if (ServerReceiveControllers.Section.Equals(messageController))
+            else if ((byte)ServerReceiveControllers.Section == messageController)
             {
                 if (!message.HasString())
                 {
@@ -109,7 +109,7 @@ namespace ROIDForumServer
                     SectionController.OnMessage(serverState, user, sectionId, message);
                 }
             }
-            else if (ServerReceiveControllers.Thread.Equals(messageController))
+            else if ((byte)ServerReceiveControllers.Thread == messageController)
             {
                 if (!message.HasString())
                 {

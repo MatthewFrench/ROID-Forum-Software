@@ -9,32 +9,32 @@ namespace ROIDForumServer
             if (!message.HasUint8()) return;
 
             byte messageId = message.GetUint8();
-            if (ProfileReceiveMessages.SetAvatar.Equals(messageId))
+            if ((byte)ProfileReceiveMessages.SetAvatar == messageId)
             {
                 if (!message.HasString()) return;
                 if (user.AccountId == null) return;
                 DatabaseAccount.SetAvatarUrl(serverState.Database.GetSession(), (Guid)user.AccountId, message.GetString());
                 ServerController.OnUserAvatarChanged(serverState, user);
-            } else if (ProfileReceiveMessages.UpdateDisplayName.Equals(messageId))
+            } else if ((byte)ProfileReceiveMessages.UpdateDisplayName == messageId)
             {
                 if (!message.HasString()) return;
                 if (user.AccountId == null) return;
                 DatabaseAccount.SetDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId, message.GetString());
                 ServerController.OnUserDisplayNameChanged(serverState, user);
             }
-            else if (ProfileReceiveMessages.GetAvatar.Equals(messageId))
+            else if ((byte)ProfileReceiveMessages.GetAvatar == messageId)
             {
                 if (user.AccountId == null) return;
                 user.Send(ProfileSendMessages.ReturnAvatarMessage(
                     DatabaseAccount.GetAvatarUrl(serverState.Database.GetSession(), (Guid)user.AccountId)));
             }
-            else if (ProfileReceiveMessages.GetDisplayName.Equals(messageId))
+            else if ((byte)ProfileReceiveMessages.GetDisplayName == messageId)
             {
                 if (user.AccountId == null) return;
                 user.Send(ProfileSendMessages.ReturnDisplayNameMessage(
                     DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId)));
             }
-            else if (ProfileReceiveMessages.Login.Equals(messageId))
+            else if ((byte)ProfileReceiveMessages.Login == messageId)
             {
                 if (user.AccountId != null) return;
                 if (!message.HasString()) return;
@@ -56,19 +56,19 @@ namespace ROIDForumServer
                     {
                         user.AccountId = accountId;
                         user.Send(ProfileSendMessages.LoggedInMessage(
-                            DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId)));
+                            DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId), user.AccountId.ToString()));
                         ServerController.OnUserLoggedIn(serverState, user);
                     }
                 }
             }
-            else if (ProfileReceiveMessages.Logout.Equals(messageId))
+            else if ((byte)ProfileReceiveMessages.Logout == messageId)
             {
                 if (user.AccountId == null) return;
                 user.AccountId = null;
                 user.Send(ProfileSendMessages.LoggedOutMessage());
                 ServerController.OnUserLoggedOut(serverState, user);
             }
-            else if (ProfileReceiveMessages.Register.Equals(messageId))
+            else if ((byte)ProfileReceiveMessages.Register == messageId)
             {
                 if (user.AccountId != null) return;
                 if (!message.HasString()) return;
@@ -96,7 +96,7 @@ namespace ROIDForumServer
                 user.AccountId = accountId;
                 //Send login notification
                 user.Send(ProfileSendMessages.LoggedInMessage(
-                    DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId)));
+                    DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId), user.AccountId.ToString()));
                 ServerController.OnUserLoggedIn(serverState, user);
             }
         }

@@ -2,6 +2,8 @@ import './ControlPanel.scss';
 
 import {AppController} from "../AppController";
 import {Interface} from "../Utility/Interface";
+import {MessageWriter} from "../Utility/Message/MessageWriter";
+import {SendMessages} from "../Networking/MessageDefinitions/SendMessages";
 
 export class ControlPanel {
     website : AppController;
@@ -74,10 +76,10 @@ export class ControlPanel {
         this.topNameDiv.classList.add('LightTheme');
     };
     preferencesButtonClicked = () => {
-        let m : any = {};
-        m['Controller'] = 'Login';
-        m['Title'] = 'Get Avatar';
-        this.website.networkController.send(m);
+        let message = new MessageWriter();
+        message.addUint8(SendMessages.Controller.Profile);
+        message.addUint8(SendMessages.ProfileMessage.GetAvatar);
+        this.website.networkController.send(message.toBuffer());
         this.website.websiteDiv.appendChild(this.hideBackgroundDiv);
         this.website.websiteDiv.appendChild(this.preferencesDiv);
         this.showingPreferencesWindow = true;
@@ -89,18 +91,18 @@ export class ControlPanel {
     };
     logoutButtonClicked = () => {
         //Notify server to log out
-        let m : any = {};
-        m['Controller'] = 'Login';
-        m['Title'] = 'Logout';
-        this.website.networkController.send(m);
+        let message = new MessageWriter();
+        message.addUint8(SendMessages.Controller.Profile);
+        message.addUint8(SendMessages.ProfileMessage.Logout);
+        this.website.networkController.send(message.toBuffer());
         //Server will tell the client to log out and the client will do all the necessaries
     };
     avatarSaveButtonClick = () => {
-        let m : any = {};
-        m['Controller'] = 'Login';
-        m['Title'] = 'Set Avatar';
-        m['AvatarURL'] = this.preferencesAvatarInput.value;
-        this.website.networkController.send(m);
+        let message = new MessageWriter();
+        message.addUint8(SendMessages.Controller.Profile);
+        message.addUint8(SendMessages.ProfileMessage.SetAvatar);
+        message.addString(this.preferencesAvatarInput.value);
+        this.website.networkController.send(message.toBuffer());
     };
     loginWindowLoginButtonClicked = () => {
         this.loginErrorDiv.innerText = "";
@@ -116,24 +118,24 @@ export class ControlPanel {
     };
     login = (name : string, password : string) => {
         this.securelyHash(password).then((hashedPassword)=>{
-            let m : any = {};
-            m['Controller'] = 'Login';
-            m['Title'] = 'Login';
-            m['Name'] = name;
-            m['Password'] = hashedPassword;
+            let message = new MessageWriter();
+            message.addUint8(SendMessages.Controller.Profile);
+            message.addUint8(SendMessages.ProfileMessage.Login);
+            message.addString(name);
+            message.addString(hashedPassword);
+            this.website.networkController.send(message.toBuffer());
             // Todo: Don't do this, or do it better. This is janky for setting up auto-login.
-            localStorage.setItem('Name', m['Name']);
-            localStorage.setItem('Password', m['Password']);
-            this.website.networkController.send(m);
+            localStorage.setItem('Name', name);
+            localStorage.setItem('Password', hashedPassword);
         });
     };
     loginAlreadyEncrypted = (name : string, password : string) => {
-        let m: any = {};
-        m['Controller'] = 'Login';
-        m['Title'] = 'Login';
-        m['Name'] = name;
-        m['Password'] = password;
-        this.website.networkController.send(m);
+        let message = new MessageWriter();
+        message.addUint8(SendMessages.Controller.Profile);
+        message.addUint8(SendMessages.ProfileMessage.Login);
+        message.addString(name);
+        message.addString(password);
+        this.website.networkController.send(message.toBuffer());
     };
     loginWindowRegisterButtonClicked = () => {
         this.loginErrorDiv.innerText = "";
@@ -150,16 +152,16 @@ export class ControlPanel {
             return;
         }
         this.securelyHash(this.loginWindowPassword.value).then((hashedPassword)=>{
-            let m: any = {};
-            m['Controller'] = 'Login';
-            m['Title'] = 'Register';
-            m['Name'] = this.loginWindowName.value;
-            m['Password'] = hashedPassword;
-            m['Email'] = this.loginWindowEmail.value;
+            let message = new MessageWriter();
+            message.addUint8(SendMessages.Controller.Profile);
+            message.addUint8(SendMessages.ProfileMessage.Login);
+            message.addString(this.loginWindowName.value);
+            message.addString(hashedPassword);
+            message.addString(this.loginWindowEmail.value);
+            this.website.networkController.send(message.toBuffer());
             // Todo: Don't do this, or do it better. This is janky for setting up auto-login.
-            localStorage.setItem('Name', m['Name']);
-            localStorage.setItem('Password', m['Password']);
-            this.website.networkController.send(m);
+            localStorage.setItem('Name', this.loginWindowName.value);
+            localStorage.setItem('Password', hashedPassword);
         });
     };
     removeLoginDiv = () => {
@@ -183,7 +185,7 @@ export class ControlPanel {
                 //Remove the login button
                 this.loginButton.remove();
                 //Show name at the top
-                this.topNameDiv.innerText = this.website.database.name;
+                this.topNameDiv.innerText = this.website.database.displayName;
                 this.topControlPanel.appendChild(this.topNameDiv);
             }
                 break;

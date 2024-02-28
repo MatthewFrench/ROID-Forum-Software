@@ -124,13 +124,13 @@ namespace ROIDForumServer
 
             byte messageId = message.GetUint8();
 
-            if (ThreadReceiveMessages.BeginViewingThread.Equals(messageId))
+            if ((byte)ThreadReceiveMessages.BeginViewingThread == messageId)
             {
                 AddUserToViewing(serverState, user, threadId);
                 return;
             }
 
-            if (ThreadReceiveMessages.ExitViewingThread.Equals(messageId))
+            if ((byte)ThreadReceiveMessages.ExitViewingThread == messageId)
             {
                 if (!message.HasString()) return;
                 RemoveUserFromViewing(serverState, user, threadId);
@@ -142,7 +142,7 @@ namespace ROIDForumServer
                 return;
             }
 
-            if (ThreadReceiveMessages.AddComment.Equals(messageId))
+            if ((byte)ThreadReceiveMessages.AddComment == messageId)
             {
                 if (!message.HasString()) return;
                 String text = message.GetString();
@@ -179,7 +179,7 @@ namespace ROIDForumServer
                 // Send successfully created comment message to user
                 user.Send(ThreadSendMessages.CommentSuccessfullyCreated(sectionId, threadId, commentId));
             }
-            else if (ThreadReceiveMessages.EditComment.Equals(messageId))
+            else if ((byte)ThreadReceiveMessages.EditComment == messageId)
             {
                 if (!message.HasString()) return;
                 Guid commentId = Guid.Parse(message.GetString());
@@ -209,7 +209,7 @@ namespace ROIDForumServer
                     otherUser.Send(updateCommentMessage);
                 }
             }
-            else if (ThreadReceiveMessages.DeleteComment.Equals(messageId))
+            else if ((byte)ThreadReceiveMessages.DeleteComment == messageId)
             {
                 if (!message.HasString()) return;
                 Guid commentId = Guid.Parse(message.GetString());

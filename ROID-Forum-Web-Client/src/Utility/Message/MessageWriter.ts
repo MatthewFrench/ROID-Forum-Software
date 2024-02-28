@@ -25,17 +25,20 @@ export class MessageWriter {
 
   toBuffer() : ArrayBuffer {
     //Take length of all data and add the message length holder
-    let totalLength = this.innerByteLength + 4;
+    let totalLength = this.innerByteLength;
     let byteData = new DataView(new ArrayBuffer(totalLength));
     let loc = 0;
-    //Append the message length
-    byteData.setUint32(loc, totalLength, false);
-    loc += 4;
     //Append the message
     for (let data of this.dataArray) {
       data.addToByteData(byteData, loc);
       loc += data.getLength();
     }
+    var byteDisplay = "";
+    var displayData = new Uint8Array(byteData.buffer);
+    for (var i = 0; i < displayData.byteLength; i++) {
+      byteDisplay += displayData[i]+",";
+    }
+    console.log("Writing message: " + byteDisplay);
     return byteData.buffer;
   }
 

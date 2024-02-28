@@ -3,7 +3,8 @@ import {AppController} from "./AppController";
 export class Database {
     appController : AppController;
     loggedIn = false;
-    name = "";
+    accountId = "";
+    displayName = "";
     //password = "";
     constructor(appController : AppController) {
         this.appController = appController;
@@ -12,42 +13,18 @@ export class Database {
     switch (event) {
     case "Logged In":
         {
-            let n : string = message['Name'];
-            //let p : string = message['Password'];
-
-            //Save name and password in local storage
-            // Todo: Don't do this
-            //let localStorage : Storage = window.localStorage;
-            //localStorage.setItem('Name', n);
-            //localStorage.setItem('Password', p);
-
+            this.displayName = message.getString();
+            this.accountId = message.getString();
             this.loggedIn = true;
-            this.name = n;
-            //this.password = p;
         }
         break;
-        case "Logged In Binary":
-        {
-            let n : string = message.getString();
-            //let p : string = message.getString();
-
-            //Save name and password in local storage
-            let localStorage : Storage = window.localStorage;
-            localStorage.setItem('Name', n);
-            //localStorage.setItem('Password', p);
-
-            this.loggedIn = true;
-            this.name = n;
-            //this.password = p;
-        }
-            break;
     case "Logged Out":
         {
             //Clear local storage
             let localStorage : Storage = window.localStorage;
             localStorage.removeItem('Name');
             localStorage.removeItem('Password');
-            this.name = "";
+            this.displayName = "";
             //this.password = "";
             this.loggedIn = false;
         }
