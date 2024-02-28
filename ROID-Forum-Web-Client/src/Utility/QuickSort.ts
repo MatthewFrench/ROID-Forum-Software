@@ -38,7 +38,7 @@ export class QuickSort {
      * zero, or positive value, depending on the arguments.
      * @return {Array} Sorted array.
      */
-    static Sort(array : any[], cmp : (a: any, b: any)=>{}) {
+    static Sort(array : any[], cmp : (a: any, b: any)=>number) {
         cmp = cmp || compare;
         QuickSort.Quicksort(array, 0, array.length - 1, cmp);
         return array;
@@ -56,7 +56,7 @@ export class QuickSort {
      * @param {function} cmp
      * @return {number}
      */
-    static Partition(array : any[], left : any, right : any, cmp : (a: any, b: any)=>{}) {
+    static Partition(array : any[], left : any, right : any, cmp : (a: any, b: any)=>number) {
         let pivot = array[Math.floor((left + right) / 2)];
         let temp;
         while (left <= right) {
@@ -87,7 +87,7 @@ export class QuickSort {
      * @param {number} right Right part of the array which should be processed
      * @param {function} cmp
      */
-    static Quicksort(array : any[], left : any, right : any, cmp : (a: any, b: any)=>{}) {
+    static Quicksort(array : any[], left : any, right : any, cmp : (a: any, b: any)=>number) {
         let mid = QuickSort.Partition(array, left, right, cmp);
         if (left < mid - 1) {
             QuickSort.Quicksort(array, left, mid - 1, cmp);

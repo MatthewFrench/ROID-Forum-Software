@@ -33,12 +33,6 @@ export class MessageWriter {
       data.addToByteData(byteData, loc);
       loc += data.getLength();
     }
-    var byteDisplay = "";
-    var displayData = new Uint8Array(byteData.buffer);
-    for (var i = 0; i < displayData.byteLength; i++) {
-      byteDisplay += displayData[i]+",";
-    }
-    console.log("Writing message: " + byteDisplay);
     return byteData.buffer;
   }
 

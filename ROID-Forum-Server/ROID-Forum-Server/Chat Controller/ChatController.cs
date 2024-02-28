@@ -11,8 +11,14 @@ namespace ROIDForumServer
             user.Send(
                 ChatSendMessages.AllMessages(
                     DatabaseChat.GetRecentChats(serverState.Database.GetSession())
-                        .Select(data => (creatorAccountId: data.CreatorAccountId, chatId: data.ChatId,
-                            createdTime: data.CreatedTime, ContentDisposition: data.Content))
+                        .Select(data => (
+                            creatorAccountId: data.CreatorAccountId,
+                            creatorDisplayName: DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(),
+                                data.CreatorAccountId),
+                            chatId: data.ChatId,
+                            createdTime: data.CreatedTime,
+                            ContentDisposition: data.Content
+                        ))
                         .ToList()
                 )
             );
@@ -91,7 +97,14 @@ namespace ROIDForumServer
             var chatData = DatabaseChat.SubmitChat(serverState.Database.GetSession(), (Guid)user.AccountId, chat);
             // Send chat to all connected websockets
             // Todo: Switch to a NATS subscription model
-            byte[] chatMsg = ChatSendMessages.NewMessage(chatData);
+            byte[] chatMsg = ChatSendMessages.NewMessage(
+                (creatorAccountId: chatData.creatorAccountId,
+                    creatorDisplayName: DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(),
+                        chatData.creatorAccountId),
+                    chatId: chatData.chatId,
+                    createdTime: chatData.createdTime,
+                    content: chatData.content)
+            );
             foreach (var user2 in serverState.Networking.Users)
             {
                 user2.Send(chatMsg);

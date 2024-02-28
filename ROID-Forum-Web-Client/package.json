@@ -58,7 +58,7 @@
     "resolve-url-loader": "^2.2.1",
     "style-loader": "^0.18.2",
     "ts-loader": "^3.3.0",
-    "typescript": "^4.0.3",
+    "typescript": "^5.3.3",
     "url-loader": "^0.5.9",
     "webpack": "^3.1.0",
     "webpack-dev-server": "^2.5.1",

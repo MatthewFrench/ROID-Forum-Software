@@ -20,16 +20,17 @@ public static class ChatSendMessages
     }
 
     public static byte[] AllMessages(
-        List<(Guid creatorAccountId, Guid chatId, TimeUuid createdTime, string content)> chats)
+        List<(Guid creatorAccountId, string creatorDisplayName, Guid chatId, TimeUuid createdTime, string content)> chats)
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
         message.AddUint8((byte)ChatMessage.AllMessages);
         message.AddUint32((uint)chats.Count);
-        foreach ((Guid creatorAccountId, Guid chatId, TimeUuid createdTime, string content) in chats)
+        foreach ((Guid creatorAccountId, string creatorDisplayName, Guid chatId, TimeUuid createdTime, string content) in chats)
         {
             message.AddString(chatId.ToString());
             message.AddString(creatorAccountId.ToString());
+            message.AddString(creatorDisplayName);
             message.AddString(createdTime.ToString());
             message.AddString(content);
         }
@@ -37,13 +38,14 @@ public static class ChatSendMessages
         return message.ToBuffer();
     }
 
-    public static byte[] NewMessage((Guid creatorAccountId, Guid chatId, TimeUuid createdTime, string content) chat)
+    public static byte[] NewMessage((Guid creatorAccountId, string creatorDisplayName, Guid chatId, TimeUuid createdTime, string content) chat)
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
         message.AddUint8((byte)ChatMessage.NewMessage);
         message.AddString(chat.chatId.ToString());
         message.AddString(chat.creatorAccountId.ToString());
+        message.AddString(chat.creatorDisplayName);
         message.AddString(chat.createdTime.ToString());
         message.AddString(chat.content);
         return message.ToBuffer();
@@ -54,6 +56,7 @@ public static class ChatSendMessages
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
         message.AddUint8((byte)ChatMessage.AllOnlineList);
+        message.AddUint32((UInt32)users.Count);
         foreach ((Guid connectionId, Guid? accountId, string displayName) in users)
         {
             message.AddString(connectionId.ToString());

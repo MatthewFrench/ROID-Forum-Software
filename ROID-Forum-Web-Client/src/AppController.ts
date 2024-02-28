@@ -237,10 +237,28 @@ export class AppController {
             case Controllers.Chat.ID: {
                 switch(messageID) {
                     case Controllers.Chat.Messages.NewMessage: {
-                        this.chatbox.gotMessageBinary(message);
+                        this.chatbox.gotNewMessage(message);
                     }break;
                     case Controllers.Chat.Messages.AllOnlineList: {
-                        this.chatbox.gotOnlineListBinary(message);
+                        this.chatbox.gotAllOnlineList(message);
+                    }break;
+                    case Controllers.Chat.Messages.AllMessages: {
+                        this.chatbox.gotAllMessages(message);
+                    }break;
+                    case Controllers.Chat.Messages.DisplayNameUpdate: {
+                        this.chatbox.gotDisplayNameUpdate(message);
+                    }break;
+                    case Controllers.Chat.Messages.OnlineListAddUser: {
+                        this.chatbox.gotOnlineListAddUser(message);
+                    }break;
+                    case Controllers.Chat.Messages.OnlineListLoggedInUser: {
+                        this.chatbox.gotOnlineListLoggedInUser(message);
+                    }break;
+                    case Controllers.Chat.Messages.OnlineListLoggedOutUser: {
+                        this.chatbox.gotOnlineListLoggedOutUser(message);
+                    }break;
+                    case Controllers.Chat.Messages.OnlineListRemoveUser: {
+                        this.chatbox.gotOnlineListRemoveUser(message);
                     }break;
                 }
             } break;

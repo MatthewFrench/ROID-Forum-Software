@@ -5,7 +5,10 @@ import {Interface} from "../Utility/Interface";
 import {DescriptionParser} from "../Utility/DescriptionParser";
 import {MessageReader} from "../Utility/Message/MessageReader";
 import {MessageWriter} from "../Utility/Message/MessageWriter";
+import {SendMessages} from "../Networking/MessageDefinitions/SendMessages";
 const ding = require('./../../static/assets/ding8.wav');
+
+type User = { connectionId: string, accountId?: string, displayName?: string};
 
 export class Chatbox {
     website : AppController;
@@ -16,6 +19,7 @@ export class Chatbox {
     ding : HTMLAudioElement;
     doneLoading = false;
     chatMsgs : ChatMsg[] = [];
+    onlineUsers: User[] = [];
     bottomNode : HTMLDivElement = null;
     constructor(w : AppController) {
         this.website = w;
@@ -61,12 +65,11 @@ export class Chatbox {
     sendChat = (e : KeyboardEvent) => {
         if (e.keyCode == 13 && this.textField.value.length != 0 && this.website.database.loggedIn) {
             let message = new MessageWriter();
-            let m : any = {};
-            m['Controller'] = 'Chat';
-            m['Title'] = 'Msg';
-            m['Data'] = this.textField.value;
+            message.addUint8(SendMessages.Controller.Chat);
+            message.addUint8(SendMessages.ChatMessage.Message);
+            message.addString(this.textField.value);
+            this.website.networkController.send(message.toBuffer());
             this.textField.value = '';
-            this.website.networkController.send(m);
         }
     };
     addChat = (chat : string) => {
@@ -110,21 +113,149 @@ export class Chatbox {
             }
         }
     }
-    onMessage(message : any) {
-        if (message['Title'] == 'Msg') {
-            this.addChat(message['Data']);
+    updateChatOnlineDisplay() {
+        let currentGuestsOnline = 0;
+        let namesOnline = [];
+        for (let user of this.onlineUsers) {
+            if (user.displayName == undefined) {
+                currentGuestsOnline += 1;
+            } else {
+                namesOnline.push(user.displayName);
+            }
         }
-        if (message['Title'] == 'Online List') {
-            this.chatOnlineBox.innerText = message['Data'];
+        let onlineText = "Online: ";
+        if (namesOnline.length > 0) {
+            onlineText += namesOnline.join(", ");
+            if (currentGuestsOnline > 0) {
+                onlineText += ` and ${currentGuestsOnline} Guest`;
+            }
+        } else if (currentGuestsOnline > 0) {
+            onlineText += `${currentGuestsOnline} Guest`;
         }
+        if (currentGuestsOnline > 1) {
+            onlineText += "s"
+        }
+        this.chatOnlineBox.innerText = onlineText;
     }
-    gotMessageBinary(message : MessageReader) {
+    gotAllMessages(message : MessageReader) {
+        /*
+        uint32 chat count
+        [
+            string chatId
+            string creatorAccountId
+            string creatorDisplayname
+            string createdTime
+            string content
+        ]
+         */
+        let count = message.getUint32()
+    }
+    gotNewMessage(message : MessageReader) {
+        /*
+        string chatId
+        string creatorAccountId
+        string creatorDisplayName
+        string createdTime
+        string content
+         */
         let chatString = message.getString();
         this.addChat(chatString);
     }
-    gotOnlineListBinary(message : MessageReader) {
-        let onlineString = message.getString();
-        this.chatOnlineBox.innerText = onlineString;
+    gotAllOnlineList(message : MessageReader) {
+        /*
+        uint32 count
+        [
+            string connectionId
+            uint8 hasAccount
+            optional string accountId
+            optional string displayName
+        ]
+         */
+        this.onlineUsers = [];
+        let count = message.getUint32();
+        for (let index = 0; index < count; index++) {
+            let connectionId = message.getString();
+            let hasAccount = message.getUint8() == 1;
+            let accountId : string | undefined = hasAccount ? message.getString() : undefined;
+            let displayName : string | undefined = hasAccount ? message.getString() : undefined;
+            this.onlineUsers.push({
+                connectionId: connectionId,
+                accountId: accountId,
+                displayName: displayName
+            });
+        }
+        this.updateChatOnlineDisplay();
+    }
+    gotOnlineListAddUser(message : MessageReader) {
+        /*
+        string connectionId
+         */
+        let connectionId = message.getString();
+        this.onlineUsers.push({
+            connectionId: connectionId
+        });
+        this.updateChatOnlineDisplay();
+    }
+    gotOnlineListRemoveUser(message : MessageReader) {
+        /*
+        string connectionId
+         */
+        let connectionId = message.getString();
+        for (let index = 0; index < this.onlineUsers.length; index++) {
+            let user = this.onlineUsers[index];
+            if (user.connectionId == connectionId) {
+                this.onlineUsers.splice(index, 1);
+                index -= 1;
+            }
+        }
+        this.updateChatOnlineDisplay();
+    }
+    gotOnlineListLoggedInUser(message : MessageReader) {
+        /*
+        string connectionId
+        string accountId
+        string displayName
+         */
+        let connectionId = message.getString();
+        let accountId = message.getString();
+        let displayName = message.getString();
+        for (let index = 0; index < this.onlineUsers.length; index++) {
+            let user = this.onlineUsers[index];
+            if (user.connectionId == connectionId) {
+                user.accountId = accountId;
+                user.displayName = displayName;
+            }
+        }
+        this.updateChatOnlineDisplay();
+    }
+    gotOnlineListLoggedOutUser(message : MessageReader) {
+        /*
+        string connectionId
+         */
+        let connectionId = message.getString();
+        for (let index = 0; index < this.onlineUsers.length; index++) {
+            let user = this.onlineUsers[index];
+            if (user.connectionId == connectionId) {
+                user.accountId = undefined;
+                user.displayName = undefined;
+            }
+        }
+        this.updateChatOnlineDisplay();
+    }
+    gotDisplayNameUpdate(message : MessageReader) {
+        /*
+        string accountId
+        string displayName
+         */
+        let accountId = message.getString();
+        let displayName = message.getString();
+        for (let index = 0; index < this.onlineUsers.length; index++) {
+            let user = this.onlineUsers[index];
+            if (user.accountId == accountId) {
+                user.displayName = undefined;
+            }
+        }
+        this.updateChatOnlineDisplay();
     }
 }
 
