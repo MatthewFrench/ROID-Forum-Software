@@ -19,6 +19,7 @@ export class ControlPanel {
     topNameDiv : HTMLDivElement;
     preferencesDiv : HTMLDivElement;
     preferencesAvatarInput : HTMLInputElement;
+    preferencesDisplayNameInput : HTMLInputElement;
 
     loginWindowName : HTMLInputElement;
     loginWindowPassword : HTMLInputElement;
@@ -62,7 +63,10 @@ export class ControlPanel {
                 {type: 'hr', className: 'PreferencesHR'},
                 this.preferencesAvatarInput = Interface.Create({type: 'input', className: 'AvatarInput'}),
                 {type: 'label', className: 'AvatarLabel', text: 'Avatar Image'},
-                {type: 'button', className: 'AvatarSaveButton', text: 'Save Avatar', onClick: this.avatarSaveButtonClick}
+                {type: 'button', className: 'AvatarSaveButton', text: 'Save Avatar', onClick: this.avatarSaveButtonClick},
+                this.preferencesDisplayNameInput = Interface.Create({type: 'input', className: 'DisplayNameInput'}),
+                {type: 'label', className: 'DisplayNameLabel', text: 'Display Name'},
+                {type: 'button', className: 'DisplayNameSaveButton', text: 'Save DisplayName', onClick: this.displayNameSaveButtonClick}
             ]});
 
         this.topNameDiv = Interface.Create({type: 'div', className: 'TopNameDiv'});
@@ -79,6 +83,10 @@ export class ControlPanel {
         let message = new MessageWriter();
         message.addUint8(SendMessages.Controller.Profile);
         message.addUint8(SendMessages.ProfileMessage.GetAvatar);
+        this.website.networkController.send(message.toBuffer());
+        message = new MessageWriter();
+        message.addUint8(SendMessages.Controller.Profile);
+        message.addUint8(SendMessages.ProfileMessage.GetDisplayName);
         this.website.networkController.send(message.toBuffer());
         this.website.websiteDiv.appendChild(this.hideBackgroundDiv);
         this.website.websiteDiv.appendChild(this.preferencesDiv);
@@ -102,6 +110,13 @@ export class ControlPanel {
         message.addUint8(SendMessages.Controller.Profile);
         message.addUint8(SendMessages.ProfileMessage.SetAvatar);
         message.addString(this.preferencesAvatarInput.value);
+        this.website.networkController.send(message.toBuffer());
+    };
+    displayNameSaveButtonClick = () => {
+        let message = new MessageWriter();
+        message.addUint8(SendMessages.Controller.Profile);
+        message.addUint8(SendMessages.ProfileMessage.UpdateDisplayName);
+        message.addString(this.preferencesDisplayNameInput.value);
         this.website.networkController.send(message.toBuffer());
     };
     loginWindowLoginButtonClicked = () => {

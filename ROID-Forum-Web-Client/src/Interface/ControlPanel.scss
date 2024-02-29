@@ -225,19 +225,37 @@
   .AvatarInput {
     width: 70%;
     position: absolute;
-    top: 45px;
+    top: 50px;
     right: 5px;
   }
   .AvatarLabel {
     width: 25%;
     position: absolute;
-    top: 45px;
+    top: 50px;
     left: 5px;
   }
   .AvatarSaveButton {
     width: 120px;
     position: absolute;
-    top: 65px;
+    top: 70px;
+    right: 5px;
+  }
+  .DisplayNameInput {
+    width: 70%;
+    position: absolute;
+    top: 90px;
+    right: 5px;
+  }
+  .DisplayNameLabel {
+    width: 25%;
+    position: absolute;
+    top: 90px;
+    left: 5px;
+  }
+  .DisplayNameSaveButton {
+    width: 120px;
+    position: absolute;
+    top: 110px;
     right: 5px;
   }
 }

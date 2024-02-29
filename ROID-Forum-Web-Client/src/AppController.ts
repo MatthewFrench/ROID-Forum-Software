@@ -268,7 +268,7 @@ export class AppController {
                         this.controlPanel.preferencesAvatarInput.value = message.getString();
                     }break;
                     case Controllers.Profile.Messages.ReturnDisplayName: {
-
+                        this.controlPanel.preferencesDisplayNameInput.value = message.getString();
                     }break;
                     case Controllers.Profile.Messages.LoggedIn: {
                         this.database.processEvent('Logged In', message);
