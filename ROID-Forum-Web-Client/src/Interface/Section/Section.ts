@@ -10,20 +10,22 @@ import {MessageReader} from "../../Utility/Message/MessageReader";
 export class Section {
     website: AppController;
     content: HTMLDivElement;
-    name = '';
+    sectionId = '';
     displayName = '';
     newPostWindow: NewPostWindow = null;
     threadController: ThreadController;
     showThreadWhenLoaded: string = null;
     background: MatrixBackground;
     hasDarkTheme = false;
+    createdTime = '';
 
-    constructor({appController, darkTheme = false, hasMatrixBackground = false, name, displayName, title} :
+    constructor({appController, darkTheme = false, hasMatrixBackground = false, sectionId, displayName, title, createdTime} :
                     {appController : AppController, darkTheme? : boolean,
-                        hasMatrixBackground? : boolean, name: string, displayName: string, title: string}) {
-        this.name = name;
+                        hasMatrixBackground? : boolean, sectionId: string, displayName: string, title: string, createdTime: string}) {
+        this.sectionId = sectionId;
         this.displayName = displayName;
         this.hasDarkTheme = darkTheme;
+        this.createdTime = createdTime;
         this.website = appController;
 
         this.content = Interface.Create({type: 'div', className: 'Section', elements: [
@@ -40,7 +42,7 @@ export class Section {
         let m: any = {};
         m['Controller'] = "Server";
         m['Title'] = 'Viewing';
-        m['Section'] = this.name;
+       //m['Section'] = this.sectionName;
         this.website.networkController.send(m);
 
         this.threadController.restoreToDefaultState();
@@ -196,8 +198,8 @@ export class Section {
         return this.content;
     }
 
-    getName(): string {
-        return this.name;
+    getId(): string {
+        return this.sectionId;
     }
 
     getDisplayName(): string {

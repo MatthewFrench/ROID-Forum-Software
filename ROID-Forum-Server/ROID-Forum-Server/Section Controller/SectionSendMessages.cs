@@ -25,15 +25,22 @@ public static class SectionSendMessages
         DisplayNameUpdate = 14
     }
 
-    public static byte[] AllSectionHeaders(List<(Guid sectionId, string name)> sections)
+    public static byte[] AllSectionHeaders(List<(Guid sectionId, string name, string title, string theme, string background, TimeUuid createdTime)> sections)
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
         message.AddUint8((byte)SectionMessage.AllSectionHeaders);
-        foreach ((Guid sectionId, string name) in sections)
+        var count = (UInt32)sections.Count;
+        Console.WriteLine("Sending count: " + count);
+        message.AddUint32(count);
+        foreach ((Guid sectionId, string name, string title, string theme, string background, TimeUuid createdTime) in sections)
         {
             message.AddString(sectionId.ToString());
             message.AddString(name);
+            message.AddString(title);
+            message.AddString(theme);
+            message.AddString(background);
+            message.AddString(createdTime.ToString());
         }
 
         return message.ToBuffer();
@@ -44,6 +51,7 @@ public static class SectionSendMessages
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Section);
         message.AddUint8((byte)SectionMessage.AllThreadHeaders);
+        message.AddUint32((UInt32)threadHeaders.Count);
         foreach ((Guid sectionId, Guid threadId, Guid creatorAccountId, string title, string description,
                      TimeUuid createdTime, TimeUuid updatedTime, uint commentCount, string creatorDisplayName,
                      string creatorAvatarUrl) in threadHeaders)

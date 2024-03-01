@@ -39,10 +39,10 @@ public class Database
         DatabaseSection.CreateTablesIfNotExist(_session);
         DatabaseThread.CreateTablesIfNotExist(_session);
         DatabaseComment.CreateTablesIfNotExist(_session);
-        DatabaseSection.CreateSectionIfNotExists(_session, "Coding Section");
-        DatabaseSection.CreateSectionIfNotExists(_session, "Game Section");
-        DatabaseSection.CreateSectionIfNotExists(_session, "Graphics Section");
-        DatabaseSection.CreateSectionIfNotExists(_session, "Other Section");
+        DatabaseSection.CreateSectionIfNotExists(_session, "Coding", "The Programmer's Corner", "dark", "matrix");
+        DatabaseSection.CreateSectionIfNotExists(_session, "Game", "The Gamer's Hangout", "", "");
+        DatabaseSection.CreateSectionIfNotExists(_session, "Graphics", "The Artist's Muse", "", "");
+        DatabaseSection.CreateSectionIfNotExists(_session, "Other", "Trash Talk", "", "");
     }
 
     public ISession GetSession()

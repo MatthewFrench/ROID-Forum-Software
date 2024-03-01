@@ -153,12 +153,14 @@ export class MessageDataString implements MessageData {
 
     addToByteData(byteData: DataView, loc: number) {
         byteData.setUint32(loc, this.totalLength - 4, false);
-        //Copy each byte of the value to the byteData
-        let stringData = new DataView(this.value);
-        let byteIndex = loc + 4;
-        for (let index = 0; index < stringData.byteLength; index++) {
-            byteData.setUint8(byteIndex, stringData.getUint8(index));
-            byteIndex++;
+        if (this.totalLength - 4 > 0) {
+            //Copy each byte of the value to the byteData
+            let stringData = new DataView(this.value);
+            let byteIndex = loc + 4;
+            for (let index = 0; index < stringData.byteLength; index++) {
+                byteData.setUint8(byteIndex, stringData.getUint8(index));
+                byteIndex++;
+            }
         }
     }
 
@@ -179,12 +181,14 @@ export class MessageDataBinary implements MessageData {
 
     addToByteData(byteData: DataView, loc: number) {
         byteData.setUint32(loc, this.totalLength - 4, false);
-        //Copy each byte of the value to the byteData
-        let data = new DataView(this.value);
-        let byteIndex = loc + 4;
-        for (let index = 0; index < data.byteLength; index++) {
-            byteData.setUint8(byteIndex, data.getUint8(index));
-            byteIndex++;
+        if (this.totalLength - 4 > 0) {
+            //Copy each byte of the value to the byteData
+            let data = new DataView(this.value);
+            let byteIndex = loc + 4;
+            for (let index = 0; index < data.byteLength; index++) {
+                byteData.setUint8(byteIndex, data.getUint8(index));
+                byteIndex++;
+            }
         }
     }
 

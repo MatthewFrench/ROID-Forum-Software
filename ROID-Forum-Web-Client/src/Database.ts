@@ -5,7 +5,6 @@ export class Database {
     loggedIn = false;
     accountId = "";
     displayName = "";
-    //password = "";
     constructor(appController : AppController) {
         this.appController = appController;
     }
@@ -25,7 +24,6 @@ export class Database {
             localStorage.removeItem('Name');
             localStorage.removeItem('Password');
             this.displayName = "";
-            //this.password = "";
             this.loggedIn = false;
         }
         break;

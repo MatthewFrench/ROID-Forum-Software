@@ -18,6 +18,10 @@ public static class DatabaseSection
                 CREATE TABLE IF NOT EXISTS ""{Database.DefaultKeyspace}"".""{TableSection}"" (
                    section_id uuid,
                    name TEXT,
+                   title Text,
+                   theme Text,
+                   background Text,
+                   created_time timeuuid,
                    PRIMARY KEY (section_id)
                 )");
         session.Execute($@"
@@ -46,7 +50,8 @@ public static class DatabaseSection
     public static bool SectionIdExists(ISession session, Guid sectionId)
     {
         PreparedStatement selectStatement =
-            session.Prepare($"SELECT section_id FROM \"{Database.DefaultKeyspace}\".\"{TableSection}\" where section_id=?");
+            session.Prepare(
+                $"SELECT section_id FROM \"{Database.DefaultKeyspace}\".\"{TableSection}\" where section_id=?");
         var result = session.Execute(selectStatement.Bind(sectionId));
         if (result.FirstOrDefault() == null)
         {
@@ -55,20 +60,33 @@ public static class DatabaseSection
 
         return true;
     }
-    
-    public static List<(Guid sectionId, string name)> GetSections(ISession session)
+
+    public static List<(Guid sectionId, string name, string title, string theme, string background, TimeUuid createdTime)> GetSections(
+        ISession session)
     {
-        var result = session.Execute($"SELECT section_id, name FROM \"{Database.DefaultKeyspace}\".\"{TableSection}\"");
-        List<(Guid sectionId, string name)> sections = new List<(Guid sectionId, string name)>();
+        var result =
+            session.Execute(
+                $"SELECT section_id, name, title, theme, background, created_time FROM \"{Database.DefaultKeyspace}\".\"{TableSection}\"");
+        List<(Guid sectionId, string name, string title, string theme, string background, TimeUuid createdTime)> sections =
+            new List<(Guid sectionId, string name, string title, string theme, string background, TimeUuid createdTime)>();
         foreach (var item in result)
         {
-            sections.Add((sectionId: item.GetValue<Guid>("section_id"), name: item.GetValue<string>("name")));
+            sections.Add(
+                (
+                    sectionId: item.GetValue<Guid>("section_id"),
+                    name: item.GetValue<string>("name"),
+                    title: item.GetValue<string>("title"),
+                    theme: item.GetValue<string>("theme"),
+                    background: item.GetValue<string>("background"),
+                    createdTime: item.GetValue<TimeUuid>("created_time")
+                )
+            );
         }
 
         return sections;
     }
 
-    public static void CreateSectionIfNotExists(ISession session, String sectionName)
+    public static void CreateSectionIfNotExists(ISession session, String sectionName, String sectionTitle, String sectionTheme, String sectionBackground)
     {
         PreparedStatement selectStatement =
             session.Prepare($"SELECT section_id FROM \"{Database.DefaultKeyspace}\".\"{TableSection}\" where name=?");
@@ -77,8 +95,8 @@ public static class DatabaseSection
         {
             PreparedStatement insertStatement =
                 session.Prepare(
-                    $"INSERT INTO \"{Database.DefaultKeyspace}\".\"{TableSection}\" (section_id, name) VALUES (uuid(), ?)");
-            session.Execute(insertStatement.Bind(sectionName));
+                    $"INSERT INTO \"{Database.DefaultKeyspace}\".\"{TableSection}\" (section_id, name, title, theme, background, created_time) VALUES (uuid(), ?, ?, ?, ?, ?)");
+            session.Execute(insertStatement.Bind(sectionName, sectionTitle, sectionTheme, sectionBackground, TimeUuid.NewId()));
         }
     }
 
@@ -117,8 +135,8 @@ public static class DatabaseSection
     {
         var selectStatement = session.Prepare(
             $"SELECT updated_time FROM \"{Database.DefaultKeyspace}\".\"{MaterializedViewSectionThreadOrdering}\" where section_id=? and thread_id=?");
-        return session.Execute(selectStatement.Bind(sectionId, threadId)).Select(row => 
-            row.GetValue<TimeUuid>("update_time"))
-        .FirstOrDefault();
+        return session.Execute(selectStatement.Bind(sectionId, threadId)).Select(row =>
+                row.GetValue<TimeUuid>("update_time"))
+            .FirstOrDefault();
     }
 }

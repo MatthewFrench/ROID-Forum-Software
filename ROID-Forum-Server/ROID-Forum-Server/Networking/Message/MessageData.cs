@@ -131,7 +131,10 @@ namespace ROIDForumServer
 		public override void AddToByteData(ByteArray byteData, int loc)
 		{
 			byteData.Write(_totalLength - 4, loc, Endianness.BigEndian);
-			byteData.Write(_value, 0, _value.Length, loc + 4);
+			if (_totalLength - 4 > 0)
+			{
+				byteData.Write(_value, 0, _value.Length, loc + 4);
+			}
 		}
         
 		public override uint GetLength()
@@ -154,7 +157,10 @@ namespace ROIDForumServer
 		public override void AddToByteData(ByteArray byteData, int loc)
 		{
             byteData.Write(_totalLength - 4, loc, Endianness.BigEndian);
-            byteData.Write(_value, 0, _value.Length, loc + 4);
+            if (_totalLength - 4 > 0)
+            {
+	            byteData.Write(_value, 0, _value.Length, loc + 4);
+            }
 		}
 
 		public override uint GetLength()

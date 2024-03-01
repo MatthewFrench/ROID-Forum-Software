@@ -167,6 +167,10 @@ namespace ROIDForumServer
 			var length = _byteData.ReadU32((int)_currentLoc, Endianness.BigEndian);
 			_currentLoc += 4;
 
+			if (length == 0)
+			{
+				return "";
+			}
 			var byteArray = new byte[length];
 			this._byteData.Read(byteArray, 0, (int)length, (int)_currentLoc);         
 			var returnString = System.Text.Encoding.Unicode.GetString(byteArray);
@@ -178,6 +182,10 @@ namespace ROIDForumServer
 		{
 			var length = _byteData.ReadU32((int)_currentLoc, Endianness.BigEndian);
 
+			if (length == 0)
+			{
+				return "";
+			}
 			var byteArray = new byte[length];
 			this._byteData.Read(byteArray, 0, (int)length, (int)_currentLoc + 4);         
 			return System.Text.Encoding.Unicode.GetString(byteArray);
@@ -198,6 +206,10 @@ namespace ROIDForumServer
 			var length = _byteData.ReadU32((int)_currentLoc, Endianness.BigEndian);
 			_currentLoc += 4;
             var byteArray = new byte[length];
+            if (length == 0)
+            {
+	            return byteArray;
+            }
             _byteData.Read(byteArray, 0, (int)length, (int)_currentLoc);  
 			_currentLoc += length;
 			return byteArray;
@@ -207,6 +219,10 @@ namespace ROIDForumServer
 		{
 			var length = _byteData.ReadU32((int)_currentLoc, Endianness.BigEndian);
 			var byteArray = new byte[length];
+			if (length == 0)
+			{
+				return byteArray;
+			}
 			_byteData.Read(byteArray, 0, (int)length, (int)_currentLoc + 4);
 			return byteArray;
 		}

@@ -73,7 +73,7 @@ export class CommentView {
         this.editDescription.remove();
 
         let message: any = {};
-        message['Controller'] = this.threadController.sectionController.name;
+        //message['Controller'] = this.threadController.sectionController.sectionName;
         message['Title'] = 'Edit Comment';
         message['Thread ID'] = this.thread.getThreadID();
         message['Comment ID'] = this.comment.getCommentID();
@@ -84,7 +84,7 @@ export class CommentView {
 
     deleteCommentButtonClick = () => {
         let message: any = {};
-        message['Controller'] = this.threadController.sectionController.name;
+        //message['Controller'] = this.threadController.sectionController.sectionName;
         message['Title'] = 'Delete Comment';
         message['Thread ID'] = this.thread.getThreadID();
         message['Comment ID'] = this.comment.getCommentID();

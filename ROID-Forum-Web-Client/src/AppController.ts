@@ -22,12 +22,7 @@ export class AppController {
     logicTimer: any;
     chatbox: Chatbox;
     mainSection: MainTopBarSection;
-    //allSection: Section;
-    codingSection: Section;
-    gameSection: Section;
-    graphicsSection: Section;
-    otherSection: Section;
-    sectionOrder: Section[];
+    sections: Section[] = [];
     showingSection: Section = null;
     body: HTMLBodyElement;
     reconnectingDiv: HTMLDivElement;
@@ -58,6 +53,7 @@ export class AppController {
         this.chatbox = new Chatbox(this);
         //Lets make the visual stuff
         //this.allSection = new Section(this);
+        /*
         this.codingSection = new Section({appController: this, name: 'Coding Section',
             displayName: 'Coding', title: 'The Programmer\'s Corner',
             darkTheme: true, hasMatrixBackground: true});
@@ -67,7 +63,8 @@ export class AppController {
             displayName: 'Graphics', title: 'The Artist\'s Muse'});
         this.otherSection = new Section({appController: this, name: 'Other Section',
             displayName: 'Other', title: 'Trash Talk'});
-        this.sectionOrder = [/*this.allSection,*/ this.codingSection, this.gameSection, this.graphicsSection, this.otherSection];
+         */
+
         //Now add the main parts of the site
         this.mainSection = new MainTopBarSection(this);
 
@@ -77,11 +74,9 @@ export class AppController {
 
     logic = () => {
         this.mainSection.logic();
-        this.codingSection.logic();
-        //this.allSection.logic();
-        this.gameSection.logic();
-        this.graphicsSection.logic();
-        this.otherSection.logic();
+        for (let section of this.sections) {
+            section.logic();
+        }
     };
 
     prepareReset() {
@@ -118,90 +113,32 @@ export class AppController {
         if (localStorage.getItem('Name') != null && localStorage.getItem('Password')) {
             this.controlPanel.loginAlreadyEncrypted(localStorage.getItem('Name'), localStorage.getItem('Password'));
         }
-        //Load the first section
-        this.mainSection.sectionClick(0);
     }
 
-    showView(section: number) {
+    showView(sectionId: string) {
         if (this.showingSection != null) {
             this.showingSection.getDiv().style.opacity = "0.0";
             this.showingSection.getDiv().remove();
             this.showingSection.hide();
-            this.showingSection = this.sectionOrder[section];
-            this.showingSection.getDiv().style.opacity = "1.0";
-            this.websiteDiv.appendChild(this.showingSection.getDiv());
-            this.showingSection.show();
-        } else {
-            this.showingSection = this.sectionOrder[section];
+        }
+        this.showingSection = this.getSection(sectionId);
+        if (this.showingSection != null) {
             this.showingSection.getDiv().style.opacity = "1.0";
             this.websiteDiv.appendChild(this.showingSection.getDiv());
             this.showingSection.show();
         }
     }
 
-    goTo(section: string, threadID: string) {
-        switch (section) {
-            case "Coding Section": {
-                this.mainSection.sectionClick(this.sectionOrder.indexOf(this.codingSection));
-                this.codingSection.showThread(threadID);
-            }
-                break;
-            case "Game Section": {
-                this.mainSection.sectionClick(this.sectionOrder.indexOf(this.gameSection));
-                this.gameSection.showThread(threadID);
-            }
-                break;
-            case "Graphics Section": {
-                this.mainSection.sectionClick(this.sectionOrder.indexOf(this.graphicsSection));
-                this.graphicsSection.showThread(threadID);
-            }
-                break;
-            case "Other Section": {
-                this.mainSection.sectionClick(this.sectionOrder.indexOf(this.otherSection));
-                this.otherSection.showThread(threadID);
-            }
-                break;
+    goTo(sectionId: string, threadID: string) {
+        let section = this.getSection(sectionId);
+        if (section != null) {
+            this.mainSection.sectionClick(this.sections.indexOf(section));
+            section.showThread(threadID);
         }
     }
 
     /*
     Message(message: MessageReader) {
-        if (message['Controller'] == 'Chat') {
-            this.chatbox.onMessage(message);
-        }
-        if (message['Controller'] == 'Login') {
-            switch (message['Title']) {
-                case 'Logged In': {
-                    this.database.processEvent('Logged In', message);
-                    this.controlPanel.processEvent('Logged In');
-                    this.chatbox.processEvent('Logged In');
-                    for (let section of this.sectionOrder) section.processEvent('Logged In');
-                }
-                    break;
-                case 'Logged Out': {
-                    this.database.processEvent('Logged Out', message);
-                    this.controlPanel.processEvent('Logged Out');
-                    this.chatbox.processEvent('Logged Out');
-                    for (let section of this.sectionOrder) section.processEvent('Logged Out');
-                }
-                    break;
-                case 'Register Failed': {
-                    this.controlPanel.processEvent('Register Failed');
-                }
-                    break;
-                case 'Login Failed': {
-                    this.controlPanel.processEvent('Login Failed');
-                }
-                    break;
-                case 'Get Avatar': {
-                    this.controlPanel.preferencesAvatarInput.value = message['AvatarURL'];
-                }
-                    break;
-                default: {
-                    console.log(`Got other message: ${message['Title']}`);
-                }
-            }
-        }
         if (message['Controller'] == this.codingSection.name) {
             this.codingSection.onMessage(message);
         }
@@ -221,9 +158,9 @@ export class AppController {
 
      */
 
-    getSection(name : String) : Section {
-        for (let section of this.sectionOrder) {
-            if (section.getName() == name) {
+    getSection(sectionId : String) : Section {
+        for (let section of this.sections) {
+            if (section.getId() == sectionId) {
                 return section;
             }
         }
@@ -274,13 +211,13 @@ export class AppController {
                         this.database.processEvent('Logged In', message);
                         this.controlPanel.processEvent('Logged In');
                         this.chatbox.processEvent('Logged In');
-                        for (let section of this.sectionOrder) section.processEvent('Logged In');
+                        for (let section of this.sections) section.processEvent('Logged In');
                     }break;
                     case Controllers.Profile.Messages.LoggedOut: {
                         this.database.processEvent('Logged Out', message);
                         this.controlPanel.processEvent('Logged Out');
                         this.chatbox.processEvent('Logged Out');
-                        for (let section of this.sectionOrder) section.processEvent('Logged Out');
+                        for (let section of this.sections) section.processEvent('Logged Out');
                     }break;
                     case Controllers.Profile.Messages.LoginFailed: {
                         this.controlPanel.processEvent('Login Failed');
@@ -291,23 +228,76 @@ export class AppController {
                 }
             } break;
             case Controllers.Section.ID: {
-                let sectionName = message.getString();
-                let section = this.getSection(sectionName);
                 switch(messageID) {
+                    case Controllers.Section.Messages.AllSectionViewers: {
+
+                    }break;
+                    case Controllers.Section.Messages.SectionAddViewer: {
+
+                    }break;
+                    case Controllers.Section.Messages.SectionRemoveViewer: {
+
+                    }break;
+                    case Controllers.Section.Messages.SectionLoggedInViewer: {
+
+                    }break;
+                    case Controllers.Section.Messages.SectionLoggedOutViewer: {
+
+                    }break;
+                    case Controllers.Section.Messages.AllSectionHeaders: {
+                        let count = message.getUint32();
+                        for (let index = 0; index < count; index++) {
+                            let sectionId = message.getString();
+                            let sectionName = message.getString();
+                            let title = message.getString();
+                            let theme = message.getString();
+                            let background = message.getString();
+                            let createdTime = message.getString();
+                            let useDarkTheme = theme === 'dark';
+                            let hasMatrixBackground = background === 'matrix';
+                            this.sections.push(
+                                new Section({
+                                    appController: this,
+                                    sectionId: sectionId,
+                                    displayName: sectionName,
+                                    title: title,
+                                    darkTheme: useDarkTheme,
+                                    hasMatrixBackground: hasMatrixBackground,
+                                    createdTime: createdTime
+                                })
+                            );
+                        }
+                        this.sections.sort((a, b) => a.createdTime.localeCompare(b.createdTime));
+                        this.mainSection.addSections();
+                        //Load the first section
+                        this.mainSection.sectionClick(0);
+                    }break;
+                    case Controllers.Section.Messages.ThreadSuccessfullyCreated: {
+
+                    }break;
+                    case Controllers.Section.Messages.UpdateThreadCommentCount: {
+
+                    }break;
+                    case Controllers.Section.Messages.AvatarUpdate: {
+
+                    }break;
+                    case Controllers.Section.Messages.DisplayNameUpdate: {
+
+                    }break;
                     case Controllers.Section.Messages.AddThreadHeader: {
-                        section.addThreadBinary(message);
+                        //section.addThreadBinary(message);
                     }break;
                     case Controllers.Section.Messages.UpdateThreadTitleAndDescription: {
-                        section.updateThreadBinary(message);
+                        //section.updateThreadBinary(message);
                     }break;
                     case Controllers.Section.Messages.RemoveThreadHeader: {
-                        section.removeThreadBinary(message);
+                        //section.removeThreadBinary(message);
                     }break;
                     case Controllers.Section.Messages.UpdateThreadCommentCountAndUpdatedTime: {
-                        section.moveThreadToTopBinary(message);
+                        //section.moveThreadToTopBinary(message);
                     }break;
                     case Controllers.Section.Messages.AllThreadHeaders: {
-                        section.allThreadsBinary(message);
+                        //section.allThreadsBinary(message);
                     }break;
                 }
             } break;

@@ -51,7 +51,7 @@ export class FullView {
     sendComment = () => {
         let text = this.commentBox.value;
         let m: any = {};
-        m['Controller'] = this.threadController.sectionController.name;
+        //m['Controller'] = this.threadController.sectionController.sectionName;
         m['Title'] = 'Add Comment';
         m['Thread ID'] = this.thread.getThreadID();
         m['Text'] = text;

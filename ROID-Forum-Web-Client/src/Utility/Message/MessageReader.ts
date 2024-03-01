@@ -106,6 +106,9 @@ export class MessageReader {
     getString() : string {
         let length = this.byteData.getUint32(this.currentLoc, false);
         this.currentLoc += 4;
+        if (length == 0) {
+            return "";
+        }
         let stringBuffer = this.byteData.buffer.slice(this.currentLoc, this.currentLoc + length);
         let string = Utility.ArrayBufferToString(stringBuffer);
         this.currentLoc += length;
@@ -124,6 +127,9 @@ export class MessageReader {
     getBinary() : ArrayBuffer {
         let length = this.byteData.getUint32(this.currentLoc, false);
         this.currentLoc += 4;
+        if (length == 0) {
+            return new ArrayBuffer(0);
+        }
         let buffer = this.byteData.buffer.slice(this.currentLoc, this.currentLoc + length);
         this.currentLoc += length;
         return buffer;

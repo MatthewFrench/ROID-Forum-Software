@@ -40,7 +40,7 @@ export class NewPostWindow {
     postButtonClick = () => {
         //Send new post to server
         let message: any = {};
-        message['Controller'] = this.sectionController.name;
+        //message['Controller'] = this.sectionController.sectionName;
         message['Title'] = 'New Post';
         message['Post Title'] = this.titleInput.value;
         message['Post Description'] = this.mainText.value;

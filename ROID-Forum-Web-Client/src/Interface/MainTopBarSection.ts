@@ -24,15 +24,19 @@ export class MainTopBarSection {
                     ]})
             ]});
 
+        this.website.websiteDiv.appendChild(this.mainDiv);
+    }
+
+    addSections() {
         //Add the sections to the bar
         let totalLetters = 0;
-        for (let i = 0; i < this.website.sectionOrder.length; i++) {
-            let section: Section = this.website.sectionOrder[i];
+        for (let i = 0; i < this.website.sections.length; i++) {
+            let section: Section = this.website.sections[i];
             totalLetters += section.getDisplayName().length;
         }
         let p = 0.0;
-        for (let i = 0; i < this.website.sectionOrder.length; i++) {
-            let section: Section = this.website.sectionOrder[i];
+        for (let i = 0; i < this.website.sections.length; i++) {
+            let section: Section = this.website.sections[i];
             let sectionName: string = section.getDisplayName();
             let s: HTMLDivElement = Interface.Create({type: 'div', className: 'SectionBarItem', onClick: () => {
                     this.sectionClick(i);
@@ -50,8 +54,6 @@ export class MainTopBarSection {
             this.sectionsBarDiv.appendChild(s);
             this.divSections.push(s);
         }
-
-        this.website.websiteDiv.appendChild(this.mainDiv);
     }
 
     darkTheme() {
@@ -76,7 +78,7 @@ export class MainTopBarSection {
             d.classList.remove('Selected');
         }
         this.divSections[section].classList.add('Selected');
-        this.website.showView(section);
+        this.website.showView(this.website.sections[section].sectionId);
         this.sectionBarHighlight.style.left = `${this.positionPercentages[section]}%`;
         this.sectionBarHighlight.style.width = `${this.widthPercentages[section]}%`;
     }
