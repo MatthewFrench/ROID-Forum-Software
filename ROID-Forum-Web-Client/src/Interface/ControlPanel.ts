@@ -95,6 +95,7 @@ export class ControlPanel {
     loginButtonClicked = () => {
         this.website.websiteDiv.appendChild(this.hideBackgroundDiv);
         this.website.websiteDiv.appendChild(this.loginDiv);
+        this.loginErrorDiv.innerText = '';
         this.showingLoginWindow = true;
     };
     logoutButtonClicked = () => {
@@ -169,12 +170,11 @@ export class ControlPanel {
         this.securelyHash(this.loginWindowPassword.value).then((hashedPassword)=>{
             let message = new MessageWriter();
             message.addUint8(SendMessages.Controller.Profile);
-            message.addUint8(SendMessages.ProfileMessage.Login);
+            message.addUint8(SendMessages.ProfileMessage.Register);
             message.addString(this.loginWindowName.value);
             message.addString(hashedPassword);
             message.addString(this.loginWindowEmail.value);
             this.website.networkController.send(message.toBuffer());
-            // Todo: Don't do this, or do it better. This is janky for setting up auto-login.
             localStorage.setItem('Name', this.loginWindowName.value);
             localStorage.setItem('Password', hashedPassword);
         });
@@ -214,7 +214,7 @@ export class ControlPanel {
                 break;
             case 'Register Failed':
             {
-                this.loginErrorDiv.innerText = 'Username taken. Or email used. One of those. Not sure.';
+                this.loginErrorDiv.innerText = 'Username taken.';
             }
                 break;
             case 'Login Failed':

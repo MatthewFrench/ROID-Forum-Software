@@ -31,7 +31,6 @@ public static class SectionSendMessages
         message.AddUint8((byte)ServerSendControllers.Section);
         message.AddUint8((byte)SectionMessage.AllSectionHeaders);
         var count = (UInt32)sections.Count;
-        Console.WriteLine("Sending count: " + count);
         message.AddUint32(count);
         foreach ((Guid sectionId, string name, string title, string theme, string background, TimeUuid createdTime) in sections)
         {

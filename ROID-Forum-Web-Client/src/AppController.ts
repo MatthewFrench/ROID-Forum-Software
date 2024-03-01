@@ -51,19 +51,6 @@ export class AppController {
         this.controlPanel = new ControlPanel(this);
         //Put the chat on the right side
         this.chatbox = new Chatbox(this);
-        //Lets make the visual stuff
-        //this.allSection = new Section(this);
-        /*
-        this.codingSection = new Section({appController: this, name: 'Coding Section',
-            displayName: 'Coding', title: 'The Programmer\'s Corner',
-            darkTheme: true, hasMatrixBackground: true});
-        this.gameSection = new Section({appController: this, name: 'Game Section',
-            displayName: 'Game', title: 'The Gamer\'s Hangout'});
-        this.graphicsSection = new Section({appController: this, name: 'Graphics Section',
-            displayName: 'Graphics', title: 'The Artist\'s Muse'});
-        this.otherSection = new Section({appController: this, name: 'Other Section',
-            displayName: 'Other', title: 'Trash Talk'});
-         */
 
         //Now add the main parts of the site
         this.mainSection = new MainTopBarSection(this);
@@ -136,27 +123,6 @@ export class AppController {
             section.showThread(threadID);
         }
     }
-
-    /*
-    Message(message: MessageReader) {
-        if (message['Controller'] == this.codingSection.name) {
-            this.codingSection.onMessage(message);
-        }
-        //if (message['Controller'] == this.allSection.name) {
-            //this.allSection.onMessage(message);
-        //}
-        if (message['Controller'] == this.otherSection.name) {
-            this.otherSection.onMessage(message);
-        }
-        if (message['Controller'] == this.graphicsSection.name) {
-            this.graphicsSection.onMessage(message);
-        }
-        if (message['Controller'] == this.gameSection.name) {
-            this.gameSection.onMessage(message);
-        }
-    }
-
-     */
 
     getSection(sectionId : String) : Section {
         for (let section of this.sections) {
@@ -245,6 +211,7 @@ export class AppController {
 
                     }break;
                     case Controllers.Section.Messages.AllSectionHeaders: {
+                        // Todo: Remove existing sections
                         let count = message.getUint32();
                         for (let index = 0; index < count; index++) {
                             let sectionId = message.getString();
