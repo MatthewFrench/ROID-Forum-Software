@@ -21,25 +21,6 @@ export class CommentInfo {
         this.commentView = new CommentView(this, this.thread, this.threadController, darkTheme);
     }
 
-    /*
-    setBinary(message: MessageReader) {
-        let threadID = message.getString();
-        let commentID = message.getString();
-        let comment = message.getString();
-        let owner = message.getString();
-        let avatarURL = message.getString();
-        this._threadID = threadID;
-        this._commentID = commentID;
-        this._comment = comment;
-        this._owner = owner;
-        this._avatarURL = avatarURL;
-        this.commentView.updateAvatarURL();
-        this.commentView.updateOwner();
-        this.commentView.updateDescription();
-    }
-
-     */
-
     setThreadID(id: string) {
         this._threadID = id;
     }

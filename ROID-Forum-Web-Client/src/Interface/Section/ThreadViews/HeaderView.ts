@@ -30,8 +30,6 @@ export class HeaderView {
         }
     }
 
-
-
     getDiv(): HTMLDivElement {
         return this.headerDiv;
     }

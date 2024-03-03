@@ -6,6 +6,8 @@ import {ThreadController} from "../ThreadController";
 import {DescriptionParser} from "../../../Utility/DescriptionParser";
 import {Utility} from "../../../Utility/Utility";
 import {Interface} from "../../../Utility/Interface";
+import {MessageWriter} from "../../../Utility/Message/MessageWriter";
+import {SendMessages} from "../../../Networking/MessageDefinitions/SendMessages";
 
 export class CommentView {
     thread: ThreadInfo;
@@ -72,23 +74,24 @@ export class CommentView {
         this.descriptionSection.insertBefore(this.description, this.editDescription);
         this.editDescription.remove();
 
-        let message: any = {};
-        //message['Controller'] = this.threadController.sectionController.sectionName;
-        message['Title'] = 'Edit Comment';
-        message['Thread ID'] = this.thread.getThreadId();
-        message['Comment ID'] = this.comment.getCommentID();
-        message['Text'] = this.editDescription.value;
-        this.threadController.sectionController.website.networkController.send(message);
-        //console.log(`Pressed Edit Comment on thread ${this.thread.getID()} and on comment ${this.comment.getCommentID()}`);
+        let message = new MessageWriter();
+        message.addUint8(SendMessages.Controller.Thread);
+        message.addString(this.threadController.sectionController.sectionId);
+        message.addString(this.thread.getThreadId());
+        message.addUint8(SendMessages.ThreadMessage.EditComment);
+        message.addString(this.comment.getCommentID());
+        message.addString(this.editDescription.value);
+        this.threadController.sectionController.website.networkController.send(message.toBuffer());
     };
 
     deleteCommentButtonClick = () => {
-        let message: any = {};
-        //message['Controller'] = this.threadController.sectionController.sectionName;
-        message['Title'] = 'Delete Comment';
-        message['Thread ID'] = this.thread.getThreadId();
-        message['Comment ID'] = this.comment.getCommentID();
-        this.threadController.sectionController.website.networkController.send(message);
+        let message = new MessageWriter();
+        message.addUint8(SendMessages.Controller.Thread);
+        message.addString(this.threadController.sectionController.sectionId);
+        message.addString(this.thread.getThreadId());
+        message.addUint8(SendMessages.ThreadMessage.DeleteComment);
+        message.addString(this.comment.getCommentID());
+        this.threadController.sectionController.website.networkController.send(message.toBuffer());
     };
 
     getDiv(): HTMLDivElement {

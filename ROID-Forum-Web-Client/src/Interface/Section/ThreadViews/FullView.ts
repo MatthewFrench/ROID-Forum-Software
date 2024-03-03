@@ -6,6 +6,8 @@ import {ThreadDisplay} from "./ThreadDisplay";
 import {CommentView} from "./CommentView";
 import {CommentInfo} from "../CommentInfo";
 import {Interface} from "../../../Utility/Interface";
+import {MessageWriter} from "../../../Utility/Message/MessageWriter";
+import {SendMessages} from "../../../Networking/MessageDefinitions/SendMessages";
 
 export class FullView {
     thread: ThreadInfo;
@@ -50,12 +52,13 @@ export class FullView {
 
     sendComment = () => {
         let text = this.commentBox.value;
-        let m: any = {};
-        //m['Controller'] = this.threadController.sectionController.sectionName;
-        m['Title'] = 'Add Comment';
-        m['Thread ID'] = this.thread.getThreadId();
-        m['Text'] = text;
-        this.threadController.sectionController.website.networkController.send(m);
+        let message = new MessageWriter();
+        message.addUint8(SendMessages.Controller.Thread);
+        message.addString(this.threadController.sectionController.sectionId);
+        message.addString(this.thread.getThreadId());
+        message.addUint8(SendMessages.ThreadMessage.AddComment);
+        message.addString(text);
+        this.threadController.sectionController.website.networkController.send(message.toBuffer());
         this.commentBox.value = "";
     };
 
