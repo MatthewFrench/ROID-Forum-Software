@@ -417,6 +417,21 @@ export class Utility {
         }
         return buf;
     }
+    static TimeuuidToMilliseconds (uuid_str: string) {
+        let uuid_arr = uuid_str.split( '-' ),
+            time_str = [
+                uuid_arr[ 2 ].substring( 1 ),
+                uuid_arr[ 1 ],
+                uuid_arr[ 0 ]
+            ].join( '' );
+        return parseInt( time_str, 16 );
+    };
+
+    static TimeuuidToDate (uuid_str: string): Date {
+        let int_time = Utility.TimeuuidToMilliseconds( uuid_str ) - 122192928000000000,
+            int_millisec = Math.floor( int_time / 10000 );
+        return new Date( int_millisec );
+    };
 }
 
 //Pollyfill for IE

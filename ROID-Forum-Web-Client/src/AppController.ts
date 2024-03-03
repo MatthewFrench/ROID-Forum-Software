@@ -235,7 +235,7 @@ export class AppController {
                                 );
                             }
                         }
-                        this.sections.sort((a, b) => a.createdTime.localeCompare(b.createdTime));
+                        this.sections.sort((a, b) => Utility.TimeuuidToMilliseconds(a.createdTime) - (Utility.TimeuuidToMilliseconds(b.createdTime)));
                         this.mainSection.addSections();
                         //Load the first section
                         this.mainSection.sectionClick(0);
@@ -253,7 +253,32 @@ export class AppController {
 
                     }break;
                     case Controllers.Section.Messages.AddThreadHeader: {
-                        //section.addThreadBinary(message);
+                        let sectionId = message.getString();
+                        let threadId = message.getString();
+                        let creatorAccountId = message.getString();
+                        let title = message.getString();
+                        let description = message.getString();
+                        let createdTime = message.getString();
+                        let updatedTime = message.getString();
+                        let commentCount = message.getUint32();
+                        let creatorDisplayName = message.getString();
+                        let creatorAvatarUrl = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        if (section) {
+                            section.addThread(threadId,
+                                creatorAccountId,
+                                title,
+                                description,
+                                createdTime,
+                                updatedTime,
+                                commentCount,
+                                creatorDisplayName,
+                                creatorAvatarUrl);
+                        }
+                        if (section && section.showThreadWhenLoaded != null) {
+                            section.threadController.showThread(section.showThreadWhenLoaded);
+                            section.showThreadWhenLoaded = null;
+                        }
                     }break;
                     case Controllers.Section.Messages.UpdateThreadTitleAndDescription: {
                         //section.updateThreadBinary(message);
@@ -266,6 +291,7 @@ export class AppController {
                     }break;
                     case Controllers.Section.Messages.AllThreadHeaders: {
                         let count = message.getUint32();
+                        let section = null;
                         for (let index = 0; index < count; index++) {
                             let sectionId = message.getString();
                             let threadId = message.getString();
@@ -277,7 +303,7 @@ export class AppController {
                             let commentCount = message.getUint32();
                             let creatorDisplayName = message.getString();
                             let creatorAvatarUrl = message.getString();
-                            let section = this.sections.find(value => value.sectionId == sectionId);
+                            section = this.sections.find(value => value.sectionId == sectionId);
                             if (section) {
                                 section.addThread(threadId,
                                     creatorAccountId,
@@ -290,6 +316,10 @@ export class AppController {
                                     creatorAvatarUrl);
                             }
                         }
+                        if (section && section.showThreadWhenLoaded != null) {
+                            section.threadController.showThread(section.showThreadWhenLoaded);
+                            section.showThreadWhenLoaded = null;
+                        }
                     }break;
                 }
             } break;
@@ -298,13 +328,13 @@ export class AppController {
                 let section = this.getSection(sectionName);
                 switch(messageID) {
                     case Controllers.Thread.Messages.AddComment: {
-                        section.addCommentBinary(message);
+                        //section.addCommentBinary(message);
                     }break;
                     case Controllers.Thread.Messages.UpdateComment: {
-                        section.updateCommentBinary(message);
+                        //section.updateCommentBinary(message);
                     }break;
                     case Controllers.Thread.Messages.RemoveComment: {
-                        section.removeCommentBinary(message);
+                        //section.removeCommentBinary(message);
                     }break;
                 }
             } break;

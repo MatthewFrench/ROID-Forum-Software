@@ -5,7 +5,6 @@ import {NewPostWindow} from "./NewPostWindow";
 import {ThreadController} from "./ThreadController";
 import {MatrixBackground} from "./MatrixBackground";
 import {Interface} from "../../Utility/Interface";
-import {MessageReader} from "../../Utility/Message/MessageReader";
 import {MessageWriter} from "../../Utility/Message/MessageWriter";
 import {SendMessages} from "../../Networking/MessageDefinitions/SendMessages";
 
@@ -132,102 +131,6 @@ export class Section {
             creatorDisplayName,
             creatorAvatarUrl
         );
-    }
-
-    onMessage(message: any) {
-        switch (message['Title']) {
-            case "All Threads": {
-                /*
-                this.threadController.clearAllThreads();
-                let threads: any[] = message['Threads'];
-                for (let i = 0; i < threads.length; i++) {
-                    this.threadController.addThread(threads[i]);
-                }
-                if (this.showThreadWhenLoaded != null) {
-                    this.threadController.showThread(this.showThreadWhenLoaded);
-                    //console.log("Told to show thread ${this.showThreadWhenLoaded}");
-                    this.showThreadWhenLoaded = null;
-                }
-
-                 */
-            }
-                break;
-            case "Thread Add": {
-                //this.threadController.addThread(message["Thread Map"]);
-            }
-                break;
-            case "Thread Remove": {
-                this.threadController.removeThread(message["ThreadID"]);
-            }
-                break;
-            case "Thread Update": {
-                this.threadController.updateThread(message["ThreadID"], message["Thread Title"], message["Thread Description"]);
-            }
-                break;
-            case "Thread Move To Top": {
-                this.threadController.moveThreadToTop(message["ThreadID"]);
-            }
-                break;
-            case "Comment Add": {
-                this.threadController.addComment(message["Comment"]);
-            }
-                break;
-            case "Comment Delete": {
-                this.threadController.deleteComment(message["ThreadID"], message["CommentID"]);
-            }
-                break;
-            case "Comment Update": {
-                this.threadController.updateComment(message["ThreadID"], message["CommentID"], message["Comment"]);
-            }
-                break;
-        }
-    }
-
-    addCommentBinary(message : MessageReader) {
-        this.threadController.addCommentBinary(new MessageReader(message.getBinary()));
-    }
-
-    addThreadBinary(message : MessageReader) {
-        //this.threadController.addThreadBinary(new MessageReader(message.getBinary()));
-    }
-
-    updateThreadBinary(message : MessageReader) {
-        let threadID = message.getString();
-        let title = message.getString();
-        let description = message.getString();
-        this.threadController.updateThread(threadID, title, description);
-    }
-
-    updateCommentBinary(message : MessageReader) {
-        this.threadController.updateComment(message.getString(), message.getString(), message.getString());
-    }
-
-    removeThreadBinary(message : MessageReader) {
-        this.threadController.removeThread(message.getString());
-    }
-
-    removeCommentBinary(message : MessageReader) {
-        this.threadController.deleteComment(message.getString(), message.getString());
-    }
-
-    moveThreadToTopBinary(message : MessageReader) {
-        this.threadController.moveThreadToTop(message.getString());
-    }
-
-    allThreadsBinary(message : MessageReader) {
-        /*
-        this.threadController.clearAllThreads();
-        let numberOfThreads = message.getUint32();
-        for (let i = 0; i < numberOfThreads; i++) {
-            this.threadController.addThreadBinary(new MessageReader(message.getBinary()));
-        }
-        if (this.showThreadWhenLoaded != null) {
-            this.threadController.showThread(this.showThreadWhenLoaded);
-            //console.log("Told to show thread ${this.showThreadWhenLoaded}");
-            this.showThreadWhenLoaded = null;
-        }
-
-         */
     }
 
     getDiv(): HTMLDivElement {

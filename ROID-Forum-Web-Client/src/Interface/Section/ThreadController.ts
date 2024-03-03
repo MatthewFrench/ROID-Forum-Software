@@ -79,6 +79,8 @@ export class ThreadController {
     };
 
     updateThreadPositions = () => {
+        // Sort the threads by last update time
+        this.threads.sort((a, b) => Utility.TimeuuidToMilliseconds(b.getUpdatedTime()) - Utility.TimeuuidToMilliseconds(a.getUpdatedTime()));
         for (let i = 0; i < this.threads.length; i++) {
             let t: ThreadInfo = this.threads[i];
             t.headerView.getDiv().style.top = `${i * 85 + 60}px`;
