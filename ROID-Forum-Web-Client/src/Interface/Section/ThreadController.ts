@@ -5,7 +5,6 @@ import {Section} from "./Section";
 import {Interface} from "../../Utility/Interface";
 import {CommentInfo} from "./CommentInfo";
 import {Utility} from "../../Utility/Utility";
-import {MessageReader} from "../../Utility/Message/MessageReader";
 
 export class ThreadController {
     threads: ThreadInfo[];
@@ -158,29 +157,6 @@ export class ThreadController {
             this.updateThreadPositions();
         }
     };
-/*
-    addThreadBinary = (message: MessageReader) => {
-        let owner = message.getString();
-        let threadID = message.getString();
-        let title = message.getString();
-
-        if (this.getThread(threadID) == null) {
-            let thread: ThreadInfo = new ThreadInfo(this, this.hasDarkTheme);
-            thread.setThreadID(threadID);
-            this.threads.push(thread);
-
-            thread.setOwner(owner);
-            thread.setTitle(title);
-
-            thread.headerView.getDiv().style.opacity = "1.0";
-            thread.headerView.getDiv().style.top = `${(this.threads.length - 1) * 85 + 60}px`;
-            this.headerView.appendChild(thread.headerView.getDiv());
-
-            this.updateThreadPositions();
-        }
-    };
-
- */
 
     removeThread = (threadID: string) => {
         let thread: ThreadInfo = this.getThread(threadID);
@@ -205,15 +181,22 @@ export class ThreadController {
         }
     };
 
-    moveThreadToTop = (threadID: string) => {
-        let thread: ThreadInfo = this.getThread(threadID);
+    updateCommentCount = (threadId: string, commentCount: number) => {
+        let thread: ThreadInfo = this.getThread(threadId);
         if (thread != null) {
-            this.threads.splice(this.threads.indexOf(thread), 1);
-            this.threads.splice(0, 0, thread);
-            this.updateThreadPositions();
+            thread.setCommentCount(commentCount);
         }
     };
 
+    updateUpdatedTime = (threadId: string, updatedTime: string) => {
+        let thread: ThreadInfo = this.getThread(threadId);
+        if (thread != null) {
+            thread.setUpdatedTime(updatedTime);
+            this.updateThreadPositions();
+        }
+    }
+
+    /*
     addComment = (commentMap: any) => {
         let threadID: string = commentMap["ThreadID"];
         let thread: ThreadInfo = this.getThread(threadID);
@@ -245,6 +228,7 @@ export class ThreadController {
             cf.setAvatarURL(avatarURL);
         }
     };
+     */
 
     deleteComment = (threadID: string, commentID: string) => {
         let thread: ThreadInfo = this.getThread(threadID);

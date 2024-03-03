@@ -7,8 +7,10 @@ export class CommentInfo {
     _threadID: string;
     _commentID: string;
     _comment: string;
-    _owner: string;
-    _avatarURL = "";
+    _creatorAccountId: string;
+    _creatorDisplayName: string;
+    _creatorAvatarUrl: string;
+    _createdTime: string;
     commentView: CommentView;
     thread: ThreadInfo;
     threadController: ThreadController;
@@ -19,6 +21,7 @@ export class CommentInfo {
         this.commentView = new CommentView(this, this.thread, this.threadController, darkTheme);
     }
 
+    /*
     setBinary(message: MessageReader) {
         let threadID = message.getString();
         let commentID = message.getString();
@@ -34,6 +37,8 @@ export class CommentInfo {
         this.commentView.updateOwner();
         this.commentView.updateDescription();
     }
+
+     */
 
     setThreadID(id: string) {
         this._threadID = id;
@@ -60,21 +65,37 @@ export class CommentInfo {
         return this._comment;
     }
 
-    setOwner(owner: string) {
-        this._owner = owner;
+    setCreatedTime(createdTime: string) {
+        this._createdTime = createdTime;
+    }
+
+    getCreatedTime(): string {
+        return this._createdTime;
+    }
+
+    setCreatorDisplayname(creatorDisplayName: string) {
+        this._creatorDisplayName = creatorDisplayName;
         this.commentView.updateOwner();
     }
 
-    getPosterName(): string {
-        return this._owner;
+    getCreatorDisplayName(): string {
+        return this._creatorDisplayName;
+    }
+
+    setCreatorAccountId(creatorAccountId: string) {
+        this._creatorAccountId = creatorAccountId;
+    }
+
+    getCreatorAccountId(): string {
+        return this._creatorAccountId;
     }
 
     setAvatarURL(avatarURL: string) {
-        this._avatarURL = avatarURL;
+        this._creatorAvatarUrl = avatarURL;
         this.commentView.updateAvatarURL();
     }
 
     getAvatarURL(): string {
-        return this._avatarURL;
+        return this._creatorAvatarUrl;
     }
 }

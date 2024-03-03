@@ -195,6 +195,7 @@ export class AppController {
             } break;
             case Controllers.Section.ID: {
                 switch(messageID) {
+                    // Todo: We can implement a user viewing display with the below messages, to make the forum seem more alive
                     case Controllers.Section.Messages.AllSectionViewers: {
 
                     }break;
@@ -241,16 +242,26 @@ export class AppController {
                         this.mainSection.sectionClick(0);
                     }break;
                     case Controllers.Section.Messages.ThreadSuccessfullyCreated: {
-
+                        // Todo: This is probably where we want to switch the user's viewing thread to the thread they just created
                     }break;
                     case Controllers.Section.Messages.UpdateThreadCommentCount: {
-
+                        let sectionId = message.getString();
+                        let threadId = message.getString();
+                        let commentCount = message.getUint32();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        if (section) {
+                            section.threadController.updateCommentCount(threadId, commentCount);
+                        }
                     }break;
                     case Controllers.Section.Messages.AvatarUpdate: {
-
+                        let accountId = message.getString();
+                        let avatarUrl = message.getString();
+                        // Todo: We will want to tell all sections and threads to update the accoutId's avatar
                     }break;
                     case Controllers.Section.Messages.DisplayNameUpdate: {
-
+                        let accountId = message.getString();
+                        let displayName = message.getString();
+                        // Todo: We will want to tell all sections and threads to update the accoutId's display name
                     }break;
                     case Controllers.Section.Messages.AddThreadHeader: {
                         let sectionId = message.getString();
@@ -281,15 +292,37 @@ export class AppController {
                         }
                     }break;
                     case Controllers.Section.Messages.UpdateThreadTitleAndDescription: {
-                        //section.updateThreadBinary(message);
+                        let sectionId = message.getString();
+                        let threadId = message.getString();
+                        let title = message.getString();
+                        let description = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        if (section) {
+                            section.threadController.updateThread(threadId, title, description);
+                        }
                     }break;
                     case Controllers.Section.Messages.RemoveThreadHeader: {
-                        //section.removeThreadBinary(message);
+                        let sectionId = message.getString();
+                        let threadId = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        if (section) {
+                            section.threadController.removeThread(threadId);
+                        }
                     }break;
                     case Controllers.Section.Messages.UpdateThreadCommentCountAndUpdatedTime: {
-                        //section.moveThreadToTopBinary(message);
+                        let sectionId = message.getString();
+                        let threadId = message.getString();
+                        let commentCount = message.getUint32();
+                        let updatedTime = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        if (section) {
+                            section.threadController.updateCommentCount(threadId, commentCount);
+                            section.threadController.updateUpdatedTime(threadId, updatedTime);
+                        }
                     }break;
                     case Controllers.Section.Messages.AllThreadHeaders: {
+                        // Todo: Measure latency in getting thread headers, when running locally, it is noticeable,
+                        // it should be instant when running locally. We'll need to profile and optimize.
                         let count = message.getUint32();
                         let section = null;
                         for (let index = 0; index < count; index++) {
