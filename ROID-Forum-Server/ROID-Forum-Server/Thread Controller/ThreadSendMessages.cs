@@ -29,14 +29,13 @@ public static class ThreadSendMessages
         message.AddUint8((byte)ThreadMessage.AllComments);
         var count = (UInt32)comments.Count;
         message.AddUint32(count);
-        foreach ((Guid sectionId, Guid threadId, Guid commentId, Guid creatorAccountId, String text, TimeUuid createdTime, string creatorDisplayName, string creatorAvatarUrl) in comments)
+        foreach ((Guid sectionId, Guid threadId, TimeUuid commentIdAndCreatedTime, Guid creatorAccountId, String text, string creatorDisplayName, string creatorAvatarUrl) in comments)
         {
             message.AddString(sectionId.ToString());
             message.AddString(threadId.ToString());
-            message.AddString(commentId.ToString());
+            message.AddString(commentIdAndCreatedTime.ToString());
             message.AddString(creatorAccountId.ToString());
             message.AddString(text);
-            message.AddString(createdTime.ToString());
             message.AddString(creatorDisplayName);
             message.AddString(creatorAvatarUrl);
         }
@@ -62,10 +61,9 @@ public static class ThreadSendMessages
         message.AddUint8((byte)ThreadMessage.AddComment);
         message.AddString(comment.sectionId.ToString());
         message.AddString(comment.threadId.ToString());
-        message.AddString(comment.commentId.ToString());
+        message.AddString(comment.commentIdAndCreatedTime.ToString());
         message.AddString(comment.creatorAccountId.ToString());
         message.AddString(comment.text);
-        message.AddString(comment.createdTime.ToString());
         message.AddString(comment.creatorDisplayName);
         message.AddString(comment.creatorAvatarUrl);
 

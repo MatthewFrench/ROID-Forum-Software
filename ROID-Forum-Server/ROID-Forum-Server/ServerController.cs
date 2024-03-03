@@ -117,9 +117,13 @@ namespace ROIDForumServer
                 }
 
                 var sectionId = Guid.Parse(message.GetString());
+                if (!message.HasString())
+                {
+                    return;
+                }
                 var threadId = Guid.Parse(message.GetString());
                 if (DatabaseSection.SectionIdExists(serverState.Database.GetSession(), sectionId) &&
-                    DatabaseThread.ThreadIdExists(serverState.Database.GetSession(), sectionId))
+                    DatabaseThread.ThreadIdExists(serverState.Database.GetSession(), threadId))
                 {
                     ThreadController.OnMessage(serverState, user, sectionId, threadId, message);
                 }

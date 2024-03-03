@@ -425,7 +425,6 @@ export class AppController {
                             let commentId = message.getString();
                             let creatorAccountId = message.getString();
                             let text = message.getString();
-                            let createdTime = message.getString();
                             let creatorDisplayName = message.getString();
                             let creatorAvatarUrl = message.getString();
                             let section = this.sections.find(value => value.sectionId == sectionId);
@@ -433,10 +432,9 @@ export class AppController {
                                 let thread = section.threadController.getThread(threadId);
                                 if (thread) {
                                     let newComment = new CommentInfo(thread, section.threadController, section.threadController.hasDarkTheme);
-                                    newComment.setCommentID(commentId);
+                                    newComment.setCommentIDAndCreatedTime(commentId);
                                     newComment.setCreatorAccountId(creatorAccountId);
                                     newComment.setComment(text);
-                                    newComment.setCreatedTime(createdTime);
                                     newComment.setCreatorDisplayName(creatorDisplayName);
                                     newComment.setCreatorAvatarUrl(creatorAvatarUrl);
                                     thread.addComment(newComment);
@@ -459,7 +457,6 @@ export class AppController {
                         let commentId = message.getString();
                         let creatorAccountId = message.getString();
                         let text = message.getString();
-                        let createdTime = message.getString();
                         let creatorDisplayName = message.getString();
                         let creatorAvatarUrl = message.getString();
                         let section = this.sections.find(value => value.sectionId == sectionId);
@@ -467,10 +464,9 @@ export class AppController {
                             let thread = section.threadController.getThread(threadId);
                             if (thread) {
                                 let newComment = new CommentInfo(thread, section.threadController, section.threadController.hasDarkTheme);
-                                newComment.setCommentID(commentId);
+                                newComment.setCommentIDAndCreatedTime(commentId);
                                 newComment.setCreatorAccountId(creatorAccountId);
                                 newComment.setComment(text);
-                                newComment.setCreatedTime(createdTime);
                                 newComment.setCreatorDisplayName(creatorDisplayName);
                                 newComment.setCreatorAvatarUrl(creatorAvatarUrl);
                                 thread.addComment(newComment);

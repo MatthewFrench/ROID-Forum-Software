@@ -1,16 +1,14 @@
 import {CommentView} from "./ThreadViews/CommentView";
 import {ThreadInfo} from "./ThreadInfo";
 import {ThreadController} from "./ThreadController";
-import {MessageReader} from "../../Utility/Message/MessageReader";
 
 export class CommentInfo {
     _threadID: string;
-    _commentID: string;
+    _commentIDAndCreatedTime: string;
     _comment: string;
     _creatorAccountId: string;
     _creatorDisplayName: string;
     _creatorAvatarUrl: string;
-    _createdTime: string;
     commentView: CommentView;
     thread: ThreadInfo;
     threadController: ThreadController;
@@ -29,12 +27,12 @@ export class CommentInfo {
         return this._threadID;
     }
 
-    setCommentID(id: string) {
-        this._commentID = id;
+    setCommentIDAndCreatedTime(id: string) {
+        this._commentIDAndCreatedTime = id;
     }
 
-    getCommentID(): string {
-        return this._commentID;
+    getCommentIDAndCreatedTime(): string {
+        return this._commentIDAndCreatedTime;
     }
 
     setComment(comment: string) {
@@ -44,14 +42,6 @@ export class CommentInfo {
 
     getComment(): string {
         return this._comment;
-    }
-
-    setCreatedTime(createdTime: string) {
-        this._createdTime = createdTime;
-    }
-
-    getCreatedTime(): string {
-        return this._createdTime;
     }
 
     setCreatorDisplayName(creatorDisplayName: string) {

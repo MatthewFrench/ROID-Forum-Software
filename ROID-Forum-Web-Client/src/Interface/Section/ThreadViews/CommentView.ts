@@ -79,7 +79,7 @@ export class CommentView {
         message.addString(this.threadController.sectionController.sectionId);
         message.addString(this.thread.getThreadId());
         message.addUint8(SendMessages.ThreadMessage.EditComment);
-        message.addString(this.comment.getCommentID());
+        message.addString(this.comment.getCommentIDAndCreatedTime());
         message.addString(this.editDescription.value);
         this.threadController.sectionController.website.networkController.send(message.toBuffer());
     };
@@ -90,7 +90,7 @@ export class CommentView {
         message.addString(this.threadController.sectionController.sectionId);
         message.addString(this.thread.getThreadId());
         message.addUint8(SendMessages.ThreadMessage.DeleteComment);
-        message.addString(this.comment.getCommentID());
+        message.addString(this.comment.getCommentIDAndCreatedTime());
         this.threadController.sectionController.website.networkController.send(message.toBuffer());
     };
 

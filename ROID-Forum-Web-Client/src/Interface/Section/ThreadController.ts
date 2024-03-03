@@ -5,6 +5,8 @@ import {Section} from "./Section";
 import {Interface} from "../../Utility/Interface";
 import {CommentInfo} from "./CommentInfo";
 import {Utility} from "../../Utility/Utility";
+import {MessageWriter} from "../../Utility/Message/MessageWriter";
+import {SendMessages} from "../../Networking/MessageDefinitions/SendMessages";
 
 export class ThreadController {
     threads: ThreadInfo[];
@@ -62,7 +64,7 @@ export class ThreadController {
         Utility.ClearElements(this.fullView);
         this.mainView.appendChild(this.headerView);
         this.backButton.remove();
-        this.viewingThread = null;
+        this.setViewingThread(null);
     };
 
     threadClicked = (thread: ThreadInfo) => {
@@ -70,7 +72,27 @@ export class ThreadController {
         this.mainView.appendChild(this.fullView);
         this.fullView.appendChild(thread.fullView.getDiv());
         this.mainView.appendChild(this.backButton);
+        this.setViewingThread(thread);
+    };
+
+    setViewingThread = (thread: ThreadInfo) => {
+        if (this.viewingThread != null) {
+            let message = new MessageWriter();
+            message.addUint8(SendMessages.Controller.Thread);
+            message.addString(this.sectionController.sectionId);
+            message.addString(this.viewingThread.getThreadId());
+            message.addUint8(SendMessages.ThreadMessage.ExitViewingThread);
+            this.sectionController.website.networkController.send(message.toBuffer());
+        }
         this.viewingThread = thread;
+        if (this.viewingThread != null) {
+            let message = new MessageWriter();
+            message.addUint8(SendMessages.Controller.Thread);
+            message.addString(this.sectionController.sectionId);
+            message.addString(this.viewingThread.getThreadId());
+            message.addUint8(SendMessages.ThreadMessage.BeginViewingThread);
+            this.sectionController.website.networkController.send(message.toBuffer());
+        }
     };
 
     backButtonClicked = () => {
@@ -108,6 +130,7 @@ export class ThreadController {
             t.fullView.getDiv().remove();
         }
         this.threads = [];
+        this.setViewingThread(null);
     };
 
     addThread = (threadId: string,

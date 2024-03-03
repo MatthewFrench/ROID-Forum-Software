@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Cassandra;
 
 namespace ROIDForumServer
 {
@@ -151,7 +152,7 @@ namespace ROIDForumServer
                     return;
                 }
 
-                Guid commentId = DatabaseComment.CreateComment(serverState.Database.GetSession(), (Guid)user.AccountId,
+                Guid commentIdAndCreatedTime = DatabaseComment.CreateComment(serverState.Database.GetSession(), (Guid)user.AccountId,
                     sectionId, threadId, text);
                 // Update thread ordering since a comment was added
                 var updatedTime =
@@ -169,7 +170,7 @@ namespace ROIDForumServer
                 // Send add comment message to all users viewing the thread
                 var addCommentMessage =
                     ThreadSendMessages.AddComment(DatabaseComment.GetComment(serverState.Database.GetSession(),
-                        commentId));
+                        threadId, commentIdAndCreatedTime));
                 foreach (var otherUser in serverState.Networking.Users.Where(connectedUser =>
                              connectedUser.ViewingThreadId == threadId))
                 {
@@ -177,18 +178,18 @@ namespace ROIDForumServer
                 }
 
                 // Send successfully created comment message to user
-                user.Send(ThreadSendMessages.CommentSuccessfullyCreated(sectionId, threadId, commentId));
+                user.Send(ThreadSendMessages.CommentSuccessfullyCreated(sectionId, threadId, commentIdAndCreatedTime));
             }
             else if ((byte)ThreadReceiveMessages.EditComment == messageId)
             {
                 if (!message.HasString()) return;
-                Guid commentId = Guid.Parse(message.GetString());
-                if (!DatabaseComment.CommentIdExists(serverState.Database.GetSession(), commentId))
+                TimeUuid commentIdAndCreatedTime = TimeUuid.Parse(message.GetString());
+                if (!DatabaseComment.CommentIdExists(serverState.Database.GetSession(), threadId, commentIdAndCreatedTime))
                 {
                     return;
                 }
 
-                if (user.AccountId != DatabaseComment.GetCommentOwner(serverState.Database.GetSession(), commentId))
+                if (user.AccountId != DatabaseComment.GetCommentOwner(serverState.Database.GetSession(), threadId, commentIdAndCreatedTime))
                 {
                     return;
                 }
@@ -198,11 +199,11 @@ namespace ROIDForumServer
                 {
                     return;
                 }
-                DatabaseComment.UpdateComment(serverState.Database.GetSession(), commentId, description);
+                DatabaseComment.UpdateComment(serverState.Database.GetSession(), threadId, commentIdAndCreatedTime, description);
                 
                 // Send update comment message to all users viewing the thread
                 var updateCommentMessage =
-                    ThreadSendMessages.UpdateComment(sectionId, threadId, commentId, description);
+                    ThreadSendMessages.UpdateComment(sectionId, threadId, commentIdAndCreatedTime, description);
                 foreach (var otherUser in serverState.Networking.Users.Where(connectedUser =>
                              connectedUser.ViewingThreadId == threadId))
                 {
@@ -212,22 +213,22 @@ namespace ROIDForumServer
             else if ((byte)ThreadReceiveMessages.DeleteComment == messageId)
             {
                 if (!message.HasString()) return;
-                Guid commentId = Guid.Parse(message.GetString());
-                if (!DatabaseComment.CommentIdExists(serverState.Database.GetSession(), commentId))
+                TimeUuid commentIdAndCreatedTime = TimeUuid.Parse(message.GetString());
+                if (!DatabaseComment.CommentIdExists(serverState.Database.GetSession(), threadId, commentIdAndCreatedTime))
                 {
                     return;
                 }
 
-                if (user.AccountId != DatabaseComment.GetCommentOwner(serverState.Database.GetSession(), commentId))
+                if (user.AccountId != DatabaseComment.GetCommentOwner(serverState.Database.GetSession(), threadId, commentIdAndCreatedTime))
                 {
                     return;
                 }
 
-                DatabaseComment.DeleteComment(serverState.Database.GetSession(), commentId);
+                DatabaseComment.DeleteComment(serverState.Database.GetSession(), threadId, commentIdAndCreatedTime);
 
                 // Send remove comment message to all users viewing the thread
                 var removeCommentMessage =
-                    ThreadSendMessages.RemoveComment(sectionId, threadId, commentId);
+                    ThreadSendMessages.RemoveComment(sectionId, threadId, commentIdAndCreatedTime);
                 foreach (var otherUser in serverState.Networking.Users.Where(connectedUser =>
                              connectedUser.ViewingThreadId == threadId))
                 {

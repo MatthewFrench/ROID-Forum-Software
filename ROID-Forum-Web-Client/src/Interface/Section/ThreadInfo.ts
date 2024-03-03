@@ -115,7 +115,7 @@ export class ThreadInfo {
     getComment(commentID: string): CommentInfo {
         for (let i = 0; i < this._comments.length; i++) {
             let ci: CommentInfo = this._comments[i];
-            if (ci.getCommentID() == commentID) {
+            if (ci.getCommentIDAndCreatedTime() == commentID) {
                 return ci;
             }
         }
