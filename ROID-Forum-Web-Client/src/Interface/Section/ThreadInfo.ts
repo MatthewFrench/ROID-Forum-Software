@@ -80,8 +80,6 @@ export class ThreadInfo {
 
     setCreatorAccountId(owner: string) {
         this._creatorAccountId = owner;
-        this.headerView.updateOwner();
-        this.fullView.threadDisplay.updateOwner();
     }
 
     getCreatorAccountId(): string {
@@ -90,6 +88,8 @@ export class ThreadInfo {
 
     setCreatorDisplayName(displayName: string) {
         this._creatorDisplayName = displayName;
+        this.headerView.updateOwner();
+        this.fullView.threadDisplay.updateOwner();
     }
 
     getCreatorDisplayName(): string {
@@ -130,5 +130,12 @@ export class ThreadInfo {
             this.fullView.removeComment(c);
             this.headerView.updateCommentCount();
         }
+    }
+
+    removeAllComments() {
+        for (let comment of this._comments) {
+            this.fullView.removeComment(comment);
+        }
+        this._comments = [];
     }
 }

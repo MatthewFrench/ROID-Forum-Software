@@ -431,6 +431,9 @@ export class AppController {
                             if (section) {
                                 let thread = section.threadController.getThread(threadId);
                                 if (thread) {
+                                    if (index == 0) {
+                                        thread.removeAllComments();
+                                    }
                                     let newComment = new CommentInfo(thread, section.threadController, section.threadController.hasDarkTheme);
                                     newComment.setCommentIDAndCreatedTime(commentId);
                                     newComment.setCreatorAccountId(creatorAccountId);
