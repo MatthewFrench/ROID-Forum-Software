@@ -71,7 +71,9 @@ public static class DatabaseComment
         Guid commentId,
         Guid creatorAccountId,
         String text,
-        TimeUuid createdTime);
+        TimeUuid createdTime,
+        string creatorDisplayName,
+        string creatorAvatarUrl);
 
     // Todo: Add pagination and dynamic loading/lookback as the user scrolls down in a section
     public static List<DatabaseCommentData> GetThreadComments(ISession session, Guid threadId)
@@ -82,13 +84,16 @@ public static class DatabaseComment
         var commentResult = session.Execute(commentSelectStatement.Bind(threadId));
         foreach (Row item in commentResult)
         {
+            var creatorAccountId = item.GetValue<Guid>("creator_account_id");
             commentDatas.Add(new DatabaseCommentData(
                 item.GetValue<Guid>("section_id"),
                 item.GetValue<Guid>("thread_id"),
                 item.GetValue<Guid>("comment_id"),
-                item.GetValue<Guid>("creator_account_id"),
+                creatorAccountId,
                 item.GetValue<String>("content"),
-                item.GetValue<TimeUuid>("created_time")
+                item.GetValue<TimeUuid>("created_time"),
+                DatabaseAccount.GetAccountDisplayName(session, creatorAccountId),
+                DatabaseAccount.GetAvatarUrl(session, creatorAccountId)
             ));
         }
 
@@ -102,13 +107,16 @@ public static class DatabaseComment
             $"SELECT section_id, thread_id, comment_id, content, creator_account_id, created_time FROM \"{Database.DefaultKeyspace}\".\"{TableComment}\" where commentId=?");
         var commentResult = session.Execute(commentSelectStatement.Bind(commentId));
         var commentItem = commentResult.FirstOrDefault();
+        var creatorAccountId = commentItem.GetValue<Guid>("creator_account_id");
         return new DatabaseCommentData(
             commentItem.GetValue<Guid>("section_id"),
             commentItem.GetValue<Guid>("thread_id"),
             commentItem.GetValue<Guid>("comment_id"),
-            commentItem.GetValue<Guid>("creator_account_id"),
+            creatorAccountId,
             commentItem.GetValue<String>("content"),
-            commentItem.GetValue<TimeUuid>("created_time")
+            commentItem.GetValue<TimeUuid>("created_time"),
+            DatabaseAccount.GetAccountDisplayName(session, creatorAccountId),
+            DatabaseAccount.GetAvatarUrl(session, creatorAccountId)
         );
     }
 

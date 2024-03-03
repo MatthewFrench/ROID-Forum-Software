@@ -10,6 +10,7 @@ import {Section} from "./Interface/Section/Section";
 import {Utility} from "./Utility/Utility";
 import {MessageReader} from "./Utility/Message/MessageReader";
 import {Controllers} from "./Networking/MessageDefinitions/ReceiveMessageDefinitions";
+import {CommentInfo} from "./Interface/Section/CommentInfo";
 
 export class AppController {
     mainDiv: HTMLDivElement;
@@ -28,7 +29,8 @@ export class AppController {
     reconnectingDiv: HTMLDivElement;
 
     constructor() {
-        this.mainDiv = Interface.Create({type: 'div', className: 'ApplicationDiv', elements: [
+        this.mainDiv = Interface.Create({
+            type: 'div', className: 'ApplicationDiv', elements: [
                 this.behindWebsiteDiv = Interface.Create({type: 'div', className: 'behindWebsite'}),
                 this.websiteDiv = Interface.Create({type: 'div', className: 'Website'}),
                 this.aheadWebsiteDiv = Interface.Create({type: 'div', className: 'aheadWebsite'})
@@ -77,7 +79,11 @@ export class AppController {
             this.reconnectingDiv.remove();
             this.reconnectingDiv = null;
         }
-        this.reconnectingDiv = Interface.Create({type: 'div', className: 'ReconnectingDiv', text: 'Unable to connect...'});
+        this.reconnectingDiv = Interface.Create({
+            type: 'div',
+            className: 'ReconnectingDiv',
+            text: 'Unable to connect...'
+        });
         this.body.appendChild(this.reconnectingDiv);
 
         this.reset();
@@ -124,7 +130,7 @@ export class AppController {
         }
     }
 
-    getSection(sectionId : String) : Section {
+    getSection(sectionId: String): Section {
         for (let section of this.sections) {
             if (section.getId() == sectionId) {
                 return section;
@@ -136,81 +142,102 @@ export class AppController {
     Message(message: MessageReader) {
         let controller = message.getUint8();
         let messageID = message.getUint8();
-        switch(controller) {
+        switch (controller) {
             case Controllers.Chat.ID: {
-                switch(messageID) {
+                switch (messageID) {
                     case Controllers.Chat.Messages.NewMessage: {
                         this.chatbox.gotNewMessage(message);
-                    }break;
+                    }
+                        break;
                     case Controllers.Chat.Messages.AllOnlineList: {
                         this.chatbox.gotAllOnlineList(message);
-                    }break;
+                    }
+                        break;
                     case Controllers.Chat.Messages.AllMessages: {
                         this.chatbox.gotAllMessages(message);
-                    }break;
+                    }
+                        break;
                     case Controllers.Chat.Messages.DisplayNameUpdate: {
                         this.chatbox.gotDisplayNameUpdate(message);
-                    }break;
+                    }
+                        break;
                     case Controllers.Chat.Messages.OnlineListAddUser: {
                         this.chatbox.gotOnlineListAddUser(message);
-                    }break;
+                    }
+                        break;
                     case Controllers.Chat.Messages.OnlineListLoggedInUser: {
                         this.chatbox.gotOnlineListLoggedInUser(message);
-                    }break;
+                    }
+                        break;
                     case Controllers.Chat.Messages.OnlineListLoggedOutUser: {
                         this.chatbox.gotOnlineListLoggedOutUser(message);
-                    }break;
+                    }
+                        break;
                     case Controllers.Chat.Messages.OnlineListRemoveUser: {
                         this.chatbox.gotOnlineListRemoveUser(message);
-                    }break;
+                    }
+                        break;
                 }
-            } break;
+            }
+                break;
             case Controllers.Profile.ID: {
-                switch(messageID) {
+                switch (messageID) {
                     case Controllers.Profile.Messages.ReturnAvatar: {
                         this.controlPanel.preferencesAvatarInput.value = message.getString();
-                    }break;
+                    }
+                        break;
                     case Controllers.Profile.Messages.ReturnDisplayName: {
                         this.controlPanel.preferencesDisplayNameInput.value = message.getString();
-                    }break;
+                    }
+                        break;
                     case Controllers.Profile.Messages.LoggedIn: {
                         this.database.processEvent('Logged In', message);
                         this.controlPanel.processEvent('Logged In');
                         this.chatbox.processEvent('Logged In');
                         for (let section of this.sections) section.processEvent('Logged In');
-                    }break;
+                    }
+                        break;
                     case Controllers.Profile.Messages.LoggedOut: {
                         this.database.processEvent('Logged Out', message);
                         this.controlPanel.processEvent('Logged Out');
                         this.chatbox.processEvent('Logged Out');
                         for (let section of this.sections) section.processEvent('Logged Out');
-                    }break;
+                    }
+                        break;
                     case Controllers.Profile.Messages.LoginFailed: {
                         this.controlPanel.processEvent('Login Failed');
-                    }break;
+                    }
+                        break;
                     case Controllers.Profile.Messages.RegisterFailed: {
                         this.controlPanel.processEvent('Register Failed');
-                    }break;
+                    }
+                        break;
                 }
-            } break;
+            }
+                break;
             case Controllers.Section.ID: {
-                switch(messageID) {
+                switch (messageID) {
                     // Todo: We can implement a user viewing display with the below messages, to make the forum seem more alive
                     case Controllers.Section.Messages.AllSectionViewers: {
 
-                    }break;
+                    }
+                        break;
                     case Controllers.Section.Messages.SectionAddViewer: {
 
-                    }break;
+                    }
+                        break;
                     case Controllers.Section.Messages.SectionRemoveViewer: {
 
-                    }break;
+                    }
+                        break;
                     case Controllers.Section.Messages.SectionLoggedInViewer: {
 
-                    }break;
+                    }
+                        break;
                     case Controllers.Section.Messages.SectionLoggedOutViewer: {
 
-                    }break;
+                    }
+                        break;
                     case Controllers.Section.Messages.AllSectionHeaders: {
                         let count = message.getUint32();
                         for (let index = 0; index < count; index++) {
@@ -240,10 +267,12 @@ export class AppController {
                         this.mainSection.addSections();
                         //Load the first section
                         this.mainSection.sectionClick(0);
-                    }break;
+                    }
+                        break;
                     case Controllers.Section.Messages.ThreadSuccessfullyCreated: {
                         // Todo: This is probably where we want to switch the user's viewing thread to the thread they just created
-                    }break;
+                    }
+                        break;
                     case Controllers.Section.Messages.UpdateThreadCommentCount: {
                         let sectionId = message.getString();
                         let threadId = message.getString();
@@ -252,17 +281,20 @@ export class AppController {
                         if (section) {
                             section.threadController.updateCommentCount(threadId, commentCount);
                         }
-                    }break;
+                    }
+                        break;
                     case Controllers.Section.Messages.AvatarUpdate: {
                         let accountId = message.getString();
                         let avatarUrl = message.getString();
                         // Todo: We will want to tell all sections and threads to update the accoutId's avatar
-                    }break;
+                    }
+                        break;
                     case Controllers.Section.Messages.DisplayNameUpdate: {
                         let accountId = message.getString();
                         let displayName = message.getString();
                         // Todo: We will want to tell all sections and threads to update the accoutId's display name
-                    }break;
+                    }
+                        break;
                     case Controllers.Section.Messages.AddThreadHeader: {
                         let sectionId = message.getString();
                         let threadId = message.getString();
@@ -290,7 +322,8 @@ export class AppController {
                             section.threadController.showThread(section.showThreadWhenLoaded);
                             section.showThreadWhenLoaded = null;
                         }
-                    }break;
+                    }
+                        break;
                     case Controllers.Section.Messages.UpdateThreadTitleAndDescription: {
                         let sectionId = message.getString();
                         let threadId = message.getString();
@@ -300,7 +333,8 @@ export class AppController {
                         if (section) {
                             section.threadController.updateThread(threadId, title, description);
                         }
-                    }break;
+                    }
+                        break;
                     case Controllers.Section.Messages.RemoveThreadHeader: {
                         let sectionId = message.getString();
                         let threadId = message.getString();
@@ -308,7 +342,8 @@ export class AppController {
                         if (section) {
                             section.threadController.removeThread(threadId);
                         }
-                    }break;
+                    }
+                        break;
                     case Controllers.Section.Messages.UpdateThreadCommentCountAndUpdatedTime: {
                         let sectionId = message.getString();
                         let threadId = message.getString();
@@ -319,7 +354,8 @@ export class AppController {
                             section.threadController.updateCommentCount(threadId, commentCount);
                             section.threadController.updateUpdatedTime(threadId, updatedTime);
                         }
-                    }break;
+                    }
+                        break;
                     case Controllers.Section.Messages.AllThreadHeaders: {
                         // Todo: Measure latency in getting thread headers, when running locally, it is noticeable,
                         // it should be instant when running locally. We'll need to profile and optimize.
@@ -353,24 +389,133 @@ export class AppController {
                             section.threadController.showThread(section.showThreadWhenLoaded);
                             section.showThreadWhenLoaded = null;
                         }
-                    }break;
+                    }
+                        break;
                 }
-            } break;
+            }
+                break;
             case Controllers.Thread.ID: {
-                let sectionName = message.getString();
-                let section = this.getSection(sectionName);
-                switch(messageID) {
+                switch (messageID) {
+                    // Todo: We can implement a user viewing display with the below messages, to make the forum seem more alive
+                    case Controllers.Thread.Messages.AllThreadViewers: {
+
+                    }
+                        break;
+                    case Controllers.Thread.Messages.ThreadAddViewer: {
+
+                    }
+                        break;
+                    case Controllers.Thread.Messages.ThreadRemoveViewer: {
+
+                    }
+                        break;
+                    case Controllers.Thread.Messages.ThreadLoggedInViewer: {
+
+                    }
+                        break;
+                    case Controllers.Thread.Messages.ThreadLoggedOutViewer: {
+
+                    }
+                        break;
+                    case Controllers.Thread.Messages.AllComments: {
+                        let count = message.getUint32();
+                        for (let index = 0; index < count; index++) {
+                            let sectionId = message.getString();
+                            let threadId = message.getString();
+                            let commentId = message.getString();
+                            let creatorAccountId = message.getString();
+                            let text = message.getString();
+                            let createdTime = message.getString();
+                            let creatorDisplayName = message.getString();
+                            let creatorAvatarUrl = message.getString();
+                            let section = this.sections.find(value => value.sectionId == sectionId);
+                            if (section) {
+                                let thread = section.threadController.getThread(threadId);
+                                if (thread) {
+                                    let newComment = new CommentInfo(thread, section.threadController, section.threadController.hasDarkTheme);
+                                    newComment.setCommentID(commentId);
+                                    newComment.setCreatorAccountId(creatorAccountId);
+                                    newComment.setComment(text);
+                                    newComment.setCreatedTime(createdTime);
+                                    newComment.setCreatorDisplayName(creatorDisplayName);
+                                    newComment.setCreatorAvatarUrl(creatorAvatarUrl);
+                                    thread.addComment(newComment);
+                                }
+                            }
+                        }
+                    }
+                        break;
+                    case Controllers.Thread.Messages.CommentSuccessfullyCreated: {
+                        /*
+        message.AddString(sectionId.ToString());
+        message.AddString(threadId.ToString());
+        message.AddString(commentId.ToString());
+                         */
+                    }
+                        break;
                     case Controllers.Thread.Messages.AddComment: {
-                        //section.addCommentBinary(message);
-                    }break;
+                        let sectionId = message.getString();
+                        let threadId = message.getString();
+                        let commentId = message.getString();
+                        let creatorAccountId = message.getString();
+                        let text = message.getString();
+                        let createdTime = message.getString();
+                        let creatorDisplayName = message.getString();
+                        let creatorAvatarUrl = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        if (section) {
+                            let thread = section.threadController.getThread(threadId);
+                            if (thread) {
+                                let newComment = new CommentInfo(thread, section.threadController, section.threadController.hasDarkTheme);
+                                newComment.setCommentID(commentId);
+                                newComment.setCreatorAccountId(creatorAccountId);
+                                newComment.setComment(text);
+                                newComment.setCreatedTime(createdTime);
+                                newComment.setCreatorDisplayName(creatorDisplayName);
+                                newComment.setCreatorAvatarUrl(creatorAvatarUrl);
+                                thread.addComment(newComment);
+                            }
+                        }
+                    }
+                        break;
                     case Controllers.Thread.Messages.UpdateComment: {
-                        //section.updateCommentBinary(message);
-                    }break;
+                        let sectionId = message.getString();
+                        let threadId = message.getString();
+                        let commentId = message.getString();
+                        let text = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        if (section) {
+                            section.threadController.updateComment(threadId, commentId, text);
+                        }
+                    }
+                        break;
                     case Controllers.Thread.Messages.RemoveComment: {
-                        //section.removeCommentBinary(message);
-                    }break;
+                        let sectionId = message.getString();
+                        let threadId = message.getString();
+                        let commentId = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        if (section) {
+                            section.threadController.deleteComment(threadId, commentId);
+                        }
+                    }
+                        break;
+                    case Controllers.Thread.Messages.AvatarUpdate: {
+                        /*
+        message.AddString(accountId.ToString());
+        message.AddString(avatarUrl);
+                         */
+                    }
+                        break;
+                    case Controllers.Thread.Messages.DisplayNameUpdate: {
+                        /*
+        message.AddString(accountId.ToString());
+        message.AddString(displayName);
+                         */
+                    }
+                        break;
                 }
-            } break;
+            }
+                break;
         }
     }
 

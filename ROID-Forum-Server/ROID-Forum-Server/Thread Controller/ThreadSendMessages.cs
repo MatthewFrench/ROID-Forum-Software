@@ -25,9 +25,11 @@ public static class ThreadSendMessages
     public static byte[] AllComments(List<DatabaseComment.DatabaseCommentData> comments)
     {
         var message = new MessageWriter();
-        message.AddUint8((byte)ServerSendControllers.Section);
+        message.AddUint8((byte)ServerSendControllers.Thread);
         message.AddUint8((byte)ThreadMessage.AllComments);
-        foreach ((Guid sectionId, Guid threadId, Guid commentId, Guid creatorAccountId, String text, TimeUuid createdTime) in comments)
+        var count = (UInt32)comments.Count;
+        message.AddUint32(count);
+        foreach ((Guid sectionId, Guid threadId, Guid commentId, Guid creatorAccountId, String text, TimeUuid createdTime, string creatorDisplayName, string creatorAvatarUrl) in comments)
         {
             message.AddString(sectionId.ToString());
             message.AddString(threadId.ToString());
@@ -35,6 +37,8 @@ public static class ThreadSendMessages
             message.AddString(creatorAccountId.ToString());
             message.AddString(text);
             message.AddString(createdTime.ToString());
+            message.AddString(creatorDisplayName);
+            message.AddString(creatorAvatarUrl);
         }
 
         return message.ToBuffer();
@@ -43,7 +47,7 @@ public static class ThreadSendMessages
     public static byte[] CommentSuccessfullyCreated(Guid sectionId, Guid threadId, Guid commentId)
     {
         var message = new MessageWriter();
-        message.AddUint8((byte)ServerSendControllers.Section);
+        message.AddUint8((byte)ServerSendControllers.Thread);
         message.AddUint8((byte)ThreadMessage.CommentSuccessfullyCreated);
         message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
@@ -54,7 +58,7 @@ public static class ThreadSendMessages
     public static byte[] AddComment(DatabaseComment.DatabaseCommentData comment)
     {
         var message = new MessageWriter();
-        message.AddUint8((byte)ServerSendControllers.Section);
+        message.AddUint8((byte)ServerSendControllers.Thread);
         message.AddUint8((byte)ThreadMessage.AddComment);
         message.AddString(comment.sectionId.ToString());
         message.AddString(comment.threadId.ToString());
@@ -62,6 +66,8 @@ public static class ThreadSendMessages
         message.AddString(comment.creatorAccountId.ToString());
         message.AddString(comment.text);
         message.AddString(comment.createdTime.ToString());
+        message.AddString(comment.creatorDisplayName);
+        message.AddString(comment.creatorAvatarUrl);
 
         return message.ToBuffer();
     }
@@ -69,7 +75,7 @@ public static class ThreadSendMessages
     public static byte[] UpdateComment(Guid sectionId, Guid threadId, Guid commentId, string text)
     {
         var message = new MessageWriter();
-        message.AddUint8((byte)ServerSendControllers.Section);
+        message.AddUint8((byte)ServerSendControllers.Thread);
         message.AddUint8((byte)ThreadMessage.UpdateComment);
         message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
@@ -82,7 +88,7 @@ public static class ThreadSendMessages
     public static byte[] RemoveComment(Guid sectionId, Guid threadId, Guid commentId)
     {
         var message = new MessageWriter();
-        message.AddUint8((byte)ServerSendControllers.Section);
+        message.AddUint8((byte)ServerSendControllers.Thread);
         message.AddUint8((byte)ThreadMessage.RemoveComment);
         message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
@@ -163,7 +169,7 @@ public static class ThreadSendMessages
     public static byte[] DisplayNameUpdate(Guid accountId, string displayName)
     {
         var message = new MessageWriter();
-        message.AddUint8((byte)ServerSendControllers.Chat);
+        message.AddUint8((byte)ServerSendControllers.Thread);
         message.AddUint8((byte)ThreadMessage.DisplayNameUpdate);
         message.AddString(accountId.ToString());
         message.AddString(displayName);
@@ -173,7 +179,7 @@ public static class ThreadSendMessages
     public static byte[] AvatarUpdate(Guid accountId, string avatarUrl)
     {
         var message = new MessageWriter();
-        message.AddUint8((byte)ServerSendControllers.Chat);
+        message.AddUint8((byte)ServerSendControllers.Thread);
         message.AddUint8((byte)ThreadMessage.AvatarUpdate);
         message.AddString(accountId.ToString());
         message.AddString(avatarUrl);

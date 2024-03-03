@@ -73,13 +73,21 @@ export class CommentInfo {
         return this._createdTime;
     }
 
-    setCreatorDisplayname(creatorDisplayName: string) {
+    setCreatorDisplayName(creatorDisplayName: string) {
         this._creatorDisplayName = creatorDisplayName;
         this.commentView.updateOwner();
     }
 
     getCreatorDisplayName(): string {
         return this._creatorDisplayName;
+    }
+
+    setCreatorAvatarUrl(creatorAvatarUrl: string) {
+        this._creatorAvatarUrl = creatorAvatarUrl;
+    }
+
+    getCreatorAvatarUrl(): string {
+        return this._creatorAvatarUrl;
     }
 
     setCreatorAccountId(creatorAccountId: string) {
