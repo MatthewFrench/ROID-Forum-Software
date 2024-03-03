@@ -211,7 +211,6 @@ export class AppController {
 
                     }break;
                     case Controllers.Section.Messages.AllSectionHeaders: {
-                        // Todo: Remove existing sections
                         let count = message.getUint32();
                         for (let index = 0; index < count; index++) {
                             let sectionId = message.getString();
@@ -222,17 +221,19 @@ export class AppController {
                             let createdTime = message.getString();
                             let useDarkTheme = theme === 'dark';
                             let hasMatrixBackground = background === 'matrix';
-                            this.sections.push(
-                                new Section({
-                                    appController: this,
-                                    sectionId: sectionId,
-                                    displayName: sectionName,
-                                    title: title,
-                                    darkTheme: useDarkTheme,
-                                    hasMatrixBackground: hasMatrixBackground,
-                                    createdTime: createdTime
-                                })
-                            );
+                            if (!this.sections.find(value => value.sectionId == sectionId)) {
+                                this.sections.push(
+                                    new Section({
+                                        appController: this,
+                                        sectionId: sectionId,
+                                        displayName: sectionName,
+                                        title: title,
+                                        darkTheme: useDarkTheme,
+                                        hasMatrixBackground: hasMatrixBackground,
+                                        createdTime: createdTime
+                                    })
+                                );
+                            }
                         }
                         this.sections.sort((a, b) => a.createdTime.localeCompare(b.createdTime));
                         this.mainSection.addSections();
@@ -264,7 +265,31 @@ export class AppController {
                         //section.moveThreadToTopBinary(message);
                     }break;
                     case Controllers.Section.Messages.AllThreadHeaders: {
-                        //section.allThreadsBinary(message);
+                        let count = message.getUint32();
+                        for (let index = 0; index < count; index++) {
+                            let sectionId = message.getString();
+                            let threadId = message.getString();
+                            let creatorAccountId = message.getString();
+                            let title = message.getString();
+                            let description = message.getString();
+                            let createdTime = message.getString();
+                            let updatedTime = message.getString();
+                            let commentCount = message.getUint32();
+                            let creatorDisplayName = message.getString();
+                            let creatorAvatarUrl = message.getString();
+                            let section = this.sections.find(value => value.sectionId == sectionId);
+                            if (section) {
+                                section.addThread(threadId,
+                                    creatorAccountId,
+                                    title,
+                                    description,
+                                    createdTime,
+                                    updatedTime,
+                                    commentCount,
+                                    creatorDisplayName,
+                                    creatorAvatarUrl);
+                            }
+                        }
                     }break;
                 }
             } break;

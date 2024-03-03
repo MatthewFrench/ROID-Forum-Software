@@ -45,7 +45,7 @@ export class HeaderView {
     }
 
     updateOwner() {
-        this.threadHeaderOwner.innerText = this.thread.getOwner();
+        this.threadHeaderOwner.innerText = this.thread.getCreatorDisplayName();
     }
 
     updateAvatarURL() {

@@ -4,11 +4,15 @@ import {FullView} from "./ThreadViews/FullView";
 import {ThreadController} from "./ThreadController";
 
 export class ThreadInfo {
-    _threadID: string;
+    _threadId: string;
     _title: string;
     _description: string;
-    _owner: string;
-    _avatarURL = "";
+    _creatorAccountId: string;
+    _creatorDisplayName: string;
+    _creatorAvatarUrl: string;
+    _createdTime: string;
+    _updatedTime: string;
+    _commentCount: number;
     _comments: CommentInfo[];
     headerView: HeaderView;
     fullView: FullView;
@@ -22,12 +26,37 @@ export class ThreadInfo {
         this.headerView.updateCommentCount();
     }
 
-    setThreadID(id: string) {
-        this._threadID = id;
+    setCommentCount(count: number) {
+        this._commentCount = count;
+        this.headerView.updateCommentCount();
     }
 
-    getThreadID(): string {
-        return this._threadID;
+    getCommentCount(): number {
+        return this._commentCount;
+    }
+
+    setCreatedTime(createdTime: string) {
+        this._createdTime = createdTime;
+    }
+
+    getCreatedTime(): string {
+        return this._createdTime;
+    }
+
+    setUpdatedTime(updatedTime: string) {
+        this._updatedTime = updatedTime;
+    }
+
+    getUpdatedTime(): string {
+        return this._updatedTime;
+    }
+
+    setThreadId(id: string) {
+        this._threadId = id;
+    }
+
+    getThreadId(): string {
+        return this._threadId;
     }
 
     setTitle(title: string) {
@@ -49,28 +78,32 @@ export class ThreadInfo {
         return this._description;
     }
 
-    setOwner(owner: string) {
-        this._owner = owner;
+    setCreatorAccountId(owner: string) {
+        this._creatorAccountId = owner;
         this.headerView.updateOwner();
         this.fullView.threadDisplay.updateOwner();
     }
 
-    getOwner(): string {
-        return this._owner;
+    getCreatorAccountId(): string {
+        return this._creatorAccountId;
+    }
+
+    setCreatorDisplayName(displayName: string) {
+        this._creatorDisplayName = displayName;
+    }
+
+    getCreatorDisplayName(): string {
+        return this._creatorDisplayName;
     }
 
     setAvatarURL(avatarURL: string) {
-        this._avatarURL = avatarURL;
+        this._creatorAvatarUrl = avatarURL;
         this.headerView.updateAvatarURL();
         this.fullView.threadDisplay.updateAvatarURL();
     }
 
     getAvatarURL(): string {
-        return this._avatarURL;
-    }
-
-    getCommentCount(): number {
-        return this._comments.length;
+        return this._creatorAvatarUrl;
     }
 
     addComment(comment: CommentInfo) {

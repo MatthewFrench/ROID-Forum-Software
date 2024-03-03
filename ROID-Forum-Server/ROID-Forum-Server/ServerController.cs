@@ -19,7 +19,7 @@ namespace ROIDForumServer
 
         public static void OnUserLoggedIn(ServerState serverState, ConnectedUser user)
         {
-            Console.WriteLine($"Account logged in {user.AccountId}");
+            Console.WriteLine($"Account logged in {user.AccountId}, {DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId)}");
             ChatController.UserLoggedIn(serverState, user);
             if (user.ViewingSectionId != null)
             {

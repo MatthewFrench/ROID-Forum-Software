@@ -53,7 +53,7 @@ export class FullView {
         let m: any = {};
         //m['Controller'] = this.threadController.sectionController.sectionName;
         m['Title'] = 'Add Comment';
-        m['Thread ID'] = this.thread.getThreadID();
+        m['Thread ID'] = this.thread.getThreadId();
         m['Text'] = text;
         this.threadController.sectionController.website.networkController.send(m);
         this.commentBox.value = "";

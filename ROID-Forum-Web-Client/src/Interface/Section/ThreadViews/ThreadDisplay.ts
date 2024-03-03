@@ -68,9 +68,9 @@ export class ThreadDisplay {
     };
 
     updateOwner = () => {
-        this.owner.innerText = this.controller.thread.getOwner();
+        this.owner.innerText = this.controller.thread.getCreatorDisplayName();
         //If this.owner is self add edit button
-        if (this.controller.thread.getOwner() == this.controller.threadController.sectionController.website.database.displayName) {
+        if (this.controller.thread.getCreatorDisplayName() == this.controller.threadController.sectionController.website.database.displayName) {
             this.descriptionSection.appendChild(this.switchToEditViewButton);
         }
     };
@@ -93,7 +93,7 @@ export class ThreadDisplay {
         let message: any = {};
         //message['Controller'] = this.controller.threadController.sectionController.sectionName;
         message['Title'] = 'Edit Post';
-        message['Thread ID'] = this.controller.thread.getThreadID();
+        message['Thread ID'] = this.controller.thread.getThreadId();
         message['Edit Title'] = this.editTitle.value;
         message['Text'] = this.editDescription.value;
         this.controller.threadController.sectionController.website.networkController.send(message);
@@ -105,7 +105,7 @@ export class ThreadDisplay {
         let message: any = {};
         //message['Controller'] = this.controller.threadController.sectionController.sectionName;
         message['Title'] = 'Delete Post';
-        message['Thread ID'] = this.controller.thread.getThreadID();
+        message['Thread ID'] = this.controller.thread.getThreadId();
         this.controller.threadController.sectionController.website.networkController.send(message);
         this.controller.threadController.restoreToDefaultState();
     };

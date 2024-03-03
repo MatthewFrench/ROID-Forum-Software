@@ -87,7 +87,7 @@ export class ThreadController {
 
     getThread(id: string): ThreadInfo {
         for (let t of this.threads) {
-            if (t.getThreadID() == id) return t;
+            if (t.getThreadId() == id) return t;
         }
         return null;
     }
@@ -109,20 +109,30 @@ export class ThreadController {
         this.threads = [];
     };
 
-    addThread = (threadMap: any) => {
-        let id: string = threadMap["Thread ID"];
-        if (this.getThread(id) == null) {
+    addThread = (threadId: string,
+                 creatorAccountId: string,
+                 title: string,
+                 description: string,
+                 createdTime: string,
+                 updatedTime: string,
+                 commentCount: number,
+                 creatorDisplayName: string,
+                 creatorAvatarUrl: string) => {
+        if (this.getThread(threadId) == null) {
             let thread: ThreadInfo = new ThreadInfo(this, this.hasDarkTheme);
-            thread.setThreadID(id);
+            thread.setThreadId(threadId);
             this.threads.push(thread);
 
-            thread.setOwner(threadMap["Owner"]);
-            if (threadMap["AvatarURL"] != null) {
-                thread.setAvatarURL(threadMap["AvatarURL"]);
-            }
-            thread.setTitle(threadMap["Title"]);
-            thread.setDescription(threadMap["Description"]);
+            thread.setCreatorAccountId(creatorAccountId);
+            thread.setAvatarURL(creatorAvatarUrl);
+            thread.setTitle(title);
+            thread.setDescription(description)
+            thread.setCreatedTime(createdTime);
+            thread.setUpdatedTime(updatedTime);
+            thread.setCommentCount(commentCount);
+            thread.setCreatorDisplayName(creatorDisplayName);
 
+            /*
             let commentArray: any[] = threadMap["Comments"];
             for (let i = 0; i < commentArray.length; i++) {
                 let c: any = commentArray[i];
@@ -137,6 +147,8 @@ export class ThreadController {
                     cf.setAvatarURL(c["AvatarURL"]);
                 }
             }
+
+             */
             thread.headerView.getDiv().style.opacity = "1.0";
             thread.headerView.getDiv().style.top = `${(this.threads.length - 1) * 85 + 60}px`;
             this.headerView.appendChild(thread.headerView.getDiv());
@@ -144,7 +156,7 @@ export class ThreadController {
             this.updateThreadPositions();
         }
     };
-
+/*
     addThreadBinary = (message: MessageReader) => {
         let owner = message.getString();
         let threadID = message.getString();
@@ -165,6 +177,8 @@ export class ThreadController {
             this.updateThreadPositions();
         }
     };
+
+ */
 
     removeThread = (threadID: string) => {
         let thread: ThreadInfo = this.getThread(threadID);

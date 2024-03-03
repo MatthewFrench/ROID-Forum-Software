@@ -20,7 +20,7 @@ public static class DatabaseComment
                    creator_account_id uuid,
                    created_time timeuuid,
                    PRIMARY KEY (thread_id, created_time)
-                ) WITH CLUSTERING ORDER BY (created_time DESC)");
+                ) WITH CLUSTERING ORDER BY (created_time ASC)");
         session.Execute($@"
                 CREATE INDEX IF NOT EXISTS ON ""{Database.DefaultKeyspace}"".""{TableComment}"" (comment_id)");
     }
@@ -118,7 +118,7 @@ public static class DatabaseComment
             $"SELECT count(*) FROM \"{Database.DefaultKeyspace}\".\"{TableComment}\" where thread_id=?");
         var commentResult = session.Execute(commentSelectStatement.Bind(threadId));
         var item = commentResult.FirstOrDefault();
-        return item.GetValue<UInt32>("count");
+        return (UInt32)item.GetValue<Int64>("count");
     }
 
     public static void DeleteCommentsForThread(ISession session, Guid threadId)

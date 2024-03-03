@@ -6,6 +6,8 @@ import {ThreadController} from "./ThreadController";
 import {MatrixBackground} from "./MatrixBackground";
 import {Interface} from "../../Utility/Interface";
 import {MessageReader} from "../../Utility/Message/MessageReader";
+import {MessageWriter} from "../../Utility/Message/MessageWriter";
+import {SendMessages} from "../../Networking/MessageDefinitions/SendMessages";
 
 export class Section {
     website: AppController;
@@ -39,11 +41,11 @@ export class Section {
     }
 
     show = () => {
-        let m: any = {};
-        m['Controller'] = "Server";
-        m['Title'] = 'Viewing';
-       //m['Section'] = this.sectionName;
-        this.website.networkController.send(m);
+        let message = new MessageWriter();
+        message.addUint8(SendMessages.Controller.Section);
+        message.addString(this.sectionId);
+        message.addUint8(SendMessages.SectionMessage.BeginViewingSection);
+        this.website.networkController.send(message.toBuffer());
 
         this.threadController.restoreToDefaultState();
 
@@ -65,6 +67,11 @@ export class Section {
     };
 
     hide = () => {
+        let message = new MessageWriter();
+        message.addUint8(SendMessages.Controller.Section);
+        message.addString(this.sectionId);
+        message.addUint8(SendMessages.SectionMessage.ExitViewingSection);
+        this.website.networkController.send(message.toBuffer());
         //Destroy all posts
         this.threadController.clearAllThreads();
 
@@ -104,9 +111,33 @@ export class Section {
         this.newPostWindow.show();
     };
 
+    addThread = (
+        threadId: string,
+        creatorAccountId: string,
+        title: string,
+        description: string,
+        createdTime: string,
+        updatedTime: string,
+        commentCount: number,
+        creatorDisplayName: string,
+        creatorAvatarUrl: string) => {
+        this.threadController.addThread(
+            threadId,
+            creatorAccountId,
+            title,
+            description,
+            createdTime,
+            updatedTime,
+            commentCount,
+            creatorDisplayName,
+            creatorAvatarUrl
+        );
+    }
+
     onMessage(message: any) {
         switch (message['Title']) {
             case "All Threads": {
+                /*
                 this.threadController.clearAllThreads();
                 let threads: any[] = message['Threads'];
                 for (let i = 0; i < threads.length; i++) {
@@ -117,10 +148,12 @@ export class Section {
                     //console.log("Told to show thread ${this.showThreadWhenLoaded}");
                     this.showThreadWhenLoaded = null;
                 }
+
+                 */
             }
                 break;
             case "Thread Add": {
-                this.threadController.addThread(message["Thread Map"]);
+                //this.threadController.addThread(message["Thread Map"]);
             }
                 break;
             case "Thread Remove": {
@@ -155,7 +188,7 @@ export class Section {
     }
 
     addThreadBinary(message : MessageReader) {
-        this.threadController.addThreadBinary(new MessageReader(message.getBinary()));
+        //this.threadController.addThreadBinary(new MessageReader(message.getBinary()));
     }
 
     updateThreadBinary(message : MessageReader) {
@@ -182,6 +215,7 @@ export class Section {
     }
 
     allThreadsBinary(message : MessageReader) {
+        /*
         this.threadController.clearAllThreads();
         let numberOfThreads = message.getUint32();
         for (let i = 0; i < numberOfThreads; i++) {
@@ -192,6 +226,8 @@ export class Section {
             //console.log("Told to show thread ${this.showThreadWhenLoaded}");
             this.showThreadWhenLoaded = null;
         }
+
+         */
     }
 
     getDiv(): HTMLDivElement {

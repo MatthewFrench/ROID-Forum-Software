@@ -2,6 +2,8 @@ import './NewPostWindow.scss';
 
 import {Section} from "./Section";
 import {Interface} from "../../Utility/Interface";
+import {MessageWriter} from "../../Utility/Message/MessageWriter";
+import {SendMessages} from "../../Networking/MessageDefinitions/SendMessages";
 
 export class NewPostWindow {
     sectionController: Section;
@@ -38,13 +40,13 @@ export class NewPostWindow {
     };
 
     postButtonClick = () => {
-        //Send new post to server
-        let message: any = {};
-        //message['Controller'] = this.sectionController.sectionName;
-        message['Title'] = 'New Post';
-        message['Post Title'] = this.titleInput.value;
-        message['Post Description'] = this.mainText.value;
-        this.sectionController.website.networkController.send(message);
+        let message = new MessageWriter();
+        message.addUint8(SendMessages.Controller.Section);
+        message.addString(this.sectionController.sectionId);
+        message.addUint8(SendMessages.SectionMessage.NewThread);
+        message.addString(this.titleInput.value);
+        message.addString(this.mainText.value);
+        this.sectionController.website.networkController.send(message.toBuffer());
         //Hide the window
         this.hide();
         //Reset window

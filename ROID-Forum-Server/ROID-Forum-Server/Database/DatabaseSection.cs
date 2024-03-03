@@ -9,7 +9,6 @@ public static class DatabaseSection
 {
     private const string TableSection = "Section";
     private const string TableSectionThreadOrdering = "SectionThreadOrdering";
-    private const string MaterializedViewSectionThreadOrdering = "SectionThreadOrderingView";
     private const string TableActiveInSection = "ActiveInSection";
 
     public static void CreateTablesIfNotExist(ISession session)
@@ -26,17 +25,15 @@ public static class DatabaseSection
                 )");
         session.Execute($@"
                 CREATE INDEX IF NOT EXISTS ON ""{Database.DefaultKeyspace}"".""{TableSection}"" (name)");
-        // I may need to make multiple tables for threads.
-        // One for ordering updated time with section, one for thread data with lookup by thread id
         session.Execute($@"
                 CREATE TABLE IF NOT EXISTS ""{Database.DefaultKeyspace}"".""{TableSectionThreadOrdering}"" (
                    section_id uuid,
                    thread_id uuid,
                    updated_time timeuuid,
-                   PRIMARY KEY (section_id, thread_id)
-                )");
+                   PRIMARY KEY (section_id, updated_time, thread_id)
+                ) WITH CLUSTERING ORDER BY (updated_time DESC, thread_id DESC)");
         session.Execute($@"
-                CREATE MATERIALIZED VIEW IF NOT EXISTS ""{Database.DefaultKeyspace}"".""{MaterializedViewSectionThreadOrdering}"" AS SELECT * FROM ""{Database.DefaultKeyspace}"".""{TableSectionThreadOrdering}"" WHERE updated_time IS NOT NULL and thread_id IS NOT NULL PRIMARY KEY (section_id, updated_time, thread_id) WITH CLUSTERING ORDER BY (updated_time ASC)");
+                CREATE INDEX IF NOT EXISTS ON ""{Database.DefaultKeyspace}"".""{TableSectionThreadOrdering}"" (thread_id)");
         session.Execute($@"
                 CREATE TABLE IF NOT EXISTS ""{Database.DefaultKeyspace}"".""{TableActiveInSection}"" (
                    account_id uuid,
@@ -103,11 +100,22 @@ public static class DatabaseSection
     public static TimeUuid UpdateSectionThreadOrdering(ISession session, Guid sectionId, Guid threadId)
     {
         var updatedTime = TimeUuid.NewId();
-        // Update also acts as an insert if the row doesn't exist.
         PreparedStatement updateOrderStatement =
             session.Prepare(
-                $"UPDATE \"{Database.DefaultKeyspace}\".\"{TableSectionThreadOrdering}\" SET updated_time=? where section_id=? and thread_id=?");
-        session.Execute(updateOrderStatement.Bind(updatedTime, sectionId, threadId));
+                $"INSERT INTO \"{Database.DefaultKeyspace}\".\"{TableSectionThreadOrdering}\" (section_id, thread_id, updated_time) values (?, ?, ?)");
+        session.Execute(updateOrderStatement.Bind(sectionId, threadId, updatedTime));
+        // Now delete the old entries
+        var selectStatement = session.Prepare(
+            $"SELECT section_id, thread_id, updated_time FROM \"{Database.DefaultKeyspace}\".\"{TableSectionThreadOrdering}\" where section_id=? and thread_id=? and updated_time<? ALLOW FILTERING");
+        var rows = session.Execute(selectStatement.Bind(sectionId, threadId, updatedTime)).GetRows();
+        foreach (var row in rows)
+        {
+            var timeToDelete = row.GetValue<TimeUuid>("updated_time");
+            PreparedStatement deleteStatement =
+                session.Prepare(
+                    $"DELETE FROM \"{Database.DefaultKeyspace}\".\"{TableSectionThreadOrdering}\" WHERE section_id=? and updated_time=? and thread_id=?");
+            session.Execute(deleteStatement.Bind(sectionId, timeToDelete, threadId));
+        }
         return updatedTime;
     }
 
@@ -123,20 +131,36 @@ public static class DatabaseSection
         ISession session, Guid sectionId)
     {
         var selectStatement = session.Prepare(
-            $"SELECT section_id, thread_id, updated_time FROM \"{Database.DefaultKeyspace}\".\"{MaterializedViewSectionThreadOrdering}\" where section_id=?");
-        return session.Execute(selectStatement.Bind(sectionId)).GetRows().Select(row => (
+            $"SELECT section_id, thread_id, updated_time FROM \"{Database.DefaultKeyspace}\".\"{TableSectionThreadOrdering}\" where section_id=?");
+        // Now de-duplicate thread ids, only keep the latest
+        // This is hacky because I'm working within the limitations of Cassandra
+        // and my lack of familiarity in modeling cassandra friendly data
+        var results = session.Execute(selectStatement.Bind(sectionId));
+        var threadIdSet = new HashSet<Guid>();
+        var nonDedupedList = results.GetRows().Select(row => (
             row.GetValue<Guid>("section_id"),
             row.GetValue<Guid>("thread_id"),
-            row.GetValue<TimeUuid>("update_time"))
+            row.GetValue<TimeUuid>("updated_time"))
         ).ToList();
+        var resultList = new List<(Guid sectionId, Guid threadId, TimeUuid updatedTime)>();
+        foreach (var item in nonDedupedList)
+        {
+            if (!threadIdSet.Contains(item.Item2))
+            {
+                resultList.Add(item);
+                threadIdSet.Add(item.Item2);
+            }
+        }
+
+        return resultList;
     }
 
     public static TimeUuid GetThreadUpdatedTime(ISession session, Guid sectionId, Guid threadId)
     {
         var selectStatement = session.Prepare(
-            $"SELECT updated_time FROM \"{Database.DefaultKeyspace}\".\"{MaterializedViewSectionThreadOrdering}\" where section_id=? and thread_id=?");
+            $"SELECT section_id, thread_id, MAX(updated_time) FROM \"{Database.DefaultKeyspace}\".\"{TableSectionThreadOrdering}\" where section_id=? and thread_id=?");
         return session.Execute(selectStatement.Bind(sectionId, threadId)).Select(row =>
-                row.GetValue<TimeUuid>("update_time"))
+                row.GetValue<TimeUuid>("system.max(updated_time)"))
             .FirstOrDefault();
     }
 }
