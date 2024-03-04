@@ -345,7 +345,14 @@ export class AppController {
                     case Controllers.Section.Messages.AvatarUpdate: {
                         let accountId = message.getString();
                         let avatarUrl = message.getString();
-                        // Todo: We will want to tell all sections and threads to update the accoutId's avatar
+                        // Update all thread header display names that use this account id
+                        if (this.showingSection != null) {
+                            for (let thread of this.showingSection.threadController.threads) {
+                                if (thread.getCreatorAccountId() == accountId) {
+                                    thread.setAvatarURL(avatarUrl);
+                                }
+                            }
+                        }
                     }
                         break;
                     case Controllers.Section.Messages.DisplayNameUpdate: {
@@ -654,10 +661,24 @@ export class AppController {
                     }
                         break;
                     case Controllers.Thread.Messages.AvatarUpdate: {
-                        /*
-        message.AddString(accountId.ToString());
-        message.AddString(avatarUrl);
-                         */
+                        let accountId = message.getString();
+                        let avatarUrl = message.getString();
+                        // Update all thread/comment displays that use this account id
+                        if (this.showingSection != null) {
+                            for (let thread of this.showingSection.threadController.threads) {
+                                if (thread.getCreatorAccountId() == accountId) {
+                                    thread.setAvatarURL(avatarUrl);
+                                }
+                            }
+                            // Update all comments in thread
+                            if (this.showingSection.threadController.viewingThread != null) {
+                                for (let comment of this.showingSection.threadController.viewingThread._comments) {
+                                    if (comment.getCreatorAccountId() == accountId) {
+                                        comment.setCreatorAvatarUrl(avatarUrl);
+                                    }
+                                }
+                            }
+                        }
                     }
                         break;
                     case Controllers.Thread.Messages.DisplayNameUpdate: {
