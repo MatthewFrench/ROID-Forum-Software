@@ -242,8 +242,13 @@ export class AppController {
                         let sectionId = message.getString();
                         let section = this.sections.find(value => value.sectionId == sectionId);
                         let connectionId = message.getString();
+                        let hasAccount = message.getUint8() == 1;
+                        let accountId: string | undefined = hasAccount ? message.getString() : undefined;
+                        let displayName: string | undefined = hasAccount ? message.getString() : undefined;
                         section.threadController.sectionViewingUsers.push({
-                            connectionId: connectionId
+                            connectionId: connectionId,
+                            accountId: accountId,
+                            displayName: displayName
                         });
                         section.threadController.updateSectionViewersDisplay();
                     }
@@ -482,8 +487,13 @@ export class AppController {
                         let thread = section.threadController.getThread(threadId);
                         if (thread) {
                             let connectionId = message.getString();
+                            let hasAccount = message.getUint8() == 1;
+                            let accountId: string | undefined = hasAccount ? message.getString() : undefined;
+                            let displayName: string | undefined = hasAccount ? message.getString() : undefined;
                             thread.fullView.threadDisplay.threadViewingUsers.push({
-                                connectionId: connectionId
+                                connectionId: connectionId,
+                                accountId: accountId,
+                                displayName: displayName
                             });
                             thread.fullView.threadDisplay.updateThreadViewersDisplay();
                         }
