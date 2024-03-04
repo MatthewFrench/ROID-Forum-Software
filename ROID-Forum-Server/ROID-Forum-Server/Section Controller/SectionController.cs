@@ -45,18 +45,6 @@ namespace ROIDForumServer
             // Send all thread headers in the section to the user
             var threadHeaders = DatabaseThread.GetThreadHeadersInSection(serverState.Database.GetSession(), sectionId);
             user.Send(SectionSendMessages.AllThreadHeaders(threadHeaders));
-            // Send all viewers to the new user
-            user.Send(SectionSendMessages.AllSectionViewers(serverState.Networking.Users
-                .Where(connectedUser => connectedUser.ViewingSectionId == sectionId).Select(connectedUser =>
-                    (
-                        connectionId: connectedUser.ConnectionId,
-                        accountId: connectedUser.AccountId,
-                        displayName: connectedUser.AccountId != null
-                            ? DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(),
-                                (Guid)connectedUser.AccountId)
-                            : ""
-                    )
-                ).ToList(), sectionId));
             // Update everyone in this section that there is a new viewer
             var viewingUserMessage = SectionSendMessages.SectionAddViewer(
                 user.ConnectionId,
@@ -73,6 +61,18 @@ namespace ROIDForumServer
                 user2.Send(viewingUserMessage);
             }
             user.ViewingSectionId = sectionId;
+            // Send all viewers to the new user
+            user.Send(SectionSendMessages.AllSectionViewers(serverState.Networking.Users
+                .Where(connectedUser => connectedUser.ViewingSectionId == sectionId).Select(connectedUser =>
+                    (
+                        connectionId: connectedUser.ConnectionId,
+                        accountId: connectedUser.AccountId,
+                        displayName: connectedUser.AccountId != null
+                            ? DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(),
+                                (Guid)connectedUser.AccountId)
+                            : ""
+                    )
+                ).ToList(), sectionId));
         }
 
         public static void RemoveUserFromViewing(ServerState serverState, ConnectedUser user, Guid sectionId)

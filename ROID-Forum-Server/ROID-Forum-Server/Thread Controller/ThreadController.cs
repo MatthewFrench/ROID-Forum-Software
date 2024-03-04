@@ -41,18 +41,6 @@ namespace ROIDForumServer
             // Send all comments in the thread to the user
             var comments = DatabaseComment.GetThreadComments(serverState.Database.GetSession(), threadId);
             user.Send(ThreadSendMessages.AllComments(comments));
-            // Send all viewers to the new user
-            user.Send(ThreadSendMessages.AllThreadViewers(serverState.Networking.Users
-                .Where(connectedUser => connectedUser.ViewingThreadId == threadId).Select(connectedUser =>
-                    (
-                        connectionId: connectedUser.ConnectionId,
-                        accountId: connectedUser.AccountId,
-                        displayName: connectedUser.AccountId != null
-                            ? DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(),
-                                (Guid)connectedUser.AccountId)
-                            : ""
-                    )
-                ).ToList(), threadId));
             // Update everyone in this thread that there is a new viewer
             var viewingUserMessage = ThreadSendMessages.ThreadAddViewer(
                 user.ConnectionId,
@@ -68,8 +56,19 @@ namespace ROIDForumServer
             {
                 user2.Send(viewingUserMessage);
             }
-
             user.ViewingThreadId = threadId;
+            // Send all viewers to the new user
+            user.Send(ThreadSendMessages.AllThreadViewers(serverState.Networking.Users
+                .Where(connectedUser => connectedUser.ViewingThreadId == threadId).Select(connectedUser =>
+                    (
+                        connectionId: connectedUser.ConnectionId,
+                        accountId: connectedUser.AccountId,
+                        displayName: connectedUser.AccountId != null
+                            ? DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(),
+                                (Guid)connectedUser.AccountId)
+                            : ""
+                    )
+                ).ToList(), threadId));
         }
 
         public static void RemoveUserFromViewing(ServerState serverState, ConnectedUser user, Guid threadId)

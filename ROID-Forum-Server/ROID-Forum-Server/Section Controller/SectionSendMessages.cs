@@ -145,6 +145,7 @@ public static class SectionSendMessages
         message.AddUint8((byte)ServerSendControllers.Section);
         message.AddUint8((byte)SectionMessage.AllSectionViewers);
         message.AddString(sectionId.ToString());
+        message.AddUint32((UInt32)viewingUsers.Count);
         foreach ((Guid connectionId, Guid? accountId, string displayName) in viewingUsers)
         {
             message.AddString(connectionId.ToString());

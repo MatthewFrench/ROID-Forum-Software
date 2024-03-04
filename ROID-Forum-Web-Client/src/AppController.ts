@@ -217,25 +217,79 @@ export class AppController {
                 break;
             case Controllers.Section.ID: {
                 switch (messageID) {
-                    // Todo: We can implement a user viewing display with the below messages, to make the forum seem more alive
                     case Controllers.Section.Messages.AllSectionViewers: {
-
+                        let sectionId = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        if (section) {
+                            section.threadController.sectionViewingUsers = [];
+                            let count = message.getUint32();
+                            for (let index = 0; index < count; index++) {
+                                let connectionId = message.getString();
+                                let hasAccount = message.getUint8() == 1;
+                                let accountId: string | undefined = hasAccount ? message.getString() : undefined;
+                                let displayName: string | undefined = hasAccount ? message.getString() : undefined;
+                                section.threadController.sectionViewingUsers.push({
+                                    connectionId: connectionId,
+                                    accountId: accountId,
+                                    displayName: displayName
+                                });
+                            }
+                            section.threadController.updateSectionViewersDisplay();
+                        }
                     }
                         break;
                     case Controllers.Section.Messages.SectionAddViewer: {
-
+                        let sectionId = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        let connectionId = message.getString();
+                        section.threadController.sectionViewingUsers.push({
+                            connectionId: connectionId
+                        });
+                        section.threadController.updateSectionViewersDisplay();
                     }
                         break;
                     case Controllers.Section.Messages.SectionRemoveViewer: {
-
+                        let sectionId = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        let connectionId = message.getString();
+                        for (let index = 0; index < section.threadController.sectionViewingUsers.length; index++) {
+                            let user = section.threadController.sectionViewingUsers[index];
+                            if (user.connectionId == connectionId) {
+                                section.threadController.sectionViewingUsers.splice(index, 1);
+                                index -= 1;
+                            }
+                        }
+                        section.threadController.updateSectionViewersDisplay();
                     }
                         break;
                     case Controllers.Section.Messages.SectionLoggedInViewer: {
-
+                        let sectionId = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        let connectionId = message.getString();
+                        let accountId = message.getString();
+                        let displayName = message.getString();
+                        for (let index = 0; index < section.threadController.sectionViewingUsers.length; index++) {
+                            let user = section.threadController.sectionViewingUsers[index];
+                            if (user.connectionId == connectionId) {
+                                user.accountId = accountId;
+                                user.displayName = displayName;
+                            }
+                        }
+                        section.threadController.updateSectionViewersDisplay();
                     }
                         break;
                     case Controllers.Section.Messages.SectionLoggedOutViewer: {
-
+                        let sectionId = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        let connectionId = message.getString();
+                        for (let index = 0; index < section.threadController.sectionViewingUsers.length; index++) {
+                            let user = section.threadController.sectionViewingUsers[index];
+                            if (user.connectionId == connectionId) {
+                                user.accountId = null;
+                                user.displayName = null;
+                            }
+                        }
+                        section.threadController.updateSectionViewersDisplay();
                     }
                         break;
                     case Controllers.Section.Messages.AllSectionHeaders: {

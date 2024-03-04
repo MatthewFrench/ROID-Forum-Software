@@ -8,6 +8,8 @@ import {Utility} from "../../Utility/Utility";
 import {MessageWriter} from "../../Utility/Message/MessageWriter";
 import {SendMessages} from "../../Networking/MessageDefinitions/SendMessages";
 
+type User = { connectionId: string, accountId?: string, displayName?: string };
+
 export class ThreadController {
     threads: ThreadInfo[];
     sectionController: Section;
@@ -18,29 +20,55 @@ export class ThreadController {
     backButton: HTMLButtonElement;
     viewingPosition = 0;
     viewingThread: ThreadInfo = null;
-    threadHeaderTitle : HTMLSpanElement;
-    hasDarkTheme : boolean;
+    sectionViewingUsers: User[] = [];
+    sectionViewersElement: HTMLDivElement;
+    threadHeaderTitle: HTMLSpanElement;
+    hasDarkTheme: boolean;
 
-    constructor(c: Section, title : string, darkTheme : boolean) {
+    constructor(c: Section, title: string, darkTheme: boolean) {
         this.sectionController = c;
         this.threads = [];
-        this.mainView = Interface.Create({type: 'div', className: 'ThreadControllerView', elements: [
-            this.headerView = Interface.Create({type: 'div', className: 'ThreadHeaderView', elements: [
-                this.threadHeaderTitle = Interface.Create({type: 'span', className: 'ThreadHeaderTitle', text: title})
-            ]})
-        ]});
+        this.mainView = Interface.Create({
+            type: 'div', className: 'ThreadControllerView', elements: [
+                this.headerView = Interface.Create({
+                    type: 'div', className: 'ThreadHeaderView', elements: [
+                        this.threadHeaderTitle = Interface.Create({
+                            type: 'span',
+                            className: 'ThreadHeaderTitle',
+                            text: title
+                        }),
+                        this.sectionViewersElement = Interface.Create({
+                            type: 'span',
+                            className: 'SectionViewers',
+                            text: ""
+                        })
+                    ]
+                })
+            ]
+        });
         this.hasDarkTheme = darkTheme;
         if (darkTheme) {
             this.threadHeaderTitle.classList.add('DarkTheme');
+            this.sectionViewersElement.classList.add('DarkTheme');
         } else {
             this.threadHeaderTitle.classList.add('LightTheme');
+            this.sectionViewersElement.classList.add('LightTheme');
         }
 
         this.fullView = Interface.Create({type: 'div', className: 'FullView'});
-        this.newPostButton = Interface.Create({type: 'button', className: 'NewPostButton', text: 'Create New Post', onClick: this.sectionController.newPostButtonClicked});
-        this.backButton = Interface.Create({type: 'button', className: 'BackButton', onClick: this.backButtonClicked, text: 'Back'});
+        this.newPostButton = Interface.Create({
+            type: 'button',
+            className: 'NewPostButton',
+            text: 'Create New Post',
+            onClick: this.sectionController.newPostButtonClicked
+        });
+        this.backButton = Interface.Create({
+            type: 'button',
+            className: 'BackButton',
+            onClick: this.backButtonClicked,
+            text: 'Back'
+        });
     }
-
 
 
     loggedInEvent = () => {
@@ -215,4 +243,29 @@ export class ThreadController {
             ci.setComment(comment);
         }
     };
+
+    updateSectionViewersDisplay = () => {
+        let currentGuestsOnline = 0;
+        let namesOnline = [];
+        for (let user of this.sectionViewingUsers) {
+            if (user.displayName == undefined) {
+                currentGuestsOnline += 1;
+            } else {
+                namesOnline.push(user.displayName);
+            }
+        }
+        let onlineText = "Currently viewing: ";
+        if (namesOnline.length > 0) {
+            onlineText += namesOnline.join(", ");
+            if (currentGuestsOnline > 0) {
+                onlineText += ` and ${currentGuestsOnline} Guest`;
+            }
+        } else if (currentGuestsOnline > 0) {
+            onlineText += `${currentGuestsOnline} Guest`;
+        }
+        if (currentGuestsOnline > 1) {
+            onlineText += "s"
+        }
+        this.sectionViewersElement.innerText = onlineText;
+    }
 }
