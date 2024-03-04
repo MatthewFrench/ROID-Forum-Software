@@ -167,6 +167,7 @@ public static class SectionSendMessages
         message.AddUint8((byte)SectionMessage.SectionAddViewer);
         message.AddString(sectionId.ToString());
         message.AddString(connectionId.ToString());
+        message.AddUint8(accountId == null ? (byte)0 : (byte)1);
         if (accountId != null)
         {
             message.AddString(accountId.ToString());
@@ -221,7 +222,7 @@ public static class SectionSendMessages
     public static byte[] DisplayNameUpdate(Guid accountId, string displayName)
     {
         var message = new MessageWriter();
-        message.AddUint8((byte)ServerSendControllers.Chat);
+        message.AddUint8((byte)ServerSendControllers.Section);
         message.AddUint8((byte)SectionMessage.DisplayNameUpdate);
         message.AddString(accountId.ToString());
         message.AddString(displayName);
@@ -231,7 +232,7 @@ public static class SectionSendMessages
     public static byte[] AvatarUpdate(Guid accountId, string avatarUrl)
     {
         var message = new MessageWriter();
-        message.AddUint8((byte)ServerSendControllers.Chat);
+        message.AddUint8((byte)ServerSendControllers.Section);
         message.AddUint8((byte)SectionMessage.AvatarUpdate);
         message.AddString(accountId.ToString());
         message.AddString(avatarUrl);

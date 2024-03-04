@@ -126,6 +126,7 @@ public static class ThreadSendMessages
         message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
         message.AddString(connectionId.ToString());
+        message.AddUint8(accountId == null ? (byte)0 : (byte)1);
         if (accountId != null)
         {
             message.AddString(accountId.ToString());

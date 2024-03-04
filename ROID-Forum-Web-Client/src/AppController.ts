@@ -351,7 +351,24 @@ export class AppController {
                     case Controllers.Section.Messages.DisplayNameUpdate: {
                         let accountId = message.getString();
                         let displayName = message.getString();
-                        // Todo: We will want to tell all sections and threads to update the accoutId's display name
+                        // Update all thread header display names that use this account id
+                        if (this.showingSection != null) {
+                            for (let thread of this.showingSection.threadController.threads) {
+                                if (thread.getCreatorAccountId() == accountId) {
+                                    thread.setCreatorDisplayName(displayName);
+                                    thread.headerView.updateOwner();
+                                }
+                            }
+                        }
+                        // Update section viewing users that use this account id
+                        if (this.showingSection != null) {
+                            for (let user of this.showingSection.threadController.sectionViewingUsers) {
+                                if (user.accountId == accountId) {
+                                    user.displayName = displayName;
+                                }
+                                this.showingSection.threadController.updateSectionViewersDisplay();
+                            }
+                        }
                     }
                         break;
                     case Controllers.Section.Messages.AddThreadHeader: {
@@ -644,10 +661,36 @@ export class AppController {
                     }
                         break;
                     case Controllers.Thread.Messages.DisplayNameUpdate: {
-                        /*
-        message.AddString(accountId.ToString());
-        message.AddString(displayName);
-                         */
+                        let accountId = message.getString();
+                        let displayName = message.getString();
+                        // Update all thread display names that use this account id
+                        if (this.showingSection != null) {
+                            for (let thread of this.showingSection.threadController.threads) {
+                                if (thread.getCreatorAccountId() == accountId) {
+                                    thread.setCreatorDisplayName(displayName);
+                                    thread.fullView.threadDisplay.updateOwner();
+                                }
+                            }
+                            // Update all comments in thread
+                            if (this.showingSection.threadController.viewingThread != null) {
+                                for (let comment of this.showingSection.threadController.viewingThread._comments) {
+                                    if (comment.getCreatorAccountId() == accountId) {
+                                        comment.setCreatorDisplayName(displayName);
+                                    }
+                                }
+                            }
+                        }
+                        // Update thread viewing users that use this account id
+                        if (this.showingSection != null) {
+                            if (this.showingSection.threadController.viewingThread != null) {
+                                for (let user of this.showingSection.threadController.viewingThread.fullView.threadDisplay.threadViewingUsers) {
+                                    if (user.accountId == accountId) {
+                                        user.displayName = displayName;
+                                    }
+                                    this.showingSection.threadController.viewingThread.fullView.threadDisplay.updateThreadViewersDisplay();
+                                }
+                            }
+                        }
                     }
                         break;
                 }
