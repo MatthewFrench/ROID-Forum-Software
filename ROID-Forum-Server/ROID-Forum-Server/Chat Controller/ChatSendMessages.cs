@@ -25,7 +25,7 @@ public static class ChatSendMessages
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Chat);
         message.AddUint8((byte)ChatMessage.AllMessages);
-        message.AddUint32((uint)chats.Count);
+        message.AddUint32(Convert.ToUInt32(chats.Count));
         foreach ((Guid creatorAccountId, string creatorDisplayName, Guid chatId, TimeUuid createdTime, string content) in chats)
         {
             message.AddString(chatId.ToString());
