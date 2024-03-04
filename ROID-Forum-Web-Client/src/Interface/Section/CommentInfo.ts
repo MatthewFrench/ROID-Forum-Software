@@ -55,6 +55,7 @@ export class CommentInfo {
 
     setCreatorAvatarUrl(creatorAvatarUrl: string) {
         this._creatorAvatarUrl = creatorAvatarUrl;
+        this.commentView.updateAvatarURL();
     }
 
     getCreatorAvatarUrl(): string {
@@ -67,14 +68,5 @@ export class CommentInfo {
 
     getCreatorAccountId(): string {
         return this._creatorAccountId;
-    }
-
-    setAvatarURL(avatarURL: string) {
-        this._creatorAvatarUrl = avatarURL;
-        this.commentView.updateAvatarURL();
-    }
-
-    getAvatarURL(): string {
-        return this._creatorAvatarUrl;
     }
 }

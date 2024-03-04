@@ -107,10 +107,11 @@ export class CommentView {
     }
 
     updateAvatarURL() {
-        if (this.comment.getAvatarURL() == null || this.comment.getAvatarURL() == undefined || this.comment.getAvatarURL() == '') {
+        if (this.comment.getCreatorAvatarUrl() == null || this.comment.getCreatorAvatarUrl() == undefined || this.comment.getCreatorAvatarUrl() == '') {
+            this.image.src = require('../../../../static/assets/generic-icon.png');
             return;
         }
-        this.image.src = this.comment.getAvatarURL();
+        this.image.src = this.comment.getCreatorAvatarUrl();
     }
 
     updateDescription() {

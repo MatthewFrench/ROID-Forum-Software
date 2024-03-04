@@ -48,6 +48,7 @@ export class HeaderView {
 
     updateAvatarURL() {
         if (this.thread.getAvatarURL() == null || this.thread.getAvatarURL() == '' || this.thread.getAvatarURL() == undefined) {
+            this.threadHeaderImage.src =  require('../../../../static/assets/generic-icon.png');
             return;
         }
         this.threadHeaderImage.src = this.thread.getAvatarURL();

@@ -116,6 +116,7 @@ export class ThreadDisplay {
 
     updateAvatarURL = () => {
         if (this.controller.thread.getAvatarURL() == null || this.controller.thread.getAvatarURL() == '' || this.controller.thread.getAvatarURL() == undefined) {
+            this.image.src =  require('../../../../static/assets/generic-icon.png');
             return;
         }
         this.image.src = this.controller.thread.getAvatarURL();
