@@ -28,6 +28,7 @@ Future Improvements:
 * Use a UI framework that automatically updates UI values, such as React, to avoid manual updating code and callbacks
 * Add a mini-game that people can join in together for fun, something simple like jumping around a 2D platformer with obstacles and shooting cannonballs at each other
 * Add admin tools to allow easy moderation
+* Re-write in Rust for maximum memory safety
 
 ## Server
 * Install ~~dotnet 2.0~~, this has been updated to dotnet 8, this section is out of date
