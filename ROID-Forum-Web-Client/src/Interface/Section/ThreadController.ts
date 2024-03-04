@@ -254,7 +254,7 @@ export class ThreadController {
                 namesOnline.push(user.displayName);
             }
         }
-        let onlineText = "Currently viewing: ";
+        let onlineText = "Currently here: ";
         if (namesOnline.length > 0) {
             onlineText += namesOnline.join(", ");
             if (currentGuestsOnline > 0) {

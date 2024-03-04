@@ -11,6 +11,24 @@
     display: inline-block;
     margin-left: 75px;
     width: calc(100% - 85px);
+    position: relative;
+
+    .ThreadViewers {
+      position: absolute;
+      width: calc(100% - 140px);
+      left: 70px;
+      text-align: center;
+      top: -5px;
+      font-size: 15px;
+      transition: all 0.5s;
+
+      &.DarkTheme {
+        color: white;
+      }
+      &.LightTheme {
+        color: black;
+      }
+    }
 
     .ProfileSection {
       display: inline-block;
@@ -36,6 +54,7 @@
       min-height: 80px;
       margin-left: 70px;
       text-align: left;
+      position: relative;
 
       .Title {
         font-size: 50px;

@@ -6,14 +6,15 @@ namespace ROIDForumServer
 {
     public static class ThreadController
     {
-        public static void UserLoggedIn(ServerState serverState, ConnectedUser user, Guid threadId)
+        public static void UserLoggedIn(ServerState serverState, ConnectedUser user, Guid threadId, Guid sectionId)
         {
             // Update everyone viewing this thread that this user logged in
             var userLoggedInMessage = ThreadSendMessages.ThreadLoggedInUser(
                 user.ConnectionId,
                 (Guid)user.AccountId,
                 DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId),
-                threadId
+                threadId,
+                sectionId
             );
             foreach (var otherUser in serverState.Networking.Users.Where(connectedUser =>
                          connectedUser.ViewingThreadId == threadId))
@@ -22,12 +23,13 @@ namespace ROIDForumServer
             }
         }
 
-        public static void UserLoggedOut(ServerState serverState, ConnectedUser user, Guid threadId)
+        public static void UserLoggedOut(ServerState serverState, ConnectedUser user, Guid threadId, Guid sectionId)
         {
             // Update everyone viewing this thread that this user logged out
             var userLoggedOutMessage = ThreadSendMessages.ThreadLoggedOutUser(
                 user.ConnectionId,
-                threadId
+                threadId,
+                sectionId
             );
             foreach (var otherUser in serverState.Networking.Users.Where(connectedUser =>
                          connectedUser.ViewingThreadId == threadId))
@@ -36,7 +38,7 @@ namespace ROIDForumServer
             }
         }
 
-        public static void AddUserToViewing(ServerState serverState, ConnectedUser user, Guid threadId)
+        public static void AddUserToViewing(ServerState serverState, ConnectedUser user, Guid threadId, Guid sectionId)
         {
             // Send all comments in the thread to the user
             var comments = DatabaseComment.GetThreadComments(serverState.Database.GetSession(), threadId);
@@ -49,7 +51,8 @@ namespace ROIDForumServer
                     ? DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(),
                         (Guid)user.AccountId)
                     : "",
-                threadId
+                threadId,
+                sectionId
             );
             foreach (var user2 in serverState.Networking.Users.Where(connectedUser =>
                          connectedUser.ViewingThreadId == threadId))
@@ -68,10 +71,10 @@ namespace ROIDForumServer
                                 (Guid)connectedUser.AccountId)
                             : ""
                     )
-                ).ToList(), threadId));
+                ).ToList(), threadId, sectionId));
         }
 
-        public static void RemoveUserFromViewing(ServerState serverState, ConnectedUser user, Guid threadId)
+        public static void RemoveUserFromViewing(ServerState serverState, ConnectedUser user, Guid threadId, Guid sectionId)
         {
             // Update everyone viewing this thread, that this user is no longer viewing
             if (user.ViewingThreadId == threadId)
@@ -80,7 +83,7 @@ namespace ROIDForumServer
             }
 
             // Update everyone viewing this thread, that this user is no longer viewing
-            var removeMessage = ThreadSendMessages.ThreadRemoveViewer(user.ConnectionId, threadId);
+            var removeMessage = ThreadSendMessages.ThreadRemoveViewer(user.ConnectionId, threadId, sectionId);
             foreach (var user2 in serverState.Networking.Users.Where(connectedUser =>
                          connectedUser.ViewingThreadId == threadId))
             {
@@ -126,14 +129,13 @@ namespace ROIDForumServer
 
             if ((byte)ThreadReceiveMessages.BeginViewingThread == messageId)
             {
-                AddUserToViewing(serverState, user, threadId);
+                AddUserToViewing(serverState, user, threadId, sectionId);
                 return;
             }
 
             if ((byte)ThreadReceiveMessages.ExitViewingThread == messageId)
             {
-                if (!message.HasString()) return;
-                RemoveUserFromViewing(serverState, user, threadId);
+                RemoveUserFromViewing(serverState, user, threadId, sectionId);
                 return;
             }
 

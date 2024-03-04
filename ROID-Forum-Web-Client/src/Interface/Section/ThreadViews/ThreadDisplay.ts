@@ -5,9 +5,13 @@ import {DescriptionParser} from "../../../Utility/DescriptionParser";
 import {Utility} from "../../../Utility/Utility";
 import {Interface} from "../../../Utility/Interface";
 
+type User = { connectionId: string, accountId?: string, displayName?: string };
+
 export class ThreadDisplay {
     main: HTMLDivElement;
     mainView: HTMLDivElement;
+    threadViewingUsers: User[] = [];
+    threadViewersElement: HTMLDivElement;
     profileSection: HTMLDivElement;
     titleSection: HTMLDivElement;
     descriptionSection: HTMLDivElement;
@@ -25,41 +29,76 @@ export class ThreadDisplay {
     controller: FullView;
     onMainView = true;
 
-    constructor(c: FullView, darkTheme : boolean) {
+    constructor(c: FullView, darkTheme: boolean) {
         this.controller = c;
 
-        this.main = Interface.Create({type: 'div', className: 'ThreadDisplay', elements: [
-            this.mainView = Interface.Create({type: 'div', className: 'View', elements: [
-                this.profileSection = Interface.Create({type: 'div', className: 'ProfileSection', elements: [
-                    this.image = Interface.Create({type: 'img', className: 'ProfileImage'}),
-                    this.owner = Interface.Create({type: 'span', className: 'OwnerText'})
-                ]}),
-                this.titleSection = Interface.Create({type: 'div', className: 'TitleSection', elements: [
-                    this.title = Interface.Create({type: 'span', className: 'Title'})
-                ]}),
-                this.descriptionSection = Interface.Create({type: 'div', className: 'DescriptionSection', elements: [
-                    this.description = Interface.Create({type: 'div', className: 'Description'})
-                ]}),
-                {type: 'hr'}
-            ]})
-        ]});
+        this.main = Interface.Create({
+            type: 'div', className: 'ThreadDisplay', elements: [
+                this.mainView = Interface.Create({
+                    type: 'div', className: 'View', elements: [
+                        this.threadViewersElement = Interface.Create({
+                            type: 'span',
+                            className: 'ThreadViewers',
+                            text: ""
+                        }),
+                        this.profileSection = Interface.Create({
+                            type: 'div', className: 'ProfileSection', elements: [
+                                this.image = Interface.Create({type: 'img', className: 'ProfileImage'}),
+                                this.owner = Interface.Create({type: 'span', className: 'OwnerText'})
+                            ]
+                        }),
+                        this.titleSection = Interface.Create({
+                            type: 'div', className: 'TitleSection', elements: [
+                                this.title = Interface.Create({type: 'span', className: 'Title'})
+                            ]
+                        }),
+                        this.descriptionSection = Interface.Create({
+                            type: 'div', className: 'DescriptionSection', elements: [
+                                this.description = Interface.Create({type: 'div', className: 'Description'})
+                            ]
+                        }),
+                        {type: 'hr'}
+                    ]
+                })
+            ]
+        });
 
         if (darkTheme) {
             this.main.classList.add('DarkTheme');
+            this.threadViewersElement.classList.add('DarkTheme');
         } else {
             this.main.classList.add('LightTheme');
+            this.threadViewersElement.classList.add('LightTheme');
         }
 
-        this.switchToEditViewButton = Interface.Create({type: 'button', text: 'Edit',
-            className: 'EditViewButton', onClick: this.switchView});
+        this.switchToEditViewButton = Interface.Create({
+            type: 'button', text: 'Edit',
+            className: 'EditViewButton', onClick: this.switchView
+        });
 
         //Make the edit stuff
-        this.editView = Interface.Create({type: 'div', className: 'EditView', elements: [
-            this.editTitle = Interface.Create({type: 'input', className: 'Title', placeholder: 'Title here'}),
-            this.editDescription = Interface.Create({type: 'textarea', placeholder: 'Description here', className: 'Description'}),
-            this.editButton = Interface.Create({type: 'button', className: 'EditButton', text: 'Save Edit', onClick: this.saveEdit}),
-            this.deleteButton = Interface.Create({type: 'button', className: 'DeleteButton', text: 'Delete Thread', onClick: this.deleteThread})
-        ]});
+        this.editView = Interface.Create({
+            type: 'div', className: 'EditView', elements: [
+                this.editTitle = Interface.Create({type: 'input', className: 'Title', placeholder: 'Title here'}),
+                this.editDescription = Interface.Create({
+                    type: 'textarea',
+                    placeholder: 'Description here',
+                    className: 'Description'
+                }),
+                this.editButton = Interface.Create({
+                    type: 'button',
+                    className: 'EditButton',
+                    text: 'Save Edit',
+                    onClick: this.saveEdit
+                }),
+                this.deleteButton = Interface.Create({
+                    type: 'button',
+                    className: 'DeleteButton',
+                    text: 'Delete Thread',
+                    onClick: this.deleteThread
+                })
+            ]
+        });
     }
 
     updateTitle = () => {
@@ -131,5 +170,30 @@ export class ThreadDisplay {
 
     getDiv(): HTMLDivElement {
         return this.main;
+    }
+
+    updateThreadViewersDisplay = () => {
+        let currentGuestsOnline = 0;
+        let namesOnline = [];
+        for (let user of this.threadViewingUsers) {
+            if (user.displayName == undefined) {
+                currentGuestsOnline += 1;
+            } else {
+                namesOnline.push(user.displayName);
+            }
+        }
+        let onlineText = "Currently viewing: ";
+        if (namesOnline.length > 0) {
+            onlineText += namesOnline.join(", ");
+            if (currentGuestsOnline > 0) {
+                onlineText += ` and ${currentGuestsOnline} Guest`;
+            }
+        } else if (currentGuestsOnline > 0) {
+            onlineText += `${currentGuestsOnline} Guest`;
+        }
+        if (currentGuestsOnline > 1) {
+            onlineText += "s"
+        }
+        this.threadViewersElement.innerText = onlineText;
     }
 }

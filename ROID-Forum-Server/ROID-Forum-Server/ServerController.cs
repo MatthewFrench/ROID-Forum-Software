@@ -21,28 +21,27 @@ namespace ROIDForumServer
         {
             Console.WriteLine($"Account logged in {user.AccountId}, {DatabaseAccount.GetAccountDisplayName(serverState.Database.GetSession(), (Guid)user.AccountId)}");
             ChatController.UserLoggedIn(serverState, user);
+            if (user.ViewingThreadId != null && user.ViewingSectionId != null)
+            {
+                ThreadController.UserLoggedIn(serverState, user, (Guid)user.ViewingThreadId, (Guid)user.ViewingSectionId);
+            }
             if (user.ViewingSectionId != null)
             {
                 SectionController.UserLoggedIn(serverState, user, (Guid)user.ViewingSectionId);
-            }
-
-            if (user.ViewingThreadId != null)
-            {
-                ThreadController.UserLoggedIn(serverState, user, (Guid)user.ViewingThreadId);
             }
         }
 
         public static void OnUserLoggedOut(ServerState serverState, ConnectedUser user)
         {
             ChatController.UserLoggedOut(serverState, user);
+            
+            if (user.ViewingThreadId != null && user.ViewingSectionId != null)
+            {
+                ThreadController.UserLoggedOut(serverState, user, (Guid)user.ViewingThreadId, (Guid) user.ViewingSectionId);
+            }
             if (user.ViewingSectionId != null)
             {
                 SectionController.UserLoggedOut(serverState, user, (Guid)user.ViewingSectionId);
-            }
-
-            if (user.ViewingThreadId != null)
-            {
-                ThreadController.UserLoggedOut(serverState, user, (Guid)user.ViewingThreadId);
             }
         }
 
@@ -54,14 +53,14 @@ namespace ROIDForumServer
 
         public static void OnUserDisconnected(ServerState serverState, ConnectedUser user)
         {
+            if (user.ViewingThreadId != null && user.ViewingSectionId != null)
+            {
+                ThreadController.RemoveUserFromViewing(serverState, user, (Guid)user.ViewingThreadId, (Guid)user.ViewingSectionId);
+            }
+            
             if (user.ViewingSectionId != null)
             {
                 SectionController.RemoveUserFromViewing(serverState, user, (Guid)user.ViewingSectionId);
-            }
-
-            if (user.ViewingThreadId != null)
-            {
-                ThreadController.RemoveUserFromViewing(serverState, user, (Guid)user.ViewingThreadId);
             }
 
             ChatController.UserDisconnected(serverState, user);

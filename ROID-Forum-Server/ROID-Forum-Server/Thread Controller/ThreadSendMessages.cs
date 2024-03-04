@@ -96,12 +96,14 @@ public static class ThreadSendMessages
     }
 
     public static byte[] AllThreadViewers(List<(Guid connectionId, Guid? accountId, string displayName)> viewingUsers,
-        Guid threadId)
+        Guid threadId, Guid sectionId)
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Thread);
         message.AddUint8((byte)ThreadMessage.AllThreadViewers);
+        message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
+        message.AddUint32((UInt32)viewingUsers.Count);
         foreach ((Guid connectionId, Guid? accountId, string displayName) in viewingUsers)
         {
             message.AddString(connectionId.ToString());
@@ -116,11 +118,12 @@ public static class ThreadSendMessages
         return message.ToBuffer();
     }
 
-    public static byte[] ThreadAddViewer(Guid connectionId, Guid? accountId, string displayName, Guid threadId)
+    public static byte[] ThreadAddViewer(Guid connectionId, Guid? accountId, string displayName, Guid threadId, Guid sectionId)
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Thread);
         message.AddUint8((byte)ThreadMessage.ThreadAddViewer);
+        message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
         message.AddString(connectionId.ToString());
         if (accountId != null)
@@ -132,21 +135,23 @@ public static class ThreadSendMessages
         return message.ToBuffer();
     }
 
-    public static byte[] ThreadRemoveViewer(Guid connectionId, Guid threadId)
+    public static byte[] ThreadRemoveViewer(Guid connectionId, Guid threadId, Guid sectionId)
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Thread);
         message.AddUint8((byte)ThreadMessage.ThreadRemoveViewer);
+        message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
         message.AddString(connectionId.ToString());
         return message.ToBuffer();
     }
 
-    public static byte[] ThreadLoggedInUser(Guid connectionId, Guid accountId, string displayName, Guid threadId)
+    public static byte[] ThreadLoggedInUser(Guid connectionId, Guid accountId, string displayName, Guid threadId, Guid sectionId)
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Thread);
         message.AddUint8((byte)ThreadMessage.ThreadLoggedInViewer);
+        message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
         message.AddString(connectionId.ToString());
         message.AddString(accountId.ToString());
@@ -154,11 +159,12 @@ public static class ThreadSendMessages
         return message.ToBuffer();
     }
 
-    public static byte[] ThreadLoggedOutUser(Guid connectionId, Guid threadId)
+    public static byte[] ThreadLoggedOutUser(Guid connectionId, Guid threadId, Guid sectionId)
     {
         var message = new MessageWriter();
         message.AddUint8((byte)ServerSendControllers.Thread);
         message.AddUint8((byte)ThreadMessage.ThreadLoggedOutViewer);
+        message.AddString(sectionId.ToString());
         message.AddString(threadId.ToString());
         message.AddString(connectionId.ToString());
         return message.ToBuffer();

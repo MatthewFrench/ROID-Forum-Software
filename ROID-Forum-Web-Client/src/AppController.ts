@@ -450,25 +450,99 @@ export class AppController {
                 break;
             case Controllers.Thread.ID: {
                 switch (messageID) {
-                    // Todo: We can implement a user viewing display with the below messages, to make the forum seem more alive
                     case Controllers.Thread.Messages.AllThreadViewers: {
-
+                        let sectionId = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        if (section) {
+                            let threadId = message.getString();
+                            let thread = section.threadController.getThread(threadId);
+                            if (thread) {
+                                thread.fullView.threadDisplay.threadViewingUsers = [];
+                                let count = message.getUint32();
+                                for (let index = 0; index < count; index++) {
+                                    let connectionId = message.getString();
+                                    let hasAccount = message.getUint8() == 1;
+                                    let accountId: string | undefined = hasAccount ? message.getString() : undefined;
+                                    let displayName: string | undefined = hasAccount ? message.getString() : undefined;
+                                    thread.fullView.threadDisplay.threadViewingUsers.push({
+                                        connectionId: connectionId,
+                                        accountId: accountId,
+                                        displayName: displayName
+                                    });
+                                }
+                                thread.fullView.threadDisplay.updateThreadViewersDisplay();
+                            }
+                        }
                     }
                         break;
                     case Controllers.Thread.Messages.ThreadAddViewer: {
-
+                        let sectionId = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        let threadId = message.getString();
+                        let thread = section.threadController.getThread(threadId);
+                        if (thread) {
+                            let connectionId = message.getString();
+                            thread.fullView.threadDisplay.threadViewingUsers.push({
+                                connectionId: connectionId
+                            });
+                            thread.fullView.threadDisplay.updateThreadViewersDisplay();
+                        }
                     }
                         break;
                     case Controllers.Thread.Messages.ThreadRemoveViewer: {
-
+                        let sectionId = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        let threadId = message.getString();
+                        let thread = section.threadController.getThread(threadId);
+                        if (thread) {
+                            let connectionId = message.getString();
+                            for (let index = 0; index < thread.fullView.threadDisplay.threadViewingUsers.length; index++) {
+                                let user = thread.fullView.threadDisplay.threadViewingUsers[index];
+                                if (user.connectionId == connectionId) {
+                                    thread.fullView.threadDisplay.threadViewingUsers.splice(index, 1);
+                                    index -= 1;
+                                }
+                            }
+                            thread.fullView.threadDisplay.updateThreadViewersDisplay();
+                        }
                     }
                         break;
                     case Controllers.Thread.Messages.ThreadLoggedInViewer: {
-
+                        let sectionId = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        let threadId = message.getString();
+                        let thread = section.threadController.getThread(threadId);
+                        if (thread) {
+                            let connectionId = message.getString();
+                            let accountId = message.getString();
+                            let displayName = message.getString();
+                            for (let index = 0; index < thread.fullView.threadDisplay.threadViewingUsers.length; index++) {
+                                let user = thread.fullView.threadDisplay.threadViewingUsers[index];
+                                if (user.connectionId == connectionId) {
+                                    user.accountId = accountId;
+                                    user.displayName = displayName;
+                                }
+                            }
+                            thread.fullView.threadDisplay.updateThreadViewersDisplay();
+                        }
                     }
                         break;
                     case Controllers.Thread.Messages.ThreadLoggedOutViewer: {
-
+                        let sectionId = message.getString();
+                        let section = this.sections.find(value => value.sectionId == sectionId);
+                        let threadId = message.getString();
+                        let thread = section.threadController.getThread(threadId);
+                        if (thread) {
+                            let connectionId = message.getString();
+                            for (let index = 0; index < thread.fullView.threadDisplay.threadViewingUsers.length; index++) {
+                                let user = thread.fullView.threadDisplay.threadViewingUsers[index];
+                                if (user.connectionId == connectionId) {
+                                    user.accountId = null;
+                                    user.displayName = null;
+                                }
+                            }
+                            thread.fullView.threadDisplay.updateThreadViewersDisplay();
+                        }
                     }
                         break;
                     case Controllers.Thread.Messages.AllComments: {
