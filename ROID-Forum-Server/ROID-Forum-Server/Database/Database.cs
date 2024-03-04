@@ -18,7 +18,7 @@ public class Database
      */
     private void ConnectToSession() {
         // Todo: These should be moved to a configuration or environment variables
-        string ip = "0.0.0.0";
+        string ip = Environment.IsRunningLocally() ? "0.0.0.0" : "forum-db-node1";
         int port = 9042;
         string username = "cassandra";
         string password = "cassandra";
